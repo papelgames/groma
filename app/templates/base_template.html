@@ -1,0 +1,120 @@
+{% from "_render_elements.html" import render_messages %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}
+        {% endblock %}</title>
+    {% block styles %}
+        <link rel="shortcut icon" href="{{ url_for('static', filename='imgs/favicon.ico') }}">
+        <link rel="stylesheet" href={{ url_for('static', filename='css/bootstrap/bootstrap.min.css') }}>
+        <link rel="stylesheet" href={{ url_for('static', filename='css/style.css') }}>
+    {% endblock %}
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('public.index') }}">Home <span class="sr-only">(current)</span></a>
+            </li>
+            
+            {% if current_user.is_anonymous %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('auth.login') }}">Ingresar <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('auth.show_signup_form') }}">Registrate <span class="sr-only">(current)</span></a>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link">{{ current_user.name }} <span class="sr-only">(current)</span></a>
+                </li>
+                {% if current_user.is_admin %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin.index') }}">Admin <span class="sr-only">(current)</span></a>
+                    </li>
+                {% endif %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        ABM
+                      </a>
+                      <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        
+                        <a class="dropdown-item" href="{{ url_for('abms.alta_individual') }}">Alta individual de productos</a>
+                        <a class="dropdown-item" href="{{ url_for('abms.alta_masiva') }}">Alta masiva de productos</a>
+                        <a class="dropdown-item" href="{{ url_for('abms.busqueda_productos') }}">Modificación de productos</a>
+                        <a class="dropdown-item" href='#'>Baja de productos</a>
+                        <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{{ url_for('abms.alta_proveedor') }}">Alta de proveedores</a>
+                            <a class="dropdown-item" href="{{ url_for('abms.modificacion_proveedor') }}">Modificación de proveedores</a>
+                        <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{{ url_for('abms.agenda') }}">Agenda</a>
+                        <div class="dropdown-divider"></div>    
+                            <a class="dropdown-item" href='#'>Manual del modulo</a>
+                       
+                      </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        CONSULTAS
+                    </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{ url_for('consultas.consulta_productos') }}">Consulta de precio</a>
+                                <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{{ url_for('consultas.consulta_presupuestos') }}">Consultar presupuestos</a>
+                                <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href='#'>Manual del modulo</a>
+                        </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        GESTIONES
+                    </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{ url_for('gestiones.alta_presupuesto') }}">Crear nuevo presupuesto</a>
+                                <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{{ url_for('gestiones.exportar_datos') }}">Exportar tablas</a>
+                                <div class="dropdown-divider"></div>    
+                            <a class="dropdown-item" href='#'>Manual del modulo</a>
+                        </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        COMPRAS
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#">Cargar productos</a>
+                        <a class="dropdown-item" href="#">Generar orden de compra</a>
+                            <div class="dropdown-divider"></div>    
+                        <a class="dropdown-item" href="#">Consultar ordenes de compra</a>
+                            <div class="dropdown-divider"></div>    
+                        <a class="dropdown-item" href='#'>Manual del modulo</a>
+                    </div>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('auth.logout') }}">Salir <span class="sr-only">(current)</span></a>            
+                </li>
+            {% endif %}
+            </li>
+        </ul>
+    </div>
+  </nav>
+ {{ render_messages(messages) }}
+{% block content %}{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/jquery-3.2.1.slim.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap/bootstrap.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/mejoras.js') }}"></script>
+{% endblock %}
+
+</body>
+</html>

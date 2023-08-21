@@ -9,7 +9,7 @@ from slugify import slugify
 from sqlalchemy import func, or_
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
-from app.auth.models import User
+from app.auth.models import Users
 
 from app import db
 
@@ -126,7 +126,7 @@ class Estados(Base):
             db.session.add(self)
         db.session.commit()
 
-class TiposGestriones(Base):
+class TiposGestiones(Base):
     __tablename__ = "tiposgestiones"
     descripcion = db.Column(db.String(50))
     

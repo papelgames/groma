@@ -9,7 +9,7 @@ from app import login_manager
 from app.common.mail import send_email
 from . import auth_bp
 from .forms import SignupForm, LoginForm
-from .models import User
+from .models import Users
 
 
 @auth_bp.route("/signup/", methods=["GET", "POST"])
@@ -25,13 +25,13 @@ def show_signup_form():
         password = form.password.data
         
         # Comprobamos que no hay ya un usuario con ese email
-        user = User.get_by_email(email)
+        user = Users.get_by_email(email)
         if user is not None:
             flash ("El correo electrónico seleccionado ya ha sido usado","alert-warning")
         else:
             # Creamos el usuario y lo guardamos
             
-            user = User(name=name, 
+            user = Users(name=name, 
                         email=email, 
                         activo=True
                         )
@@ -58,7 +58,7 @@ def login():
         return redirect(url_for('public.index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.get_by_email(form.email.data)
+        user = Users.get_by_email(form.email.data)
         if user is not None and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
             next_page = request.args.get('next')
@@ -76,4 +76,4 @@ def logout():
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.get_by_id(int(user_id))
+    return Users.get_by_id(int(user_id))

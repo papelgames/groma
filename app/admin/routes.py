@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 
 from app.auth.decorators import admin_required
-from app.auth.models import User
+from app.auth.models import Users
 #from app.models import Post
 from . import admin_bp
 from .forms import UserAdminForm
@@ -105,7 +105,7 @@ def index():
 @login_required
 @admin_required
 def list_users():
-    users = User.get_all()
+    users = Users.get_all()
     return render_template("admin/users.html", users=users)
 
 
@@ -114,7 +114,7 @@ def list_users():
 @admin_required
 def update_user_form(user_id):
     # Aquí entra para actualizar un usuario existente
-    user = User.get_by_id(user_id)
+    user = Users.get_by_id(user_id)
     if user is None:
         logger.info(f'El usuario {user_id} no existe')
         abort(404)
@@ -135,7 +135,7 @@ def update_user_form(user_id):
 @admin_required
 def delete_user(user_id):
     logger.info(f'Se va a eliminar al usuario {user_id}')
-    user = User.get_by_id(user_id)
+    user = Users.get_by_id(user_id)
     if user is None:
         logger.info(f'El usuario {user_id} no existe')
         abort(404)

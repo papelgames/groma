@@ -7,16 +7,16 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from app import db
 
 
-class User(db.Model, UserMixin):
+class Users(db.Model, UserMixin):
 
-    __tablename__ = 'user'
+    __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     username = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
-    id_estado = db.Column(db.int)
+    id_estado = db.Column(db.Integer)
 
     # def __init__(self, name, email):
     #     self.name = name
@@ -42,15 +42,15 @@ class User(db.Model, UserMixin):
 
     @staticmethod
     def get_by_id(id):
-        return User.query.get(id)
+        return Users.query.get(id)
 
     @staticmethod
     def get_by_username(username):
-        return User.query.filter_by(username=username).first()
+        return Users.query.filter_by(username=username).first()
 
     @staticmethod
     def get_all():
-        return User.query.all()
+        return Users.query.all()
     
     # @staticmethod
     # def get_by_perfil_activo(perfil):

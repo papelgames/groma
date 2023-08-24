@@ -11,7 +11,7 @@ class SignupForm(FlaskForm):
     activo = BooleanField('activo')
     is_admin = BooleanField('administrador')
     submit = SubmitField('Registrar')
-    cuit = StringField('cuit', validators=[DataRequired(), Length(max=11)])
+    cuit = StringField('CUIT', validators=[DataRequired(), Length(max=11)])
 
 class LoginForm(FlaskForm):
     username = StringField('Nombre de usuario', validators=[DataRequired(), Length(max=15)])

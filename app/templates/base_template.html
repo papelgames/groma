@@ -34,11 +34,15 @@
                     <a class="nav-link">{{ current_user.name }} <span class="sr-only">(current)</span></a>
                 </li>
                 {% if current_user.is_admin %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('admin.list_users') }}">Admin <span class="sr-only">(current)</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.show_signup_form') }}">Registro de usuarios <span class="sr-only">(current)</span></a>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            GESTION DE USUARIOS
+                          </a>
+                          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="nav-link" href="{{ url_for('admin.list_users') }}">Admin <span class="sr-only">(current)</span></a>
+                            <a class="nav-link" href="{{ url_for('auth.show_signup_form') }}">Registro de usuarios <span class="sr-only">(current)</span></a>          
+                          </div>
                     </li>
                 {% endif %}
                 <li class="nav-item dropdown">

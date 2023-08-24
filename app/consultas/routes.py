@@ -19,11 +19,48 @@ def control_vencimiento (fecha):
     if fecha < datetime.now():
         return "VENCIDO"
 
-@consultas_bp.route("/consultas/consultaproducto/<criterio>", methods = ['GET', 'POST'])
-@consultas_bp.route("/consultas/consultaproducto/", methods = ['GET', 'POST'])
+@consultas_bp.route("/consultas/consultapersonas/<criterio>", methods = ['GET', 'POST'])
+@consultas_bp.route("/consultas/consultapersonas/", methods = ['GET', 'POST'])
 @login_required
-def consulta_productos(criterio = ""):
+def consulta_personas(criterio = ""):
     form = BusquedaForm()
+    lista_de_personas = []
+    page = int(request.args.get('page', 1))
+    per_page = current_app.config['ITEMS_PER_PAGE']
+    if form.validate_on_submit():
+        buscar = form.buscar.data
+        return redirect(url_for("consultas.consulta_personas", criterio = buscar))
+    if criterio.isdigit() == True:
+        lista_de_personas = Personas.get_by_cuit(criterio)
+    elif criterio == "":
+        pass
+    else:
+        lista_de_personas = Personas.get_like_descripcion_all_paginated(criterio, page, per_page)
+        if len(lista_de_personas.items) == 0:
+            lista_de_personas =[]
 
-    return render_template("consultas/consulta_productos.html", form = form, criterio = criterio )
+    return render_template("consultas/consulta_personas.html", form = form, criterio = criterio, lista_de_personas= lista_de_personas )
+"""
+@abms_bp.route("/abms/busquedaproducto/<criterio>", methods = ['GET', 'POST'])
+@abms_bp.route("/abms/busquedaproducto/", methods = ['GET', 'POST'])
+@login_required
+def busqueda_productos(criterio = ""):
+    form = BusquedaForm()
+    lista_de_productos = []
+    page = int(request.args.get('page', 1))
+    per_page = current_app.config['ITEMS_PER_PAGE']
+    if form.validate_on_submit():
+        buscar = form.buscar.data
+        return redirect(url_for("abms.busqueda_productos", criterio = buscar))
+    
+    if criterio.isdigit() == True:
+        lista_de_productos = Productos.get_by_codigo_de_barras(criterio)
+    elif criterio == "":
+        pass
+    else:
+        lista_de_productos = Productos.get_like_descripcion_all_paginated(criterio, page, per_page)
+        if len(lista_de_productos.items) == 0:
+            lista_de_productos =[] 
+    return render_template("abms/busqueda_productos.html", form = form, lista_de_productos=lista_de_productos, criterio = criterio )
 
+    """

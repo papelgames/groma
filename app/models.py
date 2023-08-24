@@ -47,6 +47,18 @@ class Personas (Base):
     def get_by_id(id_persona):
         return Personas.query.filter_by(id = id_persona).first()
     
+    @staticmethod
+    def get_by_cuit(cuit):
+        return Personas.query.filter_by(cuit = cuit).first()
+    
+    @staticmethod
+    def get_like_descripcion_all_paginated(descripcion_, page=1, per_page=20):
+        descripcion_ = descripcion_.replace(' ','%')
+        return db.session.query(Personas)\
+            .filter(Personas.descripcion_nombre.contains(descripcion_))\
+            .paginate(page=page, per_page=per_page, error_out=False)
+    
+
 class Gestiones (Base):
     __tablename__ = "gestiones"
     id_cliente = db.Column(db.Integer)

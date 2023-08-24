@@ -51,18 +51,6 @@
                       </a>
                       <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         
-                        <a class="dropdown-item" href="#">Alta individual de productos</a>
-                        <a class="dropdown-item" href="#">Alta masiva de productos</a>
-                        <a class="dropdown-item" href="#">Modificación de productos</a>
-                        <a class="dropdown-item" href='#'>Baja de productos</a>
-                        <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Alta de proveedores</a>
-                            <a class="dropdown-item" href="#">Modificación de proveedores</a>
-                        <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Agenda</a>
-                        <div class="dropdown-divider"></div>    
-                            <a class="dropdown-item" href='#'>Manual del modulo</a>
-                       
                       </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -70,11 +58,7 @@
                         CONSULTAS
                     </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="#">Consulta de precio</a>
-                                <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Consultar presupuestos</a>
-                                <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href='#'>Manual del modulo</a>
+                            <a class="dropdown-item" href="{{ url_for('consultas.consulta_personas') }}">Consulta de personas</a>
                         </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -82,25 +66,9 @@
                         GESTIONES
                     </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="#">Nueva presupuesto</a>
+                            <a class="dropdown-item" href="#">Nueva Gestion</a>
                                 <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Exportar tablas</a>
-                                <div class="dropdown-divider"></div>    
-                            <a class="dropdown-item" href='#'>Manual del modulo</a>
                         </div>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        COMPRAS
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Cargar productos</a>
-                        <a class="dropdown-item" href="#">Generar orden de compra</a>
-                            <div class="dropdown-divider"></div>    
-                        <a class="dropdown-item" href="#">Consultar ordenes de compra</a>
-                            <div class="dropdown-divider"></div>    
-                        <a class="dropdown-item" href='#'>Manual del modulo</a>
-                    </div>
                 </li>
                 
                 <li class="nav-item">

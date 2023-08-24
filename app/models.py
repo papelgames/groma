@@ -32,6 +32,7 @@ class Personas (Base):
     nota = db.Column(db.String(256))
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))
+    id_usuario = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     def save(self):
         if not self.id:

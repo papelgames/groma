@@ -17,13 +17,14 @@ class Users(db.Model, UserMixin):
     password = db.Column(db.String(128), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     id_estado = db.Column(db.Integer)
-
+    persona = db.relationship('Personas', backref='users', uselist=False)
+    
     # def __init__(self, name, email):
     #     self.name = name
     #     self.email = email
 
-    def __repr__(self):
-        return f'<User {self.email}>'
+    # def __repr__(self):
+    #     return f'<User {self.email}>'
 
     def set_password(self, password):
         self.password = generate_password_hash(password)

@@ -8,7 +8,7 @@
     <title>{% block title %}
         {% endblock %}</title>
     {% block styles %}
-        <link rel="shortcut icon" href="{{ url_for('static', filename='imgs/favicon.ico') }}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='imgs/favicon.png') }}">
         <link rel="stylesheet" href={{ url_for('static', filename='css/bootstrap/bootstrap.min.css') }}>
         <link rel="stylesheet" href={{ url_for('static', filename='css/style.css') }}>
     {% endblock %}
@@ -28,16 +28,17 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('auth.login') }}">Ingresar <span class="sr-only">(current)</span></a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('auth.show_signup_form') }}">Registrate <span class="sr-only">(current)</span></a>
-                </li>
+
             {% else %}
                 <li class="nav-item">
                     <a class="nav-link">{{ current_user.name }} <span class="sr-only">(current)</span></a>
                 </li>
                 {% if current_user.is_admin %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('admin.index') }}">Admin <span class="sr-only">(current)</span></a>
+                        <a class="nav-link" href="{{ url_for('admin.list_users') }}">Admin <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.show_signup_form') }}">Registro de usuarios <span class="sr-only">(current)</span></a>
                     </li>
                 {% endif %}
                 <li class="nav-item dropdown">
@@ -46,15 +47,15 @@
                       </a>
                       <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         
-                        <a class="dropdown-item" href="{{ url_for('abms.alta_individual') }}">Alta individual de productos</a>
-                        <a class="dropdown-item" href="{{ url_for('abms.alta_masiva') }}">Alta masiva de productos</a>
-                        <a class="dropdown-item" href="{{ url_for('abms.busqueda_productos') }}">Modificación de productos</a>
+                        <a class="dropdown-item" href="#">Alta individual de productos</a>
+                        <a class="dropdown-item" href="#">Alta masiva de productos</a>
+                        <a class="dropdown-item" href="#">Modificación de productos</a>
                         <a class="dropdown-item" href='#'>Baja de productos</a>
                         <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{{ url_for('abms.alta_proveedor') }}">Alta de proveedores</a>
-                            <a class="dropdown-item" href="{{ url_for('abms.modificacion_proveedor') }}">Modificación de proveedores</a>
+                            <a class="dropdown-item" href="#">Alta de proveedores</a>
+                            <a class="dropdown-item" href="#">Modificación de proveedores</a>
                         <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{{ url_for('abms.agenda') }}">Agenda</a>
+                            <a class="dropdown-item" href="#">Agenda</a>
                         <div class="dropdown-divider"></div>    
                             <a class="dropdown-item" href='#'>Manual del modulo</a>
                        
@@ -65,9 +66,9 @@
                         CONSULTAS
                     </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="{{ url_for('consultas.consulta_productos') }}">Consulta de precio</a>
+                            <a class="dropdown-item" href="#">Consulta de precio</a>
                                 <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{{ url_for('consultas.consulta_presupuestos') }}">Consultar presupuestos</a>
+                            <a class="dropdown-item" href="#">Consultar presupuestos</a>
                                 <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href='#'>Manual del modulo</a>
                         </div>
@@ -77,9 +78,9 @@
                         GESTIONES
                     </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="{{ url_for('gestiones.alta_presupuesto') }}">Crear nuevo presupuesto</a>
+                            <a class="dropdown-item" href="#">Nueva presupuesto</a>
                                 <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{{ url_for('gestiones.exportar_datos') }}">Exportar tablas</a>
+                            <a class="dropdown-item" href="#">Exportar tablas</a>
                                 <div class="dropdown-divider"></div>    
                             <a class="dropdown-item" href='#'>Manual del modulo</a>
                         </div>

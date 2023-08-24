@@ -1,6 +1,6 @@
 from flask import (render_template, redirect, url_for,
                    request, current_app)
-from flask_login import current_user, login_user, logout_user
+from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy import true
 from werkzeug.urls import url_parse
 from flask.helpers import flash
@@ -10,45 +10,63 @@ from app.common.mail import send_email
 from . import auth_bp
 from .forms import SignupForm, LoginForm
 from .models import Users
-
+from app.models import Personas
+from app.auth.decorators import admin_required
 
 @auth_bp.route("/signup/", methods=["GET", "POST"])
+@login_required
+@admin_required
 def show_signup_form():
-    if current_user.is_authenticated:
-        return redirect(url_for('public.index'))
+    # if current_user.is_authenticated:
+    #     return redirect(url_for('public.index'))
     form = SignupForm()
     
 
     if form.validate_on_submit():
         name = form.name.data
-        email = form.email.data
+        username = form.username.data
+        cuit = form.cuit.data
+        correo_electronico = form.correo_electronico.data
         password = form.password.data
-        
-        # Comprobamos que no hay ya un usuario con ese email
-        user = Users.get_by_email(email)
+        is_admin = form.is_admin.data
+
+
+        # Comprobamos que no hay ya un usuario con ese nombre de usuario
+        user = Users.get_by_username(username)
         if user is not None:
-            flash ("El correo electrónico seleccionado ya ha sido usado","alert-warning")
+            flash ("El nombre de usuario elegido ya existe","alert-warning")
         else:
-            # Creamos el usuario y lo guardamos
-            
-            user = Users(name=name, 
-                        email=email, 
-                        activo=True
+            # Creamos el usuario y la persona relacionada al usuario y lo guardamos
+            user = Users(name=name,
+                        username=username, 
+                        id_estado=1, 
+                        is_admin=is_admin
                         )
             user.set_password(password)
+            
+            persona = Personas(descripcion_nombre=name,
+                                cuit=cuit,
+                                correo_electronico=correo_electronico)
+            user.persona = persona
+
             user.save()
-            # Enviamos un email de bienvenida
-            send_email(subject='Bienvenid@ al miniblog',
-                       sender=current_app.config['DONT_REPLY_FROM_EMAIL'],
-                       recipients=[email, ],
-                       text_body=f'Hola {name}, bienvenid@ al miniblog de Flask',
-                       html_body=f'<p>Hola <strong>{name}</strong>, bienvenid@ al miniblog de Flask</p>')
+            persona.save()
+
+
+            # # Enviamos un email de bienvenida
+            # send_email(subject='Bienvenid@ al miniblog',
+            #             sender=current_app.config['DONT_REPLY_FROM_EMAIL'],
+            #             recipients=[correo_electronico, ],
+            #             text_body=f'Hola {name}, bienvenid@ al miniblog de Flask',
+            #             html_body=f'<p>Hola <strong>{name}</strong>, bienvenid@ al miniblog de Flask</p>')
             # Dejamos al usuario logueado
-            login_user(user, remember=False)
-            next_page = request.args.get('next', None)
-            if not next_page or url_parse(next_page).netloc != '':
-                next_page = url_for('public.index')
-            return redirect(next_page)
+            # login_user(user, remember=False)
+            # next_page = request.args.get('next', None)
+            # if not next_page or url_parse(next_page).netloc != '':
+            #     next_page = url_for('public.index')
+            # return redirect(next_page)
+            flash("El usuario ha sido creado correctamente.", "alert-success")
+            return redirect(url_for('admin.list_users'))
     return render_template("auth/signup_form.html", form=form)
 
 
@@ -58,7 +76,7 @@ def login():
         return redirect(url_for('public.index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = Users.get_by_email(form.email.data)
+        user = Users.get_by_username(form.username.data)
         if user is not None and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
             next_page = request.args.get('next')
@@ -77,3 +95,35 @@ def logout():
 @login_manager.user_loader
 def load_user(user_id):
     return Users.get_by_id(int(user_id))
+
+
+@auth_bp.route('/firstin')
+def firstin():
+    #si ya está loguedo alguien significa que no corre esto y va index
+    if current_user.is_authenticated:
+        return redirect(url_for('public.index'))
+    #creamos el usuario admin que será con el que se va a poder crear un usuario válido para iniciar
+    #el sistema en esta función podemos ir agregando todo lo que necesitamos que esté en la bdd y no 
+    #hacer commits por fuera del sistema. 
+
+    username = "admin"        
+    user = Users.get_by_username(username)
+    
+    if user is not None:
+        flash ("El ya fue creado","alert-warning")
+        
+    else:
+        # Creamos el usuario admin
+        user = Users(name="Admin",
+                    username=username, 
+                    id_estado=1, 
+                    is_admin=True
+                    )
+        password = "Groma"
+        user.set_password(password)
+        
+        user.save()
+
+    
+    return redirect(url_for('auth.show_signup_form'))
+

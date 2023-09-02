@@ -18,3 +18,11 @@ function imprSelec(nombre, titulo) {
     
   }
 
+function evitarCaracter(event, caracterProhibido) {
+  var key = String.fromCharCode(event.keyCode);
+  if (key === caracterProhibido) {
+      event.preventDefault();
+      return false;
+  }
+  return true;
+}

@@ -33,7 +33,7 @@ class Personas (Base):
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))
     id_usuario = db.Column(db.Integer, db.ForeignKey('users.id'))
-
+    
     def save(self):
         if not self.id:
             db.session.add(self)
@@ -65,18 +65,20 @@ class Gestiones (Base):
     id_titular = db.Column(db.Integer)
     ubicacion_gestion= db.Column(db.String(50))
     fecha_inicio_gestion = db.Column(db.DateTime)
+    fecha_probable_medicion = db.Column(db.DateTime)
     fecha_medicion = db.Column(db.DateTime)
-    fecha_probable_inicio = db.Column(db.DateTime)
     fecha_asignacion_dibujante = db.Column(db.DateTime)
     fecha_devolucion_dibujante = db.Column(db.DateTime)
     fecha_fin_gestion = db.Column(db.DateTime)
     id_dibujante = db.Column(db.Integer)
     id_tipo_gestion = db.Column(db.Integer)
+    id_tipo_bienes = db.Column(db.Integer)
     id_estado = db.Column(db.Integer)
     estado_parcelario= db.Column(db.String(50))
     numero_partida= db.Column(db.String(50))
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))
+    observaciones = db.relationship('Observaciones', backref='gestiones', uselist=False)
 
     def save(self):
         if not self.id:
@@ -115,7 +117,7 @@ class ImportesCobros (Base):
 
 class Observaciones (Base):
     __tablename__ = "observaciones"
-    id_gestion = db.Column(db.Integer)
+    id_gestion = db.Column(db.Integer, db.ForeignKey('gestiones.id'))
     id_cobro = db.Column(db.Integer)
     id_importe_cobro = db.Column(db.Integer)
     observacion = db.Column(db.String(256))
@@ -143,6 +145,23 @@ class TiposGestiones(Base):
     __tablename__ = "tiposgestiones"
     descripcion = db.Column(db.String(50))
     
+    @staticmethod
+    def get_all():
+        return TiposGestiones.query.all()
+        
+    def save(self):
+        if not self.id:
+            db.session.add(self)
+        db.session.commit()
+
+class TiposBienes(Base):
+    __tablename__ = "tiposbienes"
+    descripcion = db.Column(db.String(50))
+    
+    @staticmethod
+    def get_all():
+        return TiposBienes.query.all()
+        
     def save(self):
         if not self.id:
             db.session.add(self)

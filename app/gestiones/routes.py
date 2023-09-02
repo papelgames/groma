@@ -86,7 +86,16 @@ def alta_gestiones(id_cliente):
         estado_parcelario = form.estado_parcelario.data
         numero_partida = form.numero_partida.data
         observacion = form.observacion.data
-        print (len(form.id_dibujante.data.split('|',)))
+        
+        descripcion_nombre = form.descripcion_nombre.data
+        cuit = form.cuit.data
+        
+        if (descripcion_nombre and cuit) and not id_titular:
+            nuevo_titular = Personas(descripcion_nombre = descripcion_nombre,
+                                     cuit = cuit) 
+            nuevo_titular.save()
+            id_titular = nuevo_titular.id
+           
         nueva_gestion = Gestiones(id_cliente = id_cliente,
                                 id_titular = id_titular,
                                 ubicacion_gestion = ubicacion_gestion, 
@@ -101,15 +110,6 @@ def alta_gestiones(id_cliente):
         observacion_gestion = Observaciones(
             observacion = observacion
         )
-        # titular_x_id = Personas.get_by_id(id_titular)
-        # dibujante_x_id = Personas.get_by_id(id_dibujante)
-        # #antes de graba controlo que las personas existan en la tabla de personas. 
-        # if not titular_x_id:
-        #     flash ("El titular no existe, debe crearlo", "alert-danger")
-        #     return redirect(url_for('gestiones.alta_gestiones', id_cliente = id_cliente))
-        # if not dibujante_x_id:
-        #     flash ("El dibujante no existe o no está habilitado. Comuniquese con el administrador.", "alert-danger")
-        #     return redirect(url_for('gestiones.alta_gestiones', id_cliente = id_cliente))
 
         if observacion:
             nueva_gestion.observaciones = observacion_gestion

@@ -44,7 +44,7 @@
                             Acción
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item"  href="#">Modificar</a>
+                        <a class="dropdown-item"  href="{{ url_for('abms.actualizacion_persona', id_persona = persona.id ) }}">Modificar</a>
                         <a class="dropdown-item"  href="#">Seleccionar</a>
                     </div>
                 </td>
@@ -108,7 +108,7 @@
                         Acción
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item"  href="#">Modificar</a>
+                    <a class="dropdown-item"  href="{{ url_for('abms.actualizacion_persona', id_persona = lista_de_personas.id ) }}">Modificar</a>
                     <a class="dropdown-item"  href="#">Seleccionar</a>
                 </div>
             </td>

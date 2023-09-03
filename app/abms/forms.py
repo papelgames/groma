@@ -7,6 +7,16 @@ from wtforms.fields import FloatField, IntegerField
 from wtforms.validators import DataRequired, Length, Email, ValidationError
 
 
+class AltaPersonasForm(FlaskForm):
+    descripcion_nombre = StringField("Nombre/Razón Social", validators=[DataRequired('Debe cargar el nombre o la razón social' )])
+    correo_electronico = StringField('Correo electrónico', validators=[Email()])
+    telefono = StringField('Telefono')
+    cuit = StringField('CUIT', validators=[DataRequired(), Length(max=11)])
+    tipo_persona = SelectField('Tipo de persona', choices =[( '','Seleccionar acción'),( "fisica",'Persona Física'),( "juridica",'Persona Jurídica')], coerce = str, default = None, validators=[DataRequired('Seleccione tipo de persona')])
+    #estado = SelectField('Tipo de persona', choices =[], coerce = str, default = None)
+    nota = TextAreaField('Nota', validators=[Length(max=256)])
+
+
 class ProveedoresForm(FlaskForm):
     nombre = StringField('Nombre del proveedor',validators=[DataRequired('Complete el nombre del proveedor')])
     correo_electronico = StringField('Correo electrónico', validators=[DataRequired(), Email()])

@@ -45,7 +45,7 @@ def alta_persona():
                            nota = nota)
         persona.save()
         flash("Se ha creado la persona correctamente.", "alert-success")
-        return redirect(url_for('public.index'))
+        return redirect(url_for('gestiones.gestiones'))
     return render_template("abms/alta_datos_persona.html", form = form)
 
 

@@ -16,8 +16,11 @@
 			{{ render_input(form.correo_electronico,'', id= "correo_electronico", value = persona.correo_electronico, class="form-control", placeholder="Ingrese correo electronico del cliente" ) }}
 			{{ render_input(form.telefono,'', id= "telefono", value = persona.telefono, class="form-control", placeholder = "Telefono" ) }}
 			{{ render_input(form.cuit,'', id= "cuit" , value = persona.cuit, class="form-control", placeholder="CUIT" ) }}
-			{{ render_input(form.tipo_persona,persona.tipo_persona, id= "tipo_persona", class="form-control" ) }}
-			{{ render_input(form.nota,'', id= "nota", value = persona.nota, class="form-control", placeholder = "Ingrese nota" ) }}
+			{{ render_input(form.tipo_persona, persona.tipo_persona, id= "tipo_persona", class="form-control" ) }}
+			<td>Nota
+			<div class="form-group">
+				<textarea name="nota" id="nota" class="form-control" placeholder = "Ingrese nota"> {{ persona.nota }}</textarea>
+			</div>
 			<button type="submmit" class="btn btn-primary">Guardar</button>
 			
 		</form>

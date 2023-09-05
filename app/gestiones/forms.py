@@ -54,3 +54,11 @@ class AltaGestionesForm(FlaskForm):
 
 class ModificacionGestionesForm(AltaGestionesForm):
     fecha_medicion = DateField('Fecha de medicion')
+
+class CobrosForm(FlaskForm):
+    fecha_probable_cobro = DateField('Fecha Probable de cobro', validators=[DataRequired('Debe cargar el nombre o la razón social' )])
+    fecha_vencimiento = DateField('Fecha de vencimiento')
+    importe_total = FloatField('Importe total')
+    moneda = SelectField('Tipo de gestión', choices =[( '','Seleccionar acción'),( "peso",'Pesos'),( "dolar",'Dolar')], coerce = str, default = None, validators=[DataRequired('Seleccione moneda de cobro')])
+    #estado = db.Column(db.Integer)
+    observacion = TextAreaField('Observación', validators=[Length(max=256)])

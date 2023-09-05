@@ -10,12 +10,16 @@
 	<div class="offset-md-3 col-md-6">
 		<h1>Gestiones</h1>
         <p>Buscando un cliente puede iniciar el alta de una gestión.</p>
-		<form action="" method="post" enctype="multipart/form-data" novalidate>	
-            {{ form.hidden_tag() }}
-			{{ render_input(form.buscar,'', id= "buscar" , class="form-control", placeholder="Ingrese nombre/razón social o CUIT" ) }}
-			<button type="submmit" class="btn btn-primary" >Buscar</button>
-		</form>
-	</div>
+            <form action="" method="post" enctype="multipart/form-data" novalidate>	
+                {{ form.hidden_tag() }}
+                {{ render_input(form.buscar,'', id= "buscar" , class="form-control", placeholder="Ingrese nombre/razón social o CUIT" ) }}
+                <button type="submmit" class="btn btn-primary" >Buscar</button>
+            </form>
+            <a href="{{ url_for('abms.alta_persona')}}"></br>
+                <button class="btn btn-primary">Crear un nuevo cliente</button>
+            </a> 
+        
+    </div>
 </div>
 {% if lista_de_personas.items %}
 <table class="table table-striped">

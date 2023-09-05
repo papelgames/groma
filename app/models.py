@@ -90,9 +90,11 @@ class Cobros (Base):
     fecha_probable_cobro = db.Column(db.DateTime, nullable = False)
     fecha_vencimiento = db.Column(db.DateTime, nullable = False)
     importe_total = db.Column(db.Numeric(precision=15, scale=2))
+    moneda = db.Column(db.String(25))
     estado = db.Column(db.Integer)
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))
+    observaciones = db.relationship('Observaciones', backref='cobros', uselist=False)
     
     def save(self):
         if not self.id:
@@ -118,7 +120,7 @@ class ImportesCobros (Base):
 class Observaciones (Base):
     __tablename__ = "observaciones"
     id_gestion = db.Column(db.Integer, db.ForeignKey('gestiones.id'))
-    id_cobro = db.Column(db.Integer)
+    id_cobro = db.Column(db.Integer, db.ForeignKey('cobros.id'))
     id_importe_cobro = db.Column(db.Integer)
     observacion = db.Column(db.String(256))
     usuario_alta = db.Column(db.String(256))

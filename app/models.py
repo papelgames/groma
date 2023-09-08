@@ -6,7 +6,8 @@ from types import ClassMethodDescriptorType
 from typing import Text
 
 from slugify import slugify
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, alias
+from sqlalchemy.orm import aliased
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.auth.models import Users
@@ -57,10 +58,15 @@ class Personas (Base):
         return db.session.query(Personas)\
             .filter(Personas.descripcion_nombre.contains(descripcion_))\
             .paginate(page=page, per_page=per_page, error_out=False)
-    
+
+
+personas_cliente = aliased(Personas)
+personas_titular = aliased(Personas)
+personas_dibujante = aliased(Personas)
 
 class Gestiones (Base):
     __tablename__ = "gestiones"
+
     id_cliente = db.Column(db.Integer)
     id_titular = db.Column(db.Integer)
     ubicacion_gestion= db.Column(db.String(50))
@@ -79,14 +85,47 @@ class Gestiones (Base):
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))
     observaciones = db.relationship('Observaciones', backref='gestiones', uselist=False)
-
+     
     def save(self):
         if not self.id:
             db.session.add(self)
         db.session.commit()
 
+    @staticmethod
+    def get_all(page=1, per_page=20):
+        return db.session.query(Gestiones, personas_cliente, personas_titular, personas_dibujante, TiposGestiones)\
+            .filter(Gestiones.id_cliente == personas_cliente.id)\
+            .filter(Gestiones.id_titular == personas_titular.id)\
+            .filter(Gestiones.id_dibujante == personas_dibujante.id)\
+            .filter(Gestiones.id_tipo_gestion == TiposGestiones.id)\
+            .paginate(page=page, per_page=per_page, error_out=False)
+
+    @staticmethod
+    def get_by_id(id_):
+        return db.session.query(Gestiones, personas_cliente, personas_titular, personas_dibujante, TiposGestiones)\
+            .filter(Gestiones.id_cliente == personas_cliente.id)\
+            .filter(Gestiones.id_titular == personas_titular.id)\
+            .filter(Gestiones.id_dibujante == personas_dibujante.id)\
+            .filter(Gestiones.id_tipo_gestion == TiposGestiones.id)\
+            .filter(Gestiones.id == id_)\
+            .first()
+            
+
+    @staticmethod
+    def get_like_descripcion_all_paginated(descripcion_, page=1, per_page=20):
+        descripcion_ = descripcion_.replace(' ','%')
+        return db.session.query(Gestiones, personas_cliente, personas_titular, personas_dibujante, TiposGestiones)\
+            .filter(Gestiones.id_cliente == personas_cliente.id)\
+            .filter(Gestiones.id_titular == personas_titular.id)\
+            .filter(Gestiones.id_dibujante == personas_dibujante.id)\
+            .filter(Gestiones.id_tipo_gestion == TiposGestiones.id)\
+            .filter(personas_cliente.descripcion_nombre.contains(descripcion_))\
+            .paginate(page=page, per_page=per_page, error_out=False)
+
+
 class Cobros (Base):
     __tablename__ = "cobros"
+    id_gestion = db.Column(db.Integer, nullable = False)
     fecha_probable_cobro = db.Column(db.DateTime, nullable = False)
     fecha_vencimiento = db.Column(db.DateTime, nullable = False)
     importe_total = db.Column(db.Numeric(precision=15, scale=2))
@@ -100,7 +139,19 @@ class Cobros (Base):
         if not self.id:
             db.session.add(self)
         db.session.commit()
-
+    
+    @staticmethod
+    def get_all():
+        return Cobros.query.all()
+    
+    @staticmethod
+    def get_all_by_id_gestion(id_gestion):
+        return Cobros.query.filter_by(id_gestion = id_gestion).all()
+    
+    @staticmethod
+    def get_by_id(id_persona):
+        return Cobros.query.filter_by(id = id_persona).first()
+    
 class ImportesCobros (Base):
     __tablename__ = "importescobros"
     id_cobro = db.Column(db.Integer, nullable = False)

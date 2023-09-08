@@ -117,11 +117,13 @@ def gestiones(criterio = ""):
 @gestiones_bp.route("/gestiones/altacobroscabecera/<int:id_gestion>", methods = ['GET', 'POST'])
 @login_required
 @admin_required
-def alta_cobros_cavecera(id_gestion):
+def alta_cobros_cabecera(id_gestion):
     if not id_gestion:
-        return redirect(url_for('gestiones.gestiones'))
+        return redirect(url_for('gestiones.lista_gestiones'))
     form = CobrosForm()                                                                                                                   
     
+    cobros = Cobros.get_all_by_id_gestion(id_gestion)
+
     if form.validate_on_submit():
         fecha_probable_cobro = form.fecha_probable_cobro.data
         fecha_vencimiento = form.fecha_vencimiento.data
@@ -144,7 +146,7 @@ def alta_cobros_cavecera(id_gestion):
 
         flash("El cobro se a cargado proyectado correctamente.", "alert-success")
         return redirect(url_for('public.index'))
-    return render_template("gestiones/alta_cobros_cabecera.html", form = form)
+    return render_template("gestiones/alta_cobros_cabecera.html", form = form, cobros = cobros)
 
 
 @gestiones_bp.route('/gestiones/datosgestion')

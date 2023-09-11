@@ -51,7 +51,11 @@ class Personas (Base):
     @staticmethod
     def get_by_cuit(cuit):
         return Personas.query.filter_by(cuit = cuit).first()
-    
+
+    @staticmethod
+    def get_by_correo(correo):
+        return Personas.query.filter_by(correo_electronico = correo).first()
+        
     @staticmethod
     def get_like_descripcion_all_paginated(descripcion_, page=1, per_page=20):
         descripcion_ = descripcion_.replace(' ','%')

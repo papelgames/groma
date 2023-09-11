@@ -8,7 +8,7 @@ from flask.helpers import flash
 from app import login_manager
 from app.common.mail import send_email
 from . import auth_bp
-from .forms import SignupForm, LoginForm
+from .forms import SignupForm, LoginForm, ChangePasswordForm
 from .models import Users
 from app.models import Personas
 from app.auth.decorators import admin_required
@@ -33,32 +33,45 @@ def show_signup_form():
 
         # Comprobamos que no hay ya un usuario con ese nombre de usuario
         user = Users.get_by_username(username)
+        check_correo = Personas.get_by_correo(correo_electronico)
         if user is not None:
             flash ("El nombre de usuario elegido ya existe","alert-warning")
+        elif check_correo and check_correo.id_usuario != None:
+
+            flash ("Ya existe un usuario con ese correo " + check_correo.descripcion_nombre,"alert-warning")
         else:
             # Creamos el usuario y la persona relacionada al usuario y lo guardamos
-            user = Users(name=name,
-                        username=username, 
+            user = Users(username=username, 
                         id_estado=1, 
                         is_admin=is_admin
                         )
             user.set_password(password)
             
-            persona = Personas(descripcion_nombre=name,
+            #valido si la persona y si ya tiene usuario.
+            check_persona = Personas.get_by_cuit(cuit)
+
+            if check_persona and check_persona.id_usuario == None:
+                user.check_persona = check_persona
+                user.save()
+                check_persona.id_usuario = user.id
+                check_persona.save()
+            elif check_persona and check_persona.id_usuario != None:
+                flash("El la persona elegida ya tiene usuario.", "alert-warning")
+                return redirect(url_for('admin.list_users'))
+            else:
+                persona = Personas(descripcion_nombre=name,
                                 cuit=cuit,
                                 correo_electronico=correo_electronico)
-            user.persona = persona
+                user.persona = persona
+                user.save()
+            
 
-            user.save()
-            persona.save()
-
-
-            # # Enviamos un email de bienvenida
-            # send_email(subject='Bienvenid@ al miniblog',
-            #             sender=current_app.config['DONT_REPLY_FROM_EMAIL'],
-            #             recipients=[correo_electronico, ],
-            #             text_body=f'Hola {name}, bienvenid@ al miniblog de Flask',
-            #             html_body=f'<p>Hola <strong>{name}</strong>, bienvenid@ al miniblog de Flask</p>')
+            # Enviamos un email de bienvenida
+            send_email(subject='Bienvenid@ GromaSoft',
+                        sender=current_app.config['DONT_REPLY_FROM_EMAIL'],
+                        recipients=[correo_electronico, ],
+                        text_body=f'Hola {name}, eres nuevo usuairo de GromaSoft',
+                        html_body=f'<p>Hola <strong>{name}</strong>, Ya tienes usuario en gromasoft</p>')
             # Dejamos al usuario logueado
             # login_user(user, remember=False)
             # next_page = request.args.get('next', None)
@@ -84,6 +97,28 @@ def login():
                 next_page = url_for('public.index')
             return redirect(next_page)
     return render_template('auth/login_form.html', form=form)
+
+@auth_bp.route('/changepassword', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    user = Users.get_by_username(current_user.username)
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        
+        password_actual = user.check_password(form.password_actual.data)
+        print (password_actual)
+        if password_actual:
+            user.set_password(form.password_nuevo.data)
+            user.save()
+            flash('La contraseña ha sido actualizada correctamente','alert-success')
+            return redirect(url_for('public.index'))
+        else:
+            flash('El password actual no es correcto','alert-warning')
+            
+    # user = Users.get_by_username('jaltamonte')
+    # user.set_password('123123')
+    # user.save()
+    return render_template('auth/change_password.html', form=form)
 
 
 @auth_bp.route('/logout')

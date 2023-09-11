@@ -31,7 +31,7 @@
 
             {% else %}
                 <li class="nav-item">
-                    <a class="nav-link">{{ current_user.name }} <span class="sr-only">(current)</span></a>
+                    <a class="nav-link">{{ current_user.persona.descripcion_nombre }} <span class="sr-only">(current)</span></a>
                 </li>
                 {% if current_user.is_admin %}
 

@@ -8,10 +8,11 @@ from flask.helpers import flash
 from app import login_manager
 from app.common.mail import send_email
 from . import auth_bp
-from .forms import SignupForm, LoginForm, ChangePasswordForm
+from .forms import SignupForm, LoginForm, ChangePasswordForm, UsernameForm, FindUserForm
 from .models import Users
 from app.models import Personas
 from app.auth.decorators import admin_required
+from time import strftime, gmtime
 
 @auth_bp.route("/signup/", methods=["GET", "POST"])
 @login_required
@@ -27,7 +28,7 @@ def show_signup_form():
         username = form.username.data
         cuit = form.cuit.data
         correo_electronico = form.correo_electronico.data
-        password = form.password.data
+        new_password = 'groma' + str(strftime('%d%m%y%H%m%s', gmtime()))
         is_admin = form.is_admin.data
 
 
@@ -45,7 +46,8 @@ def show_signup_form():
                         id_estado=1, 
                         is_admin=is_admin
                         )
-            user.set_password(password)
+            
+            user.set_password(new_password)
             
             #valido si la persona y si ya tiene usuario.
             check_persona = Personas.get_by_cuit(cuit)
@@ -56,7 +58,7 @@ def show_signup_form():
                 check_persona.id_usuario = user.id
                 check_persona.save()
             elif check_persona and check_persona.id_usuario != None:
-                flash("El la persona elegida ya tiene usuario.", "alert-warning")
+                flash("La persona elegida ya tiene usuario.", "alert-warning")
                 return redirect(url_for('admin.list_users'))
             else:
                 persona = Personas(descripcion_nombre=name,
@@ -71,7 +73,7 @@ def show_signup_form():
                         sender=current_app.config['DONT_REPLY_FROM_EMAIL'],
                         recipients=[correo_electronico, ],
                         text_body=f'Hola {name}, eres nuevo usuairo de GromaSoft',
-                        html_body=f'<p>Hola <strong>{name}</strong>, Ya tienes usuario en gromasoft</p>')
+                        html_body=f'<p>Hola <strong>{name}</strong>, ya tienes usuario en gromasoft: Usuario: {username} Contraseña:{new_password}</p>')
             # Dejamos al usuario logueado
             # login_user(user, remember=False)
             # next_page = request.args.get('next', None)
@@ -91,7 +93,10 @@ def login():
     if form.validate_on_submit():
         user = Users.get_by_username(form.username.data)
         if user is not None and user.check_password(form.password.data):
+            print (user.id_estado)
             login_user(user, remember=form.remember_me.data)
+            if user.id_estado == 1:
+                return redirect(url_for('auth.change_password'))
             next_page = request.args.get('next')
             if not next_page or url_parse(next_page).netloc != '':
                 next_page = url_for('public.index')
@@ -106,20 +111,72 @@ def change_password():
     if form.validate_on_submit():
         
         password_actual = user.check_password(form.password_actual.data)
-        print (password_actual)
         if password_actual:
             user.set_password(form.password_nuevo.data)
+            user.id_estado = 2
             user.save()
             flash('La contraseña ha sido actualizada correctamente','alert-success')
             return redirect(url_for('public.index'))
         else:
             flash('El password actual no es correcto','alert-warning')
-            
-    # user = Users.get_by_username('jaltamonte')
-    # user.set_password('123123')
-    # user.save()
+
     return render_template('auth/change_password.html', form=form)
 
+@auth_bp.route('/forgotpassword', methods=['GET', 'POST'])
+def forgot_password():
+    form = UsernameForm()
+    if form.validate_on_submit():
+        user = Users.get_by_username(form.username.data)
+        
+        if user:
+            new_password = 'groma' + str(strftime('%d%m%y%H%m%s', gmtime()))
+            user.set_password(new_password)
+            user.id_estado = 1
+            user.save()
+
+            correo_electronico = user.persona.correo_electronico        
+            name = user.persona.descripcion_nombre
+            url_login = url_for('auth.login', _external=True)
+
+            send_email(subject='Groma | Blanqueo de contraseña',
+                        sender = current_app.config['DONT_REPLY_FROM_EMAIL'],
+                        recipients=[correo_electronico, ],
+                        text_body=f'Hola {name}, te enviamos un correo para poder blanquear la contraseña',
+                        html_body=f'<p>Hola <strong>{name}</strong>, ingresando al siguiente link podrás generar una nueva contraseña <a href="{url_login}">Link</a> tu contraseña temporal es:{new_password} </p>')
+            
+            flash('Se ha enviado una notificación a su correo para generar una nueva contraseña','alert-success')
+            return redirect(url_for('auth.login'))
+        else:
+            flash('El el usuario no es correcto','alert-warning')
+
+    return render_template('auth/forgot_password.html', form=form)
+
+
+@auth_bp.route('/forgotusername', methods=['GET', 'POST'])
+def forgot_username():
+    form = FindUserForm()
+    if form.validate_on_submit():
+        persona = Personas.get_by_correo(form.correo_electronico.data)
+        user = Users.get_by_id(persona.id_usuario)
+        if user:
+            
+            correo_electronico = persona.correo_electronico        
+            name = persona.descripcion_nombre
+            username = user.username 
+            url_login = url_for('auth.login', _external=True)
+
+            send_email(subject='Groma | Usuario',
+                        sender = current_app.config['DONT_REPLY_FROM_EMAIL'],
+                        recipients=[correo_electronico, ],
+                        text_body=f'Hola {name}, te enviamos un correo para poder informarte tu nombre de usuario',
+                        html_body=f'<p>Hola <strong>{name}</strong>, su nombre de usuario es: <strong>{username}</strong>. Puede ingresar <a href="{url_login}">Link</a></p>')
+            
+            flash('Se ha enviado una notificación a su correo con el nombre de usuario','alert-success')
+            return redirect(url_for('auth.login'))
+        else:
+            flash('Comuniquese con el administrador de Groma','alert-warning')
+
+    return render_template('auth/forgot_username.html', form=form)
 
 @auth_bp.route('/logout')
 def logout():

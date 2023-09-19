@@ -29,7 +29,6 @@ class AltaGestionesForm(FlaskForm):
         if (not self.cuit.data or not self.descripcion_nombre.data) and len(id_titular.data.split('|',)) == 1:
             raise ValidationError('Debe elegir un titular o en su defecto crearlo')
         elif id_titular.data != '':
-            print (id_titular.data.split)
             titular_x_id = Personas.get_by_id(id_titular.data.split('|',)[0])
             #valido que las personas existan en la tabla de personas. 
             if not titular_x_id:

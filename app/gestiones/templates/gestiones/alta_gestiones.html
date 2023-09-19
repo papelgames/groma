@@ -14,21 +14,9 @@
             {{ form.hidden_tag() }}
 
             <div class="form-group">
-                {{ render_input(form.id_titular, '', id="id_titular", class="form-control", placeholder="Busque el nombre del titular", list="clientes", onkeypress="return evitarCaracter(event, '|');" ) }}
+                {{ render_input(form.titular, '', id="titular", class="form-control", placeholder="Busque el nombre del titular", list="titulares" ) }}
             </div>
-            <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#campoOculto">
-                Crear titular
-            </button>
-              
-            <div id="campoOculto" class="collapse">
-                <div class="form-group">
-                    {{ render_input(form.descripcion_nombre, '', id="descripcion_nombre", class="form-control", placeholder="Ingrese el nombre o Razon social del titular") }}
-                </div>
-                <div class="form-group">
-                    {{ render_input(form.cuit, '', id="cuit", class="form-control", placeholder="Ingrese el CUIT del titular")}}
-                </div>
-            </div>
-
+            
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
@@ -54,7 +42,7 @@
                     </div>
                     
                     <div class="form-group">
-                        {{ render_input(form.id_dibujante,'', id= "id_dibujante" , class="form-control", placeholder="Ingrese el nombre del dibujante", list="clientes", onkeypress="return evitarCaracter(event, '|');" ) }}
+                        {{ render_input(form.id_dibujante,'', id= "id_dibujante" , class="form-control", placeholder="Ingrese el nombre del dibujante", list="dibujantes", onkeypress="return evitarCaracter(event, '|');" ) }}
                     </div>
                     
                     <div class="form-group">
@@ -73,12 +61,17 @@
                 {{ render_input(form.observacion, '', id="observacion", class="form-control", placeholder="Ingrese una observación") }}
             </div>
 
-            <datalist id="clientes">
-                {% for cliente in clientes %}
-                <option  value="{{[cliente.id, cliente.descripcion_nombre, cliente.cuit]|join('|')}}">
+            <datalist id="dibujantes">
+                {% for dibujante in clientes %}
+                <option  value="{{[dibujante.id, dibujante.descripcion_nombre, dibujante.cuit]|join('|')}}">
                 {% endfor %}
             </datalist>
 
+            <datalist id="titulares">
+                {% for titular in clientes %}
+                <option  value="{{ titular.descripcion_nombre}}">
+                {% endfor %}
+            </datalist>
             <button type="submit" class="btn btn-primary">Guardar</button>
         </form>
     </div>

@@ -65,14 +65,13 @@ class Personas (Base):
 
 
 personas_cliente = aliased(Personas)
-personas_titular = aliased(Personas)
 personas_dibujante = aliased(Personas)
 
 class Gestiones (Base):
     __tablename__ = "gestiones"
 
     id_cliente = db.Column(db.Integer)
-    id_titular = db.Column(db.Integer)
+    titular = db.Column(db.String(50), nullable = False)
     ubicacion_gestion= db.Column(db.String(50))
     fecha_inicio_gestion = db.Column(db.DateTime)
     fecha_probable_medicion = db.Column(db.DateTime)
@@ -97,18 +96,16 @@ class Gestiones (Base):
 
     @staticmethod
     def get_all(page=1, per_page=20):
-        return db.session.query(Gestiones, personas_cliente, personas_titular, personas_dibujante, TiposGestiones)\
+        return db.session.query(Gestiones, personas_cliente, personas_dibujante, TiposGestiones)\
             .filter(Gestiones.id_cliente == personas_cliente.id)\
-            .filter(Gestiones.id_titular == personas_titular.id)\
             .filter(Gestiones.id_dibujante == personas_dibujante.id)\
             .filter(Gestiones.id_tipo_gestion == TiposGestiones.id)\
             .paginate(page=page, per_page=per_page, error_out=False)
 
     @staticmethod
     def get_by_id(id_):
-        return db.session.query(Gestiones, personas_cliente, personas_titular, personas_dibujante, TiposGestiones)\
+        return db.session.query(Gestiones, personas_cliente, personas_dibujante, TiposGestiones)\
             .filter(Gestiones.id_cliente == personas_cliente.id)\
-            .filter(Gestiones.id_titular == personas_titular.id)\
             .filter(Gestiones.id_dibujante == personas_dibujante.id)\
             .filter(Gestiones.id_tipo_gestion == TiposGestiones.id)\
             .filter(Gestiones.id == id_)\
@@ -118,9 +115,8 @@ class Gestiones (Base):
     @staticmethod
     def get_like_descripcion_all_paginated(descripcion_, page=1, per_page=20):
         descripcion_ = descripcion_.replace(' ','%')
-        return db.session.query(Gestiones, personas_cliente, personas_titular, personas_dibujante, TiposGestiones)\
+        return db.session.query(Gestiones, personas_cliente, personas_dibujante, TiposGestiones)\
             .filter(Gestiones.id_cliente == personas_cliente.id)\
-            .filter(Gestiones.id_titular == personas_titular.id)\
             .filter(Gestiones.id_dibujante == personas_dibujante.id)\
             .filter(Gestiones.id_tipo_gestion == TiposGestiones.id)\
             .filter(personas_cliente.descripcion_nombre.contains(descripcion_))\

@@ -49,7 +49,7 @@ def alta_gestiones(id_cliente):
     form.id_tipo_bienes.choices = tipo_bien_select()
     
     if form.validate_on_submit():
-        id_titular = form.id_titular.data.split('|',)[0]
+        titular = form.titular.data
         ubicacion_gestion = form.ubicacion_gestion.data 
         id_tipo_bienes = form.id_tipo_bienes.data
         fecha_inicio_gestion = form.fecha_inicio_gestion.data
@@ -59,18 +59,9 @@ def alta_gestiones(id_cliente):
         estado_parcelario = form.estado_parcelario.data
         numero_partida = form.numero_partida.data
         observacion = form.observacion.data
-        
-        descripcion_nombre = form.descripcion_nombre.data
-        cuit = form.cuit.data
-        
-        if (descripcion_nombre and cuit) and not id_titular:
-            nuevo_titular = Personas(descripcion_nombre = descripcion_nombre,
-                                     cuit = cuit) 
-            nuevo_titular.save()
-            id_titular = nuevo_titular.id
-           
+          
         nueva_gestion = Gestiones(id_cliente = id_cliente,
-                                id_titular = id_titular,
+                                titular = titular,
                                 ubicacion_gestion = ubicacion_gestion, 
                                 id_tipo_bienes = id_tipo_bienes,
                                 fecha_inicio_gestion = fecha_inicio_gestion,

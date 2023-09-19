@@ -11,7 +11,7 @@ class BusquedaForm(FlaskForm):
     buscar = StringField('Buscar')
 
 class AltaGestionesForm(FlaskForm):
-    id_titular = StringField('Titular')
+    titular = StringField('Titular', validators=[DataRequired('Debe cargar el nombre o la razón social' )])
     ubicacion_gestion= StringField('Ubicación')
     id_tipo_bienes = SelectField('Tipo de bien', choices =[], coerce = str, default = None, validators=[DataRequired('Seleccione tipo de bien')])
     fecha_inicio_gestion = DateField('Fecha de inicio de gestión')
@@ -22,20 +22,20 @@ class AltaGestionesForm(FlaskForm):
     numero_partida= StringField("Número de partida")
     observacion = TextAreaField('Observación', validators=[Length(max=256)])
 
-    descripcion_nombre = StringField("Nombre/Razón Social")
-    cuit = StringField('CUIT', validators=[Length(max=11)])
+    # descripcion_nombre = StringField("Nombre/Razón Social")
+    # cuit = StringField('CUIT', validators=[Length(max=11)])
     
-    def validate_id_titular(self, id_titular ):
-        if (not self.cuit.data or not self.descripcion_nombre.data) and len(id_titular.data.split('|',)) == 1:
-            raise ValidationError('Debe elegir un titular o en su defecto crearlo')
-        elif id_titular.data != '':
-            titular_x_id = Personas.get_by_id(id_titular.data.split('|',)[0])
-            #valido que las personas existan en la tabla de personas. 
-            if not titular_x_id:
-                raise ValidationError('El titular no existe, debe crearlo.')
-        #valido el formato de la lista de car
-        if len(id_titular.data.split('|',)) != 3 and len(id_titular.data.split('|',)) > 0 and id_titular.data != '':
-            raise ValidationError('El titular cargado no es valido.')
+    # def validate_id_titular(self, id_titular ):
+    #     if (not self.cuit.data or not self.descripcion_nombre.data) and len(id_titular.data.split('|',)) == 1:
+    #         raise ValidationError('Debe elegir un titular o en su defecto crearlo')
+    #     elif id_titular.data != '':
+    #         titular_x_id = Personas.get_by_id(id_titular.data.split('|',)[0])
+    #         #valido que las personas existan en la tabla de personas. 
+    #         if not titular_x_id:
+    #             raise ValidationError('El titular no existe, debe crearlo.')
+    #     #valido el formato de la lista de car
+    #     if len(id_titular.data.split('|',)) != 3 and len(id_titular.data.split('|',)) > 0 and id_titular.data != '':
+    #         raise ValidationError('El titular cargado no es valido.')
     
     def validate_id_dibujante(self, id_dibujante ):
         #valido el formato de la lista de carga

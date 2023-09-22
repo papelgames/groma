@@ -47,7 +47,7 @@
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <a class="dropdown-item"  href="{{ url_for('gestiones.alta_cobros_cabecera', id_gestion = gestion.Gestiones.id) }}">Crear presupuesto cobro</a>
-                        <a class="dropdown-item"  href="#">Ver presupuesto cobro</a>
+                        <a class="dropdown-item"  href="{{ url_for('consultas.cobro', id_gestion = gestion.Gestiones.id) }}">Ver presupuesto cobro</a>
                         <a class="dropdown-item"  href="#">Seleccionar</a>
                     </div>
                 </td>
@@ -109,7 +109,7 @@
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     <a class="dropdown-item"  href="{{ url_for('gestiones.alta_cobros_cabecera', id_gestion = gestiones.Gestiones.id) }}">Crear presupuesto cobro</a>
-                    <a class="dropdown-item"  href="#">Ver presupuesto cobro</a>
+                    <a class="dropdown-item"  href="{{ url_for('consultas.cobro', id_gestion = gestiones.Gestiones.id) }}">Ver presupuesto cobro</a>
                     <a class="dropdown-item"  href="#">Seleccionar</a>
                 </div>
             </td>

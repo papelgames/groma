@@ -5,7 +5,7 @@ from datetime import date, datetime, timedelta
 from flask import render_template, redirect, url_for, abort, current_app, flash, request
 from flask_login import login_required, current_user
 
-#from app.auth.decorators import admin_required
+from app.auth.decorators import admin_required
 from app.auth.models import Users
 from app.models import Gestiones, Cobros, ImportesCobros, Estados, TiposGestiones, Observaciones, Personas
 
@@ -51,6 +51,9 @@ def lista_gestiones(criterio = ""):
     per_page = current_app.config['ITEMS_PER_PAGE']
     gestiones = Gestiones.get_all(page, per_page)
     
+    if len(gestiones.items) == 0:
+            gestiones =[]
+
     if form.validate_on_submit():
         buscar = form.buscar.data
         return redirect(url_for("consultas.lista_gestiones", criterio = buscar))
@@ -66,4 +69,13 @@ def lista_gestiones(criterio = ""):
             gestiones =[]
  
     return render_template("consultas/lista_gestiones.html", form = form, criterio = criterio, gestiones = gestiones )
+
+
+@consultas_bp.route("/consultas/cobro/<id_gestion>")
+@login_required
+@admin_required
+def cobro(id_gestion):
+    cobro_individual = Cobros.get_all_by_id_gestion(id_gestion)
+    print (cobro_individual.id)
+    return render_template("consultas/cobro.html", cobro_individual = cobro_individual)
 

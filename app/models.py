@@ -146,8 +146,12 @@ class Cobros (Base):
     
     @staticmethod
     def get_all_by_id_gestion(id_gestion):
-        return Cobros.query.filter_by(id_gestion = id_gestion).all()
+        return Cobros.query.filter_by(id_gestion = id_gestion).first()
     
+    @staticmethod
+    def get_all_by_id_cobro(id_cobro):
+        return Cobros.query.filter_by(id = id_cobro).first()
+
     @staticmethod
     def get_by_id(id_persona):
         return Cobros.query.filter_by(id = id_persona).first()
@@ -162,6 +166,7 @@ class ImportesCobros (Base):
     medio_cobro = db.Column(db.String(25))
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))
+    observaciones = db.relationship('Observaciones', backref='importe_cobro', uselist=False)
 
     def save(self):
         if not self.id:
@@ -172,7 +177,7 @@ class Observaciones (Base):
     __tablename__ = "observaciones"
     id_gestion = db.Column(db.Integer, db.ForeignKey('gestiones.id'))
     id_cobro = db.Column(db.Integer, db.ForeignKey('cobros.id'))
-    id_importe_cobro = db.Column(db.Integer)
+    id_importe_cobro = db.Column(db.Integer, db.ForeignKey('importescobros.id'))
     observacion = db.Column(db.String(256))
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))

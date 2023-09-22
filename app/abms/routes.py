@@ -42,7 +42,8 @@ def alta_persona():
                            telefono = telefono,
                            cuit = cuit,
                            tipo_persona = tipo_persona,
-                           nota = nota)
+                           nota = nota,
+                           usuario_alta = current_user.username)
         persona.save()
         flash("Se ha creado la persona correctamente.", "alert-success")
         return redirect(url_for('gestiones.gestiones'))
@@ -61,6 +62,7 @@ def actualizacion_persona(id_persona):
         persona.cuit = form.cuit.data
         persona.tipo_persona = form.tipo_persona.data 
         persona.nota = form.nota.data
+        persona.usuario_modificacion = current_user.username
         
         persona.save()
         flash("Se ha actualizado la persona correctamente.", "alert-success")

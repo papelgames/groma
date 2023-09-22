@@ -63,7 +63,8 @@ def show_signup_form():
             else:
                 persona = Personas(descripcion_nombre=name,
                                 cuit=cuit,
-                                correo_electronico=correo_electronico)
+                                correo_electronico=correo_electronico,
+                                usuario_alta = current_user.username)
                 user.persona = persona
                 user.save()
             

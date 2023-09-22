@@ -9,9 +9,9 @@ from flask_login import login_required, current_user
 
 from app.auth.decorators import admin_required
 from app.auth.models import Users
-from app.models import Personas, TiposGestiones, TiposBienes, Gestiones, Observaciones, Cobros
+from app.models import Personas, TiposGestiones, TiposBienes, Gestiones, Observaciones, Cobros, ImportesCobros
 from . import gestiones_bp 
-from .forms import AltaGestionesForm, BusquedaForm, CobrosForm
+from .forms import AltaGestionesForm, BusquedaForm, CobrosForm, ImportesCobrosForm
 
 logger = logging.getLogger(__name__)
 
@@ -69,10 +69,13 @@ def alta_gestiones(id_cliente):
                                 id_tipo_gestion = id_tipo_gestion,
                                 id_dibujante = id_dibujante,
                                 estado_parcelario = estado_parcelario,
-                                numero_partida = numero_partida
+                                numero_partida = numero_partida,
+                                usuario_alta = current_user.username
                                 )
         observacion_gestion = Observaciones(
-            observacion = observacion
+            observacion = observacion,
+            usuario_alta = current_user.username
+
         )
 
         if observacion:
@@ -122,22 +125,65 @@ def alta_cobros_cabecera(id_gestion):
         moneda = form.moneda.data        
         observacion = form.observacion.data
         
-        nuevo_cobro = Cobros(fecha_probable_cobro = fecha_probable_cobro,
+        nuevo_cobro = Cobros(id_gestion=id_gestion, 
+                             fecha_probable_cobro = fecha_probable_cobro,
                              fecha_vencimiento = fecha_vencimiento,
                              importe_total = importe_total,
-                             moneda = moneda)        
-        observacion_gestion = Observaciones(
+                             moneda = moneda,
+                             usuario_alta = current_user.username)        
+        observacion_cobro_cabecera = Observaciones(
             id_gestion = id_gestion,
-            observacion = observacion
+            observacion = observacion,
+            usuario_alta = current_user.username)
+
+        if observacion:
+            nuevo_cobro.observaciones = observacion_cobro_cabecera
+        nuevo_cobro.save()
+
+        flash("El cobro se ha proyectado correctamente.", "alert-success")
+        return redirect(url_for('public.index'))
+    return render_template("gestiones/alta_cobros_cabecera.html", form = form, cobros = cobros)
+
+@gestiones_bp.route("/gestiones/altacobros/<int:id_cobro>", methods = ['GET', 'POST'])
+@login_required
+@admin_required
+def alta_importe_cobro(id_cobro):
+    if not id_cobro:
+        return redirect(url_for('gestiones.lista_gestiones'))
+    form = ImportesCobrosForm()                                                                                                                   
+    cabecera_cobro = Cobros.get_all_by_id_cobro(id_cobro)
+
+    if form.validate_on_submit():
+        fecha_cobro = form.fecha_cobro.data
+        importe = form.importe.data
+        tipo_cambio = form.tipo_cambio.data
+        moneda = form.moneda.data
+        medio_cobro = form.medio_cobro.data
+        observacion = form.observacion.data
+        
+        nuevo_importe_cobro = ImportesCobros(id_cobro = id_cobro,
+                             fecha_cobro = fecha_cobro,
+                             importe = importe,
+                             tipo_cambio = tipo_cambio,
+                             moneda = moneda,
+                             medio_cobro = medio_cobro,
+                             usuario_alta = current_user.username)
+        
+        observacion_importe_cobro = Observaciones(
+            id_gestion = cabecera_cobro.id_gestion,
+            id_cobro = id_cobro,
+            observacion = observacion,
+            usuario_alta = current_user.username
         )
 
         if observacion:
-            nuevo_cobro.observaciones = observacion_gestion
-        nuevo_cobro.save()
+            nuevo_importe_cobro.observaciones = observacion_importe_cobro
+        nuevo_importe_cobro.save()
 
-        flash("El cobro se a cargado proyectado correctamente.", "alert-success")
+        flash("El importe se ha cargado correctamente.", "alert-success")
         return redirect(url_for('public.index'))
-    return render_template("gestiones/alta_cobros_cabecera.html", form = form, cobros = cobros)
+    return render_template("gestiones/alta_importe_cobro.html", form = form)
+
 
 
 @gestiones_bp.route('/gestiones/datosgestion')

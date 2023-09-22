@@ -55,9 +55,17 @@ class ModificacionGestionesForm(AltaGestionesForm):
     fecha_medicion = DateField('Fecha de medicion')
 
 class CobrosForm(FlaskForm):
-    fecha_probable_cobro = DateField('Fecha Probable de cobro', validators=[DataRequired('Debe cargar el nombre o la razón social' )])
+    fecha_probable_cobro = DateField('Fecha Probable de cobro', validators=[DataRequired('Debe cargar la fecha probable de cobro' )])
     fecha_vencimiento = DateField('Fecha de vencimiento')
     importe_total = FloatField('Importe total')
-    moneda = SelectField('Tipo de gestión', choices =[( '','Seleccionar acción'),( "peso",'Pesos'),( "dolar",'Dolar')], coerce = str, default = None, validators=[DataRequired('Seleccione moneda de cobro')])
+    moneda = SelectField('Moneda', choices =[( '','Seleccionar acción'),( "peso",'Pesos'),( "dolar",'Dolar')], coerce = str, default = None, validators=[DataRequired('Seleccione moneda de cobro')])
     #estado = db.Column(db.Integer)
+    observacion = TextAreaField('Observación', validators=[Length(max=256)])
+
+class ImportesCobrosForm(FlaskForm):
+    fecha_cobro = DateField('Fecha de cobro', validators=[DataRequired('Debe cargar la fecha de cobro' )])
+    importe = FloatField('Importe cobrado', validators=[DataRequired('Debe cargar el importe cobrado' )])
+    tipo_cambio = FloatField('Tipo de cambio')
+    moneda = SelectField('Moneda', choices =[( '','Seleccionar acción'),( "peso",'Pesos'),( "dolar",'Dolar')], coerce = str, default = None, validators=[DataRequired('Seleccione moneda de cobro')])
+    medio_cobro = SelectField('Medio de cobro', choices =[( '','Seleccionar acción'), ( 'Cheque','Cheque'),( 'Transferencia','Transferencia'),( 'Efectivo','Efectivo')], coerce = str, default = None, validators=[DataRequired('Seleccione un medio de cobro')])
     observacion = TextAreaField('Observación', validators=[Length(max=256)])

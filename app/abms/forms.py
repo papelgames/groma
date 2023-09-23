@@ -80,4 +80,6 @@ class ProductosMasivosForm(FlaskForm):
 
 class BusquedaForm(FlaskForm):
     buscar = StringField('Buscar', validators=[DataRequired('Escriba la descripción de un producto o su código de barras' )])
- 
+
+class TiposForm(FlaskForm):
+    tipo = StringField('Nuevo tipo', validators=[DataRequired('Escriba una descripción' )])

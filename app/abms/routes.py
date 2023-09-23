@@ -7,11 +7,11 @@ from flask_login import login_required, current_user
 
 from werkzeug.utils import secure_filename
 
-#from app.auth.decorators import admin_required
+from app.auth.decorators import admin_required
 from app.auth.models import Users
-from app.models import Personas
+from app.models import Personas, TiposGestiones
 from . import abms_bp
-from .forms import AltaPersonasForm
+from .forms import AltaPersonasForm, TiposForm
 
 #from app.common.mail import send_email
 from time import strftime, gmtime
@@ -69,3 +69,19 @@ def actualizacion_persona(id_persona):
         return redirect(url_for('consultas.consulta_personas'))
        
     return render_template("abms/modificacion_datos_persona.html", form=form, persona = persona)
+
+@abms_bp.route("/abms/altatipogestiones/", methods = ['GET', 'POST'])
+@login_required
+@admin_required
+def alta_tipo_gestion():
+    form = TiposForm()
+    tipos = TiposGestiones.get_all()
+    if form.validate_on_submit():
+        descripcion = form.tipo.data
+
+        tipo_gestion = TiposGestiones(descripcion=descripcion)
+
+        tipo_gestion.save()
+        flash("Nuevo tipo de gestión creada", "alert-success")
+
+    return render_template("abms/alta_tipo_gestion.html", form=form, tipos=tipos)

@@ -51,6 +51,8 @@ def lista_gestiones(criterio = ""):
     per_page = current_app.config['ITEMS_PER_PAGE']
     gestiones = Gestiones.get_all(page, per_page)
     
+    cuit_cliente = request.args.get('cuit','')
+    
     if len(gestiones.items) == 0:
             gestiones =[]
 
@@ -60,7 +62,12 @@ def lista_gestiones(criterio = ""):
     
     if criterio.isdigit() == True:
         gestiones = Gestiones.get_by_id(criterio)
-        print (gestiones)
+    elif cuit_cliente:
+        id_cliente = Personas.get_by_cuit(cuit_cliente)
+        gestiones = Gestiones.get_gestiones_by_id_cliente_all_paginated(id_cliente.id)
+        if len(gestiones.items) == 0:
+            gestiones =[]
+
     elif criterio == "":
         pass
     else:
@@ -76,6 +83,7 @@ def lista_gestiones(criterio = ""):
 @admin_required
 def cobro(id_gestion):
     cobro_individual = Cobros.get_all_by_id_gestion(id_gestion)
-    print (cobro_individual.id)
-    return render_template("consultas/cobro.html", cobro_individual = cobro_individual)
-
+    if cobro_individual:
+        return render_template("consultas/cobro.html", cobro_individual = cobro_individual)
+    flash("La gestión no tiene dado de alta un presupuesto","alert-warning")
+    return redirect(url_for("consultas.lista_gestiones", criterio = id_gestion))

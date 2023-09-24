@@ -8,11 +8,10 @@
 {% block content %}
 <div class="row">
 	<div class="offset-md-3 col-md-6">
-		<h1>Gestiones</h1>
-        <p>Buscando un cliente puede iniciar el alta de una gestión.</p>
+		<h1>Consulta de Gestiones</h1>
             <form action="" method="post" enctype="multipart/form-data" novalidate>	
                 {{ form.hidden_tag() }}
-                {{ render_input(form.buscar,'', id= "buscar" , class="form-control", placeholder="Ingrese nombre/razón social o CUIT" ) }}
+                {{ render_input(form.buscar,'', id= "buscar" , class="form-control", placeholder="Ingrese nombre/razón social o número de gestión" ) }}
                 <button type="submmit" class="btn btn-primary" >Buscar</button>
             </form>
     </div>

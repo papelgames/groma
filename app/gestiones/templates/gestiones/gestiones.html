@@ -8,7 +8,7 @@
 {% block content %}
 <div class="row">
 	<div class="offset-md-3 col-md-6">
-		<h1>Gestiones</h1>
+		<h1>Alta de Gestiones</h1>
         <p>Buscando un cliente puede iniciar el alta de una gestión.</p>
             <form action="" method="post" enctype="multipart/form-data" novalidate>	
                 {{ form.hidden_tag() }}
@@ -49,7 +49,7 @@
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <a class="dropdown-item"  href="{{ url_for('gestiones.alta_gestiones', id_cliente = persona.id) }}">Nueva gestion</a>
-                        <a class="dropdown-item"  href="#">Ver gestiones</a>
+                        <a class="dropdown-item"  href="{{ url_for('consultas.lista_gestiones', cuit = persona.cuit) }}">Ver gestiones</a>
                         <a class="dropdown-item"  href="#">Seleccionar</a>
                     </div>
                 </td>
@@ -113,7 +113,8 @@
                         Acción
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item"  href="#">Modificar</a>
+                    <a class="dropdown-item"  href="{{ url_for('gestiones.alta_gestiones', id_cliente = lista_de_personas.id) }}">Nueva gestion</a>
+                    <a class="dropdown-item"  href="{{ url_for('consultas.lista_gestiones', cuit = lista_de_personas.cuit) }}">Ver gestiones</a>
                     <a class="dropdown-item"  href="#">Seleccionar</a>
                 </div>
             </td>

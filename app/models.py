@@ -122,6 +122,14 @@ class Gestiones (Base):
             .filter(personas_cliente.descripcion_nombre.contains(descripcion_))\
             .paginate(page=page, per_page=per_page, error_out=False)
 
+    @staticmethod
+    def get_gestiones_by_id_cliente_all_paginated(id_cliente_, page=1, per_page=20):
+        return db.session.query(Gestiones, personas_cliente, personas_dibujante, TiposGestiones)\
+            .filter(Gestiones.id_cliente == personas_cliente.id)\
+            .filter(Gestiones.id_dibujante == personas_dibujante.id)\
+            .filter(Gestiones.id_tipo_gestion == TiposGestiones.id)\
+            .filter(Gestiones.id_cliente == id_cliente_)\
+            .paginate(page=page, per_page=per_page, error_out=False)
 
 class Cobros (Base):
     __tablename__ = "cobros"

@@ -9,7 +9,7 @@ from werkzeug.utils import secure_filename
 
 from app.auth.decorators import admin_required
 from app.auth.models import Users
-from app.models import Personas, TiposGestiones
+from app.models import Personas, TiposGestiones, TiposBienes
 from . import abms_bp
 from .forms import AltaPersonasForm, TiposForm
 
@@ -83,5 +83,23 @@ def alta_tipo_gestion():
 
         tipo_gestion.save()
         flash("Nuevo tipo de gestión creada", "alert-success")
+        return redirect(url_for('abms.alta_tipo_gestion'))
 
     return render_template("abms/alta_tipo_gestion.html", form=form, tipos=tipos)
+
+@abms_bp.route("/abms/altatipobienes/", methods = ['GET', 'POST'])
+@login_required
+@admin_required
+def alta_tipo_bien():
+    form = TiposForm()
+    tipos = TiposBienes.get_all()
+    if form.validate_on_submit():
+        descripcion = form.tipo.data
+
+        tipo_bien = TiposBienes(descripcion=descripcion)
+
+        tipo_bien.save()
+        flash("Nuevo tipo de bien creado", "alert-success")
+        return redirect(url_for('abms.alta_tipo_bien'))
+
+    return render_template("abms/alta_tipo_bien.html", form=form, tipos=tipos)

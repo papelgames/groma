@@ -186,16 +186,3 @@ def alta_importe_cobro(id_cobro):
         flash("El importe se ha cargado correctamente.", "alert-success")
         return redirect(url_for('public.index'))
     return render_template("gestiones/alta_importe_cobro.html", form = form)
-
-
-
-@gestiones_bp.route('/gestiones/datosgestion')
-@login_required
-def datosgestion():
-    descripcion = "Casa" 
-    nuevotpgestion = TiposBienes(descripcion = descripcion)
-    print(descripcion)
-    nuevotpgestion.save()
-
-    flash('Grabado','alert-success')
-    return redirect(url_for('public.index'))

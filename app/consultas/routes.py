@@ -87,3 +87,12 @@ def cobro(id_gestion):
         return render_template("consultas/cobro.html", cobro_individual = cobro_individual)
     flash("La gestión no tiene dado de alta un presupuesto","alert-warning")
     return redirect(url_for("consultas.lista_gestiones", criterio = id_gestion))
+
+@consultas_bp.route("/consultas/caratula/<id_gestion>")
+@login_required
+def caratula(id_gestion):
+    gestion = Gestiones.get_by_id(id_gestion)
+    if caratula:
+        return render_template("consultas/caratula.html", gestion = gestion)
+    flash("La gestión no caratula","alert-warning")
+    return redirect(url_for("consultas.lista_gestiones", criterio = id_gestion))

@@ -20,7 +20,10 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        {{ render_input(form.ubicacion_gestion, '', id="ubicacion_gestion", class="form-control", placeholder="Ingrese la ubicación del bien") }}
+                        {{ render_input(form.ubicacion_gestion, '', id="ubicacion_gestion", class="form-control", placeholder="Ingrese la ubicación del inmueble") }}
+                    </div>
+                    <div class="form-group">
+                        {{ render_input(form.coordenadas, '', id="coordenadas", class="form-control", placeholder="Ingrese las coordenadas del inmueble") }}
                     </div>
 
                     <div class="form-group">
@@ -29,14 +32,14 @@
                     <div class="form-group">
                         {{ render_input(form.fecha_inicio_gestion, '', id="fecha_inicio_gestion", class="form-control", type="date") }}
                     </div>
+
+                </div>
+                <div class="col-md-6">
                      
                     <div class="form-group">
                         {{ render_input(form.fecha_probable_medicion,'', id= "fecha_probable_medicion" , class="form-control", type="date"  ) }}
                     </div>
-                    
-                </div>
-                <div class="col-md-6">
-                   
+                                       
                     <div class="form-group">
                         {{ render_input(form.id_tipo_gestion,'', id= "id_tipo_gestion" , class="form-control") }}
                     </div>
@@ -45,15 +48,15 @@
                         {{ render_input(form.id_dibujante,'', id= "id_dibujante" , class="form-control", placeholder="Ingrese el nombre del dibujante", list="dibujantes", onkeypress="return evitarCaracter(event, '|');" ) }}
                     </div>
                     
-                    <div class="form-group">
-                        {{ render_input(form.estado_parcelario,'', id= "estado_parcelario" , class="form-control", placeholder="Ingrese el estado parcelario") }}
+                    <div class="row">
+                        <div class="col-xs-4 col-sm-3 col-md-4 col-lg-4">
+                            {{ render_input(form.numero_partido,'', id= "numero_partido" , class="form-control", placeholder="Partido") }}
+                        </div>
+                        <div class="col-xs-8 col-sm-9 col-md-8 col-lg-8">
+                            {{ render_input(form.numero_partida,'', id= "numero_partida" , class="form-control", placeholder="Partida") }}
+                        </div>
                     </div>
-                    
-                    <div class="form-group">
-                        {{ render_input(form.numero_partida,'', id= "numero_partida" , class="form-control", placeholder="Ingrese el número de partida") }}
-                    </div>
-
-                    
+            
                 </div>
             </div>
 

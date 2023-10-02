@@ -26,3 +26,15 @@ function evitarCaracter(event, caracterProhibido) {
   }
   return true;
 }
+
+window.addEventListener('load', () => {
+  // Elemento HTML donde se muestra el QR
+  const contenedorQR = document.getElementById('contenedorQR');
+
+  // Obtiene el valor del div contenedorQR
+  const valorParaQR = contenedorQR.textContent;
+  // Crea una instancia de QRCode con el valor obtenido
+  const QR = new QRCode(contenedorQR, valorParaQR);
+
+
+});

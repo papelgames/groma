@@ -51,24 +51,26 @@ def alta_gestiones(id_cliente):
     if form.validate_on_submit():
         titular = form.titular.data
         ubicacion_gestion = form.ubicacion_gestion.data 
+        coordenadas = form.coordenadas.data
         id_tipo_bienes = form.id_tipo_bienes.data
         fecha_inicio_gestion = form.fecha_inicio_gestion.data
         fecha_probable_medicion = form.fecha_probable_medicion.data
         id_tipo_gestion = form.id_tipo_gestion.data
         id_dibujante = form.id_dibujante.data.split('|',)[0]
-        estado_parcelario = form.estado_parcelario.data
+        numero_partido = form.numero_partido.data
         numero_partida = form.numero_partida.data
         observacion = form.observacion.data
           
         nueva_gestion = Gestiones(id_cliente = id_cliente,
                                 titular = titular,
-                                ubicacion_gestion = ubicacion_gestion, 
+                                ubicacion_gestion = ubicacion_gestion,
+                                coordenadas= coordenadas, 
                                 id_tipo_bienes = id_tipo_bienes,
                                 fecha_inicio_gestion = fecha_inicio_gestion,
                                 fecha_probable_medicion = fecha_probable_medicion,
                                 id_tipo_gestion = id_tipo_gestion,
                                 id_dibujante = id_dibujante,
-                                estado_parcelario = estado_parcelario,
+                                numero_partido = numero_partido,
                                 numero_partida = numero_partida,
                                 usuario_alta = current_user.username
                                 )
@@ -83,7 +85,7 @@ def alta_gestiones(id_cliente):
         nueva_gestion.save()
 
         flash("Se ha creado la gestion correctamente.", "alert-success")
-        return redirect(url_for('public.index'))
+        return redirect(url_for('consultas.caratula', id_gestion = nueva_gestion.id))
     return render_template("gestiones/alta_gestiones.html", form = form, clientes = clientes)
 
 @gestiones_bp.route("/gestiones/gestiones/<criterio>", methods = ['GET', 'POST'])

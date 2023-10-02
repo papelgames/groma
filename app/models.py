@@ -73,6 +73,7 @@ class Gestiones (Base):
     id_cliente = db.Column(db.Integer)
     titular = db.Column(db.String(50), nullable = False)
     ubicacion_gestion= db.Column(db.String(50))
+    coordenadas=db.Column(db.String(50))
     fecha_inicio_gestion = db.Column(db.DateTime)
     fecha_probable_medicion = db.Column(db.DateTime)
     fecha_medicion = db.Column(db.DateTime)
@@ -83,8 +84,8 @@ class Gestiones (Base):
     id_tipo_gestion = db.Column(db.Integer)
     id_tipo_bienes = db.Column(db.Integer)
     id_estado = db.Column(db.Integer)
-    estado_parcelario= db.Column(db.String(50))
-    numero_partida= db.Column(db.String(50))
+    numero_partido= db.Column(db.String(4))
+    numero_partida= db.Column(db.String(8))
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))
     observaciones = db.relationship('Observaciones', backref='gestiones', uselist=False)
@@ -96,18 +97,20 @@ class Gestiones (Base):
 
     @staticmethod
     def get_all(page=1, per_page=20):
-        return db.session.query(Gestiones, personas_cliente, personas_dibujante, TiposGestiones)\
+        return db.session.query(Gestiones, personas_cliente, personas_dibujante, TiposGestiones, TiposBienes)\
             .filter(Gestiones.id_cliente == personas_cliente.id)\
             .filter(Gestiones.id_dibujante == personas_dibujante.id)\
             .filter(Gestiones.id_tipo_gestion == TiposGestiones.id)\
+            .filter(Gestiones.id_tipo_bienes == TiposBienes.id)\
             .paginate(page=page, per_page=per_page, error_out=False)
 
     @staticmethod
     def get_by_id(id_):
-        return db.session.query(Gestiones, personas_cliente, personas_dibujante, TiposGestiones)\
+        return db.session.query(Gestiones, personas_cliente, personas_dibujante, TiposGestiones, TiposBienes)\
             .filter(Gestiones.id_cliente == personas_cliente.id)\
             .filter(Gestiones.id_dibujante == personas_dibujante.id)\
             .filter(Gestiones.id_tipo_gestion == TiposGestiones.id)\
+            .filter(Gestiones.id_tipo_bienes == TiposBienes.id)\
             .filter(Gestiones.id == id_)\
             .first()
             
@@ -115,10 +118,11 @@ class Gestiones (Base):
     @staticmethod
     def get_like_descripcion_all_paginated(descripcion_, page=1, per_page=20):
         descripcion_ = descripcion_.replace(' ','%')
-        return db.session.query(Gestiones, personas_cliente, personas_dibujante, TiposGestiones)\
+        return db.session.query(Gestiones, personas_cliente, personas_dibujante, TiposGestiones, TiposBienes)\
             .filter(Gestiones.id_cliente == personas_cliente.id)\
             .filter(Gestiones.id_dibujante == personas_dibujante.id)\
             .filter(Gestiones.id_tipo_gestion == TiposGestiones.id)\
+            .filter(Gestiones.id_tipo_bienes == TiposBienes.id)\
             .filter(personas_cliente.descripcion_nombre.contains(descripcion_))\
             .paginate(page=page, per_page=per_page, error_out=False)
 

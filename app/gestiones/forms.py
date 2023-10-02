@@ -12,14 +12,15 @@ class BusquedaForm(FlaskForm):
 
 class AltaGestionesForm(FlaskForm):
     titular = StringField('Titular', validators=[DataRequired('Debe cargar el nombre o la razón social' )])
-    ubicacion_gestion= StringField('Ubicación')
+    ubicacion_gestion= StringField('Ubicación',validators=[Length(max=50)])
+    coordenadas= StringField('Coordenadas',validators=[Length(max=50)])
     id_tipo_bienes = SelectField('Tipo de bien', choices =[], coerce = str, default = None, validators=[DataRequired('Seleccione tipo de bien')])
     fecha_inicio_gestion = DateField('Fecha de inicio de gestión')
     fecha_probable_medicion = DateField('Fecha probable de medición')
     id_tipo_gestion = SelectField('Tipo de gestión', choices =[], coerce = str, default = None, validators=[DataRequired('Seleccione tipo de gestión')])
     id_dibujante = StringField('Dibujante')
-    estado_parcelario= StringField("Estado parcelario")
-    numero_partida= StringField("Número de partida")
+    numero_partido= StringField("Partido",validators=[Length(max=4)])
+    numero_partida= StringField("Partida",validators=[Length(max=8)])
     observacion = TextAreaField('Observación', validators=[Length(max=256)])
 
     # descripcion_nombre = StringField("Nombre/Razón Social")

@@ -70,3 +70,6 @@ class ImportesCobrosForm(FlaskForm):
     moneda = SelectField('Moneda', choices =[( '','Seleccionar acción'),( "peso",'Pesos'),( "dolar",'Dolar')], coerce = str, default = None, validators=[DataRequired('Seleccione moneda de cobro')])
     medio_cobro = SelectField('Medio de cobro', choices =[( '','Seleccionar acción'), ( 'Cheque','Cheque'),( 'Transferencia','Transferencia'),( 'Efectivo','Efectivo')], coerce = str, default = None, validators=[DataRequired('Seleccione un medio de cobro')])
     observacion = TextAreaField('Observación', validators=[Length(max=256)])
+
+class PasoForm(FlaskForm):
+    observacion = TextAreaField('Observación', validators=[Length(max=256)])

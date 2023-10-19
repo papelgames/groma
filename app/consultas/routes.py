@@ -92,7 +92,13 @@ def cobro(id_gestion):
 @login_required
 def caratula(id_gestion):
     gestion = Gestiones.get_by_id(id_gestion)
-    if caratula:
-        return render_template("consultas/caratula.html", gestion = gestion)
-    flash("La gestión no caratula","alert-warning")
-    return redirect(url_for("consultas.lista_gestiones", criterio = id_gestion))
+    return render_template("consultas/caratula.html", gestion = gestion)
+    
+@consultas_bp.route("/consultas/bitacora/<id_gestion>")
+@login_required
+def bitacora(id_gestion):
+    gestion = Gestiones.get_by_id(id_gestion)
+    bitacora_completa = Observaciones.get_all_by_id_gestion(id_gestion)
+
+    return render_template("consultas/bitacora.html", gestion = gestion, bitacora_completa=bitacora_completa)
+    

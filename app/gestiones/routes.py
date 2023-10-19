@@ -11,7 +11,7 @@ from app.auth.decorators import admin_required
 from app.auth.models import Users
 from app.models import Personas, TiposGestiones, TiposBienes, Gestiones, Observaciones, Cobros, ImportesCobros
 from . import gestiones_bp 
-from .forms import AltaGestionesForm, BusquedaForm, CobrosForm, ImportesCobrosForm
+from .forms import AltaGestionesForm, BusquedaForm, CobrosForm, ImportesCobrosForm, PasoForm
 
 logger = logging.getLogger(__name__)
 
@@ -221,10 +221,33 @@ def modificacion_gestiones(id_gestion):
         )
 
         if observacion:
-            gestion.Gestiones.observaciones = observacion_gestion
+            gestion.Gestiones.observaciones.append(observacion_gestion)
         gestion.Gestiones.save()
 
         flash("Se ha modificado la gestion correctamente.", "alert-success")
         return redirect(url_for('consultas.caratula', id_gestion = gestion.Gestiones.id))
-    print (gestion.Gestiones.fecha_probable_medicion)
     return render_template("gestiones/modificacion_gestiones.html", form = form, clientes = clientes, gestion = gestion)
+
+@gestiones_bp.route("/gestiones/nuevopaso/<int:id_gestion>", methods = ['GET', 'POST'])
+@login_required
+def nuevo_paso(id_gestion):
+    form = PasoForm()
+    gestion = Gestiones.get_by_id(id_gestion)
+
+    if form.validate_on_submit():
+
+        observacion = form.observacion.data
+        
+        observacion_gestion = Observaciones(
+            observacion = observacion,
+            usuario_alta = current_user.username
+
+        )
+
+        if observacion:
+            gestion.Gestiones.observaciones.append(observacion_gestion)
+        gestion.Gestiones.save()
+        flash("Se ha dado de alta un paso en la bitácora correctamente.", "alert-success")
+        return redirect(url_for('consultas.bitacora', id_gestion = id_gestion))
+    
+    return render_template("gestiones/nuevo_paso.html", form = form,  gestion = gestion)

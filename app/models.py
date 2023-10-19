@@ -88,7 +88,7 @@ class Gestiones (Base):
     numero_partida= db.Column(db.String(8))
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))
-    observaciones = db.relationship('Observaciones', backref='gestiones', uselist=False)
+    observaciones = db.relationship('Observaciones', backref='gestiones', uselist=True, lazy=True)
      
     def save(self):
         if not self.id:
@@ -198,6 +198,10 @@ class Observaciones (Base):
         if not self.id:
             db.session.add(self)
         db.session.commit()
+    
+    @staticmethod
+    def get_all_by_id_gestion(id_gestion):
+        return Observaciones.query.filter_by(id_gestion = id_gestion).all()
 
 class Estados(Base):
     __tablename__ = "estados"

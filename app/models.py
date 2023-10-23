@@ -143,6 +143,7 @@ class Cobros (Base):
     importe_total = db.Column(db.Numeric(precision=15, scale=2))
     moneda = db.Column(db.String(25))
     estado = db.Column(db.Integer)
+    limitada = db.Column(db.Boolean)
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))
     observaciones = db.relationship('Observaciones', backref='cobros', uselist=False)
@@ -205,6 +206,7 @@ class Observaciones (Base):
 
 class Estados(Base):
     __tablename__ = "estados"
+    clave = db.Column(db.Integer)
     descripcion = db.Column(db.String(50))
     tabla = db.Column(db.String(50))
     inicial = db.Column(db.Boolean)
@@ -218,6 +220,7 @@ class Estados(Base):
 class TiposGestiones(Base):
     __tablename__ = "tiposgestiones"
     descripcion = db.Column(db.String(50))
+    limitada = db.Column(db.Boolean)
     
     @staticmethod
     def get_all():

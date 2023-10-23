@@ -7,8 +7,9 @@ class SignupForm(FlaskForm):
     name = StringField('Nombre', validators=[DataRequired(), Length(max=64)])
     username = StringField('Nombre de usuario', validators=[DataRequired(), Length(max=15)])
     correo_electronico = StringField('Correo electronico', validators=[DataRequired(), Email()])
-    activo = BooleanField('activo')
-    is_admin = BooleanField('administrador')
+    activo = BooleanField('Activo')
+    is_admin = BooleanField('Administrador')
+    es_dibujante = BooleanField('Dibujante')
     submit = SubmitField('Registrar')
     cuit = StringField('CUIT', validators=[DataRequired(), Length(max=11)])
 

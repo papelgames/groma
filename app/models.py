@@ -10,7 +10,7 @@ from sqlalchemy import func, or_, alias
 from sqlalchemy.orm import aliased
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
-from app.auth.models import Users
+#from app.auth.models import Users
 
 from app import db
 
@@ -243,3 +243,17 @@ class TiposBienes(Base):
         if not self.id:
             db.session.add(self)
         db.session.commit()
+
+class PermisosPorUsuarios(Base):
+    __tablename__ = "permisosporusuarios"
+    descripcion = db.Column(db.String(50))
+    id_usuario = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    def save(self):
+        if not self.id:
+            db.session.add(self)
+        db.session.commit()
+
+    @staticmethod
+    def get_all_by_id_user(user_id):
+        return PermisosPorUsuarios.query.filter_by(id_usuario = user_id).all()

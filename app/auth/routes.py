@@ -30,7 +30,7 @@ def show_signup_form():
         correo_electronico = form.correo_electronico.data
         new_password = 'groma' + str(strftime('%d%m%y%H%m%s', gmtime()))
         is_admin = form.is_admin.data
-
+        es_dibujante = form.es_dibujante.data
 
         # Comprobamos que no hay ya un usuario con ese nombre de usuario
         user = Users.get_by_username(username)
@@ -44,7 +44,8 @@ def show_signup_form():
             # Creamos el usuario y la persona relacionada al usuario y lo guardamos
             user = Users(username=username, 
                         id_estado=1, 
-                        is_admin=is_admin
+                        is_admin=is_admin,
+                        es_dibujante=es_dibujante
                         )
             
             user.set_password(new_password)
@@ -74,7 +75,7 @@ def show_signup_form():
                         sender=current_app.config['DONT_REPLY_FROM_EMAIL'],
                         recipients=[correo_electronico, ],
                         text_body=f'Hola {name}, eres nuevo usuairo de GromaSoft',
-                        html_body=f'<p>Hola <strong>{name}</strong>, ya tienes usuario en gromasoft: Usuario: {username} Contraseña:{new_password}</p>')
+                        html_body=f'<p>Hola <strong>{name}</strong>, ya tienes usuario en gromasoft: <br>Usuario: <strong>{username}</strong> <br>Contraseña: <strong>{new_password}</strong></p>')
             # Dejamos al usuario logueado
             # login_user(user, remember=False)
             # next_page = request.args.get('next', None)

@@ -1,0 +1,63 @@
+{% extends "base_template.html" %}
+{% from "_render_elements.html" import render_input %}
+
+{% block title %}
+    Groma | Permisos por usuario
+{% endblock %}
+
+{% block content %}
+<h1>Alta de permisos por usuarios</h1>
+<div class="row">
+
+	<div class="col-md-6">
+        <div class="card">       
+            <div class="card-body">
+				<form action="" method="post" enctype="multipart/form-data" novalidate>	
+					{{ form.hidden_tag() }}
+					{{ render_input(form.descripcion,'', id= "descripcion" , class="form-control", placeholder="Nombre del permiso" ) }}
+					<button type="submmit" class="btn btn-primary" >Guardar</button>
+					
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-6">
+        <div class="card">       
+            <div class="card-body">
+				{% if permisos_en_usuario %}
+					
+				
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th scope="col">PERMISO</th>
+								<th scope="col">ACCION</th>
+								
+							</tr>
+						</thead>
+						
+						{% for permiso in permisos_en_usuario %}
+							<tbody>
+								<tr>
+									<td>{{ permiso.descripcion }}</td>
+									
+									<td>
+										<div class="dropdown">
+											<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+												Acción
+										</button>
+										<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+											<a class="dropdown-item"  href="#">Eliminar</a>
+											
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						{% endfor %}
+					</table>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

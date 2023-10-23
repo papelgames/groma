@@ -1,15 +1,15 @@
 import logging
 import os
 
-from flask import render_template, redirect, url_for, abort, current_app
+from flask import render_template, redirect, url_for, abort, current_app, flash
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 
 from app.auth.decorators import admin_required
 from app.auth.models import Users
-#from app.models import Post
+from app.models import PermisosPorUsuarios
 from . import admin_bp
-from .forms import UserAdminForm
+from .forms import UserAdminForm, PermisosUserForm
 
 logger = logging.getLogger(__name__)
 
@@ -19,87 +19,6 @@ logger = logging.getLogger(__name__)
 @admin_required
 def index():
     return render_template("admin/index.html")
-
-
-# @admin_bp.route("/admin/posts/")
-# @login_required
-# @admin_required
-# def list_posts():
-#     posts = Post.get_all()
-#     return render_template("admin/posts.html", posts=posts)
-
-
-# @admin_bp.route("/admin/post/", methods=['GET', 'POST'])
-# @login_required
-# @admin_required
-# def post_form():
-#     """Crea un nuevo post"""
-#     form = PostForm()
-#     if form.validate_on_submit():
-#         print('entro aca')
-#         title = form.title.data
-#         content = form.content.data
-#         file = form.post_image.data
-#         image_name = None
-#         # Comprueba si se ha subido un fichero
-#         if file:
-#             image_name = secure_filename(file.filename)
-#             images_dir = current_app.config['POSTS_IMAGES_DIR']
-#             os.makedirs(images_dir, exist_ok=True)
-#             file_path = os.path.join(images_dir, image_name)
-#             file.save(file_path)
-#         post = Post(user_id=current_user.id, title=title, content=content)
-#         post.image_name = image_name
-#         post.save()
-#         logger.info(f'Guardando nuevo post {title}')
-#         return redirect(url_for('admin.list_posts'))
-#     return render_template("admin/post_form.html", form=form)
-
-
-# @admin_bp.route("/admin/post/<int:post_id>/", methods=['GET', 'POST'])
-# @login_required
-# @admin_required
-# def update_post_form(post_id):
-#     """Actualiza un post existente"""
-#     post = Post.get_by_id(post_id)
-#     if post is None:
-#         logger.info(f'El post {post_id} no existe')
-#         abort(404)
-#     # Crea un formulario inicializando los campos con
-#     # los valores del post.
-#     form = PostForm(obj=post)
-#     if form.validate_on_submit():
-#         # Actualiza los campos del post existente
-#         post.title = form.title.data
-#         post.content = form.content.data
-#         file = form.post_image.data
-#         # Comprueba si se ha subido un fichero
-#         if file:
-#             image_name = secure_filename(file.filename)
-#             images_dir = current_app.config['POSTS_IMAGES_DIR']
-#             os.makedirs(images_dir, exist_ok=True)
-#             file_path = os.path.join(images_dir, image_name)
-#             file.save(file_path)
-#             post.image_name = image_name
-#         post.save()
-#         logger.info(f'Guardando el post {post_id}')
-#         return redirect(url_for('admin.list_posts'))
-#     return render_template("admin/post_form.html", form=form, post=post)
-
-
-# @admin_bp.route("/admin/post/delete/<int:post_id>/", methods=['POST', ])
-# @login_required
-# @admin_required
-# def delete_post(post_id):
-#     logger.info(f'Se va a eliminar el post {post_id}')
-#     post = Post.get_by_id(post_id)
-#     if post is None:
-#         logger.info(f'El post {post_id} no existe')
-#         abort(404)
-#     post.delete()
-#     logger.info(f'El post {post_id} ha sido eliminado')
-#     return redirect(url_for('admin.list_posts'))
-
 
 @admin_bp.route("/admin/users/")
 @login_required
@@ -124,6 +43,7 @@ def update_user_form(user_id):
     if form.validate_on_submit():
         # Actualiza los campos del usuario existente
         user.is_admin = form.is_admin.data
+        user.es_dibujante = form.es_dibujante.data
         user.save()
         logger.info(f'Guardando el usuario {user_id}')
         return redirect(url_for('admin.list_users'))
@@ -142,3 +62,23 @@ def delete_user(user_id):
     user.delete()
     logger.info(f'El usuario {user_id} ha sido eliminado')
     return redirect(url_for('admin.list_users'))
+
+@admin_bp.route("/admin/asignacionpermisos/<int:user_id>/", methods=['GET', 'POST'])
+@login_required
+@admin_required
+def asignacion_permisos(user_id):
+    # Aquí entra para actualizar un usuario existente
+    user = Users.get_by_id(user_id)
+    permisos_en_usuario = PermisosPorUsuarios.get_all_by_id_user(user_id)
+    form = PermisosUserForm()
+    if form.validate_on_submit():
+        descripcion = form.descripcion.data
+
+        permisos_usuarios = PermisosPorUsuarios(descripcion=descripcion)
+
+        user.permisos_usuario.append(permisos_usuarios)
+
+        user.save()
+        flash ('Permiso asignado correctamente', 'alert-success')
+        return redirect(url_for('admin.asignacion_permisos', user_id = user_id))
+    return render_template("admin/permisos_usuarios.html", form=form, user=user, permisos_en_usuario=permisos_en_usuario)

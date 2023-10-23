@@ -3,6 +3,7 @@
 from flask_login import UserMixin
 # from jinja2 import PrefixLoader
 from werkzeug.security import generate_password_hash, check_password_hash
+from app.models import PermisosPorUsuarios
 
 from app import db
 
@@ -12,21 +13,15 @@ class Users(db.Model, UserMixin):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    #name = db.Column(db.String(80), nullable=False)
     username = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     es_dibujante = db.Column(db.Boolean, default=False)
     id_estado = db.Column(db.Integer)
     persona = db.relationship('Personas', backref='users', uselist=False)
+    permisos_usuario = db.relationship('PermisosPorUsuarios', backref='users', uselist=True, lazy=True)
     
-    # def __init__(self, name, email):
-    #     self.name = name
-    #     self.email = email
-
-    # def __repr__(self):
-    #     return f'<User {self.email}>'
-
+    
     def set_password(self, password):
         self.password = generate_password_hash(password)
 

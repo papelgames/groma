@@ -47,7 +47,8 @@ def alta_gestiones(id_cliente):
     clientes = Personas.get_all()
     form.id_tipo_gestion.choices = tipo_gestion_select()
     form.id_tipo_bienes.choices = tipo_bien_select()
-    
+    dibujantes = Users.get_by_id_dibujante()
+
     if form.validate_on_submit():
         titular = form.titular.data
         ubicacion_gestion = form.ubicacion_gestion.data 
@@ -60,7 +61,7 @@ def alta_gestiones(id_cliente):
         numero_partido = form.numero_partido.data
         numero_partida = form.numero_partida.data
         observacion = form.observacion.data
-          
+
         nueva_gestion = Gestiones(id_cliente = id_cliente,
                                 titular = titular,
                                 ubicacion_gestion = ubicacion_gestion,
@@ -81,12 +82,12 @@ def alta_gestiones(id_cliente):
         )
 
         if observacion:
-            nueva_gestion.observaciones = observacion_gestion
+            nueva_gestion.observaciones.append(observacion_gestion)
         nueva_gestion.save()
 
         flash("Se ha creado la gestion correctamente.", "alert-success")
         return redirect(url_for('consultas.caratula', id_gestion = nueva_gestion.id))
-    return render_template("gestiones/alta_gestiones.html", form = form, clientes = clientes)
+    return render_template("gestiones/alta_gestiones.html", form = form, clientes = clientes, dibujantes = dibujantes)
 
 @gestiones_bp.route("/gestiones/gestiones/<criterio>", methods = ['GET', 'POST'])
 @gestiones_bp.route("/gestiones/gestiones/", methods = ['GET', 'POST'])
@@ -199,7 +200,8 @@ def modificacion_gestiones(id_gestion):
     gestion = Gestiones.get_by_id(id_gestion)
     form.id_tipo_gestion.choices = tipo_gestion_select()
     form.id_tipo_bienes.choices = tipo_bien_select()
-    
+    dibujantes = Users.get_by_id_dibujante()
+
     if form.validate_on_submit():
         gestion.Gestiones.titular = form.titular.data
         gestion.Gestiones.ubicacion_gestion = form.ubicacion_gestion.data 
@@ -226,7 +228,7 @@ def modificacion_gestiones(id_gestion):
 
         flash("Se ha modificado la gestion correctamente.", "alert-success")
         return redirect(url_for('consultas.caratula', id_gestion = gestion.Gestiones.id))
-    return render_template("gestiones/modificacion_gestiones.html", form = form, clientes = clientes, gestion = gestion)
+    return render_template("gestiones/modificacion_gestiones.html", form = form, clientes = clientes, gestion = gestion, dibujantes = dibujantes)
 
 @gestiones_bp.route("/gestiones/nuevopaso/<int:id_gestion>", methods = ['GET', 'POST'])
 @login_required

@@ -6,6 +6,7 @@ from wtforms import (StringField, SubmitField, TextAreaField, BooleanField, Date
 from wtforms.fields import FloatField, IntegerField 
 from wtforms.validators import DataRequired, Length, Email, NumberRange, ValidationError
 from app.models import Personas
+from app.auth.models import Users
 
 class BusquedaForm(FlaskForm):
     buscar = StringField('Buscar')
@@ -42,7 +43,8 @@ class AltaGestionesForm(FlaskForm):
         #valido el formato de la lista de carga
         if len(id_dibujante.data.split('|',)) != 3:
             raise ValidationError('El dibujante cargado no es valido.')
-        dibujante_x_id = Personas.get_by_id(id_dibujante.data.split('|',)[0])
+        #dibujante_x_id = Personas.get_by_id(id_dibujante.data.split('|',)[0])
+        dibujante_x_id = Users.get_dibujante_persona(id_dibujante.data.split('|',)[0])
         #valido que las personas existan en la tabla de personas. 
         if not dibujante_x_id:
             raise ValidationError('El dibujante seleccionado no es valido.')

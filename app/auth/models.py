@@ -3,7 +3,7 @@
 from flask_login import UserMixin
 # from jinja2 import PrefixLoader
 from werkzeug.security import generate_password_hash, check_password_hash
-from app.models import PermisosPorUsuarios
+from app.models import Personas
 
 from app import db
 
@@ -48,7 +48,11 @@ class Users(db.Model, UserMixin):
     @staticmethod
     def get_all():
         return Users.query.all()
+
+    @staticmethod
+    def get_by_id_dibujante():
+        return Users.query.filter_by(es_dibujante=1).all()    
     
-    # @staticmethod
-    # def get_by_perfil_activo(perfil):
-    #     return User.query.filter_by(activo=True, perfil = perfil).all()
+    @staticmethod
+    def get_dibujante_persona(id_persona):
+        return Users.query.filter(Users.es_dibujante == True, Users.persona.has(Personas.id == id_persona)).all()

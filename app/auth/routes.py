@@ -11,18 +11,17 @@ from . import auth_bp
 from .forms import SignupForm, LoginForm, ChangePasswordForm, UsernameForm, FindUserForm
 from .models import Users
 from app.models import Personas
-from app.auth.decorators import admin_required
+from app.auth.decorators import admin_required, not_initial_status
 from time import strftime, gmtime
 
 @auth_bp.route("/signup/", methods=["GET", "POST"])
 @login_required
 @admin_required
+@not_initial_status
 def show_signup_form():
     # if current_user.is_authenticated:
     #     return redirect(url_for('public.index'))
     form = SignupForm()
-    
-
     if form.validate_on_submit():
         name = form.name.data
         username = form.username.data
@@ -97,8 +96,8 @@ def login():
         if user is not None and user.check_password(form.password.data):
             print (user.id_estado)
             login_user(user, remember=form.remember_me.data)
-            if user.id_estado == 1:
-                return redirect(url_for('auth.change_password'))
+            # if user.id_estado == 1:
+            #     return redirect(url_for('auth.change_password'))
             next_page = request.args.get('next')
             if not next_page or url_parse(next_page).netloc != '':
                 next_page = url_for('public.index')
@@ -144,7 +143,7 @@ def forgot_password():
                         sender = current_app.config['DONT_REPLY_FROM_EMAIL'],
                         recipients=[correo_electronico, ],
                         text_body=f'Hola {name}, te enviamos un correo para poder blanquear la contraseña',
-                        html_body=f'<p>Hola <strong>{name}</strong>, ingresando al siguiente link podrás generar una nueva contraseña <a href="{url_login}">Link</a> tu contraseña temporal es:{new_password} </p>')
+                        html_body=f'<p>Hola <strong>{name}</strong>, ingresando al siguiente link podrás generar una nueva contraseña <a href="{url_login}">Link</a> tu contraseña temporal es: <br><strong>{new_password}</strong> </p>')
             
             flash('Se ha enviado una notificación a su correo para generar una nueva contraseña','alert-success')
             return redirect(url_for('auth.login'))

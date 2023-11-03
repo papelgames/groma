@@ -5,7 +5,7 @@ from datetime import date, datetime, timedelta
 from flask import render_template, redirect, url_for, abort, current_app, flash, request
 from flask_login import login_required, current_user
 
-from app.auth.decorators import admin_required
+from app.auth.decorators import admin_required, not_initial_status
 from app.auth.models import Users
 from app.models import Gestiones, Cobros, ImportesCobros, Estados, TiposGestiones, Observaciones, Personas
 
@@ -22,6 +22,7 @@ def control_vencimiento (fecha):
 @consultas_bp.route("/consultas/consultapersonas/<criterio>", methods = ['GET', 'POST'])
 @consultas_bp.route("/consultas/consultapersonas/", methods = ['GET', 'POST'])
 @login_required
+@not_initial_status
 def consulta_personas(criterio = ""):
     form = BusquedaForm()
     lista_de_personas = []
@@ -44,6 +45,7 @@ def consulta_personas(criterio = ""):
 @consultas_bp.route("/consultas/listagestiones/<criterio>", methods = ['GET', 'POST'])
 @consultas_bp.route("/consultas/listagestiones/", methods = ['GET', 'POST'])
 @login_required
+@not_initial_status
 def lista_gestiones(criterio = ""):
     form = BusquedaForm()
     
@@ -81,6 +83,7 @@ def lista_gestiones(criterio = ""):
 @consultas_bp.route("/consultas/cobro/<id_gestion>")
 @login_required
 @admin_required
+@not_initial_status
 def cobro(id_gestion):
     cobro_individual = Cobros.get_all_by_id_gestion(id_gestion)
     if cobro_individual:
@@ -90,12 +93,14 @@ def cobro(id_gestion):
 
 @consultas_bp.route("/consultas/caratula/<id_gestion>")
 @login_required
+@not_initial_status
 def caratula(id_gestion):
     gestion = Gestiones.get_by_id(id_gestion)
     return render_template("consultas/caratula.html", gestion = gestion)
     
 @consultas_bp.route("/consultas/bitacora/<id_gestion>")
 @login_required
+@not_initial_status
 def bitacora(id_gestion):
     gestion = Gestiones.get_by_id(id_gestion)
     bitacora_completa = Observaciones.get_all_by_id_gestion(id_gestion)

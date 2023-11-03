@@ -7,7 +7,7 @@ from flask_login import login_required, current_user
 
 from werkzeug.utils import secure_filename
 
-from app.auth.decorators import admin_required
+from app.auth.decorators import admin_required, not_initial_status
 from app.auth.models import Users
 from app.models import Personas, TiposGestiones, TiposBienes
 from . import abms_bp
@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 @abms_bp.route("/abms/altapersonas/", methods = ['GET', 'POST'])
 @login_required
+@not_initial_status
 def alta_persona():
     form = AltaPersonasForm()                                                                                                                   
 
@@ -52,6 +53,7 @@ def alta_persona():
 
 @abms_bp.route("/abms/actualizacionpersona/<int:id_persona>", methods = ['GET', 'POST'])
 @login_required
+@not_initial_status
 def actualizacion_persona(id_persona):
     form=AltaPersonasForm()
     persona = Personas.get_by_id(id_persona)
@@ -73,6 +75,7 @@ def actualizacion_persona(id_persona):
 @abms_bp.route("/abms/altatipogestiones/", methods = ['GET', 'POST'])
 @login_required
 @admin_required
+@not_initial_status
 def alta_tipo_gestion():
     form = TiposForm()
     tipos = TiposGestiones.get_all()
@@ -90,6 +93,7 @@ def alta_tipo_gestion():
 @abms_bp.route("/abms/altatipobienes/", methods = ['GET', 'POST'])
 @login_required
 @admin_required
+@not_initial_status
 def alta_tipo_bien():
     form = TiposForm()
     tipos = TiposBienes.get_all()

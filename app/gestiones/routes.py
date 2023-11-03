@@ -7,7 +7,7 @@ from datetime import date, datetime, timedelta
 from flask import render_template, redirect, url_for, current_app, flash, send_file, request #, make_response, abort
 from flask_login import login_required, current_user
 
-from app.auth.decorators import admin_required
+from app.auth.decorators import admin_required, not_initial_status
 from app.auth.models import Users
 from app.models import Personas, TiposGestiones, TiposBienes, Gestiones, Observaciones, Cobros, ImportesCobros
 from . import gestiones_bp 
@@ -40,6 +40,7 @@ def tipo_bien_select():
 
 @gestiones_bp.route("/gestiones/altagestiones/<int:id_cliente>", methods = ['GET', 'POST'])
 @login_required
+@not_initial_status
 def alta_gestiones(id_cliente):
     if not id_cliente:
         return redirect(url_for('gestiones.gestiones'))
@@ -92,6 +93,7 @@ def alta_gestiones(id_cliente):
 @gestiones_bp.route("/gestiones/gestiones/<criterio>", methods = ['GET', 'POST'])
 @gestiones_bp.route("/gestiones/gestiones/", methods = ['GET', 'POST'])
 @login_required
+@not_initial_status
 def gestiones(criterio = ""):
     form = BusquedaForm()
     lista_de_personas = []
@@ -114,6 +116,7 @@ def gestiones(criterio = ""):
 @gestiones_bp.route("/gestiones/altacobroscabecera/<int:id_gestion>", methods = ['GET', 'POST'])
 @login_required
 @admin_required
+@not_initial_status
 def alta_cobros_cabecera(id_gestion):
     if not id_gestion:
         return redirect(url_for('consultas.lista_gestiones'))
@@ -153,6 +156,7 @@ def alta_cobros_cabecera(id_gestion):
 @gestiones_bp.route("/gestiones/altacobros/<int:id_cobro>", methods = ['GET', 'POST'])
 @login_required
 @admin_required
+@not_initial_status
 def alta_importe_cobro(id_cobro):
     if not id_cobro:
         return redirect(url_for('consultas.lista_gestiones'))
@@ -190,48 +194,50 @@ def alta_importe_cobro(id_cobro):
         return redirect(url_for('public.index'))
     return render_template("gestiones/alta_importe_cobro.html", form = form)
 
+
 @gestiones_bp.route("/gestiones/modificaciongestiones/<int:id_gestion>", methods = ['GET', 'POST'])
 @login_required
+@not_initial_status
 def modificacion_gestiones(id_gestion):
     if not id_gestion:
         return redirect(url_for('gestiones.gestiones'))
-    form = AltaGestionesForm()                                                                                                                   
-    clientes = Personas.get_all()
     gestion = Gestiones.get_by_id(id_gestion)
+    form = AltaGestionesForm(request.form)                                                                                                                   
+    clientes = Personas.get_all()
     form.id_tipo_gestion.choices = tipo_gestion_select()
     form.id_tipo_bienes.choices = tipo_bien_select()
     dibujantes = Users.get_by_id_dibujante()
 
     if form.validate_on_submit():
-        gestion.Gestiones.titular = form.titular.data
-        gestion.Gestiones.ubicacion_gestion = form.ubicacion_gestion.data 
-        gestion.Gestiones.coordenadas = form.coordenadas.data
-        gestion.Gestiones.id_tipo_bienes = form.id_tipo_bienes.data
-        gestion.Gestiones.fecha_inicio_gestion = form.fecha_inicio_gestion.data
-        gestion.Gestiones.fecha_probable_medicion = form.fecha_probable_medicion.data
-        gestion.Gestiones.id_tipo_gestion = form.id_tipo_gestion.data
+        form.populate_obj(gestion.Gestiones)  # Actualizar la gestión con los datos del formulario
         gestion.Gestiones.id_dibujante = form.id_dibujante.data.split('|',)[0]
-        gestion.Gestiones.numero_partido = form.numero_partido.data
-        gestion.Gestiones.numero_partida = form.numero_partida.data
         gestion.Gestiones.usuario_modificacion = current_user.username
         observacion = form.observacion.data
         
         observacion_gestion = Observaciones(
             observacion = observacion,
             usuario_alta = current_user.username
-
         )
 
         if observacion:
             gestion.Gestiones.observaciones.append(observacion_gestion)
         gestion.Gestiones.save()
-
+        for a in request.form.items():
+            print (a)    
         flash("Se ha modificado la gestion correctamente.", "alert-success")
         return redirect(url_for('consultas.caratula', id_gestion = gestion.Gestiones.id))
+    
+    for campo in list(request.form.items())[1:11]:
+        data_campo = getattr(form,campo[0]).data
+        setattr(gestion.Gestiones,campo[0], data_campo)
+    if request.form:
+        gestion.Gestiones.id_dibujante = form.id_dibujante.data.split('|',)[0]
+      
     return render_template("gestiones/modificacion_gestiones.html", form = form, clientes = clientes, gestion = gestion, dibujantes = dibujantes)
 
 @gestiones_bp.route("/gestiones/nuevopaso/<int:id_gestion>", methods = ['GET', 'POST'])
 @login_required
+@not_initial_status
 def nuevo_paso(id_gestion):
     form = PasoForm()
     gestion = Gestiones.get_by_id(id_gestion)

@@ -1,7 +1,7 @@
 import logging
 import os
 
-from flask import render_template, redirect, url_for, abort, current_app, flash
+from flask import render_template, redirect, url_for, abort, current_app, flash, request
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 
@@ -88,3 +88,4 @@ def asignacion_permisos(user_id):
         flash ('Permiso asignado correctamente', 'alert-success')
         return redirect(url_for('admin.asignacion_permisos', user_id = user_id))
     return render_template("admin/permisos_usuarios.html", form=form, user=user, permisos_en_usuario=permisos_en_usuario)
+

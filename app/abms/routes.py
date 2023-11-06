@@ -9,15 +9,24 @@ from werkzeug.utils import secure_filename
 
 from app.auth.decorators import admin_required, not_initial_status
 from app.auth.models import Users
-from app.models import Personas, TiposGestiones, TiposBienes
+from app.models import Personas, TiposGestiones, TiposBienes, Permisos, Roles
 from . import abms_bp
-from .forms import AltaPersonasForm, TiposForm
+from .forms import AltaPersonasForm, TiposForm, PermisosForm, RolesForm
 
 #from app.common.mail import send_email
 from time import strftime, gmtime
 
 
 logger = logging.getLogger(__name__)
+
+#creo una tupla para usar en el campo select del form que quiera que necesite los tipo de gestiones
+def permisos_select():
+    permisos = Permisos.get_all()
+    select_permisos =[( '','Seleccionar permiso')]
+    for rs in permisos:
+        sub_select_permisos = (str(rs.id), rs.descripcion)
+        select_permisos.append(sub_select_permisos)
+    return select_permisos
 
 
 @abms_bp.route("/abms/altapersonas/", methods = ['GET', 'POST'])
@@ -107,3 +116,49 @@ def alta_tipo_bien():
         return redirect(url_for('abms.alta_tipo_bien'))
 
     return render_template("abms/alta_tipo_bien.html", form=form, tipos=tipos)
+
+@abms_bp.route("/abms/altapermisos/", methods = ['GET', 'POST'])
+@login_required
+@admin_required
+@not_initial_status
+def alta_permiso():
+    form = PermisosForm()
+    permisos = Permisos.get_all()
+    if form.validate_on_submit():
+        descripcion = form.permiso.data
+
+        permiso = Permisos(descripcion=descripcion)
+
+        permiso.save()
+        flash("Nuevo permiso creado", "alert-success")
+        return redirect(url_for('abms.alta_permiso'))
+
+    return render_template("abms/alta_permisos.html", form=form, permisos=permisos)
+
+@abms_bp.route("/admin/crearroles/", methods=['GET', 'POST'])
+@login_required
+@admin_required
+@not_initial_status
+def crear_roles():
+    descripcion_rol = request.args.get('rol','')
+    permisos_en_rol = Roles.get_all_by_descripcion(descripcion_rol)
+    
+    form = RolesForm()
+    form.id_permiso.choices= permisos_select()
+
+    if form.validate_on_submit():
+        id_permiso = form.id_permiso.data
+        descripcion = form.descripcion.data
+        
+        permiso=Permisos.get_by_id(id_permiso)
+        
+        rol = Roles(descripcion=descripcion)
+
+        permiso.roles.append(rol)
+
+        permiso.save()
+        
+        flash ('Permiso en rol correctamente', 'alert-success')
+        return redirect(url_for('abms.crear_roles', rol = descripcion))
+    return render_template("abms/roles.html", form=form, permisos_en_rol=permisos_en_rol)
+

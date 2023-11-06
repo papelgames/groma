@@ -83,3 +83,11 @@ class BusquedaForm(FlaskForm):
 
 class TiposForm(FlaskForm):
     tipo = StringField('Nuevo tipo', validators=[DataRequired('Escriba una descripción' )])
+
+class PermisosForm(FlaskForm):
+    permiso = StringField('Nuevo permiso', validators=[DataRequired('Escriba una descripción' )])
+
+
+class RolesForm(FlaskForm):
+    descripcion = StringField('Rol',validators=[DataRequired('Debe ingresar un rol'),Length(max=15)])
+    id_permiso = SelectField('Permiso', choices =[], coerce = str, default = None, validators=[DataRequired('Seleccione un permiso')])

@@ -69,7 +69,6 @@ personas_dibujante = aliased(Personas)
 
 class Gestiones (Base):
     __tablename__ = "gestiones"
-
     id_cliente = db.Column(db.Integer)
     titular = db.Column(db.String(50), nullable = False)
     ubicacion_gestion= db.Column(db.String(50))
@@ -248,7 +247,7 @@ class PermisosPorUsuarios(Base):
     __tablename__ = "permisosporusuarios"
     descripcion = db.Column(db.String(50))
     id_usuario = db.Column(db.Integer, db.ForeignKey('users.id'))
-
+    
     def save(self):
         if not self.id:
             db.session.add(self)
@@ -257,3 +256,40 @@ class PermisosPorUsuarios(Base):
     @staticmethod
     def get_all_by_id_user(user_id):
         return PermisosPorUsuarios.query.filter_by(id_usuario = user_id).all()
+
+class Roles(Base):
+    __tablename__ = "roles"
+    descripcion = db.Column(db.String(50))
+    id_permiso = db.Column(db.Integer, db.ForeignKey('permisos.id'))
+
+    def save(self):
+        if not self.id:
+            db.session.add(self)
+        db.session.commit()
+    
+    @staticmethod
+    def get_all_by_id(id_rol):
+        return Roles.query.filter_by(id = id_rol).all()
+
+    @staticmethod
+    def get_all_by_descripcion(descripcion):
+        return Roles.query.filter_by(descripcion = descripcion).all()
+
+
+class Permisos(Base):
+    __tablename__ = "permisos"
+    descripcion = db.Column(db.String(50))
+    roles = db.relationship('Roles', backref='permisos', uselist=True, lazy=True)
+
+    def save(self):
+        if not self.id:
+            db.session.add(self)
+        db.session.commit()
+    
+    @staticmethod
+    def get_all():
+        return Permisos.query.all()
+
+    @staticmethod
+    def get_by_id(id_permiso):
+        return Permisos.query.filter_by(id = id_permiso).first()

@@ -67,18 +67,17 @@ def actualizacion_persona(id_persona):
     form=AltaPersonasForm()
     persona = Personas.get_by_id(id_persona)
     if form.validate_on_submit():
-        persona.descripcion_nombre = form.descripcion_nombre.data
-        persona.correo_electronico = form.correo_electronico.data
-        persona.telefono = form.telefono.data
-        persona.cuit = form.cuit.data
-        persona.tipo_persona = form.tipo_persona.data 
-        persona.nota = form.nota.data
+        form.populate_obj(persona)
         persona.usuario_modificacion = current_user.username
         
         persona.save()
         flash("Se ha actualizado la persona correctamente.", "alert-success")
         return redirect(url_for('consultas.consulta_personas'))
-       
+    
+    for campo in list(request.form.items())[1:]:
+        data_campo = getattr(form,campo[0]).data
+        setattr(persona,campo[0], data_campo)
+
     return render_template("abms/modificacion_datos_persona.html", form=form, persona = persona)
 
 @abms_bp.route("/abms/altatipogestiones/", methods = ['GET', 'POST'])

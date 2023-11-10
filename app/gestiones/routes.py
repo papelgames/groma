@@ -222,8 +222,7 @@ def modificacion_gestiones(id_gestion):
         if observacion:
             gestion.Gestiones.observaciones.append(observacion_gestion)
         gestion.Gestiones.save()
-        for a in request.form.items():
-            print (a)    
+    
         flash("Se ha modificado la gestion correctamente.", "alert-success")
         return redirect(url_for('consultas.caratula', id_gestion = gestion.Gestiones.id))
     

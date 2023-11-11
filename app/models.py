@@ -245,9 +245,12 @@ class TiposBienes(Base):
 
 class PermisosPorUsuarios(Base):
     __tablename__ = "permisosporusuarios"
-    descripcion = db.Column(db.String(50))
+    id_permiso = db.Column(db.Integer, db.ForeignKey('permisos.id'))
     id_usuario = db.Column(db.Integer, db.ForeignKey('users.id'))
     
+    # user = db.relationship('Users', back_populates='permisos')
+    # permiso = db.relationship('Permisos', back_populates='users')
+
     def save(self):
         if not self.id:
             db.session.add(self)
@@ -267,19 +270,28 @@ class Roles(Base):
             db.session.add(self)
         db.session.commit()
     
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+    
     @staticmethod
     def get_all_by_id(id_rol):
-        return Roles.query.filter_by(id = id_rol).all()
+        return Roles.query.filter_by(id = id_rol).first()
 
     @staticmethod
     def get_all_by_descripcion(descripcion):
         return Roles.query.filter_by(descripcion = descripcion).all()
+
+    @staticmethod
+    def get_all_descripcion_agrupada():
+        return db.session.query(Roles.descripcion.label('nombre_rol')).distinct().all()
 
 
 class Permisos(Base):
     __tablename__ = "permisos"
     descripcion = db.Column(db.String(50))
     roles = db.relationship('Roles', backref='permisos', uselist=True, lazy=True)
+    users = db.relationship('Users', secondary='permisosporusuarios', back_populates='permisos')
 
     def save(self):
         if not self.id:

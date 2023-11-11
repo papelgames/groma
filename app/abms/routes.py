@@ -147,7 +147,8 @@ def crear_roles():
 
     if form.validate_on_submit():
         id_permiso = form.id_permiso.data
-        descripcion = form.descripcion.data
+        
+        descripcion = form.descripcion.data.upper()
         
         permiso=Permisos.get_by_id(id_permiso)
         
@@ -159,5 +160,15 @@ def crear_roles():
         
         flash ('Permiso en rol correctamente', 'alert-success')
         return redirect(url_for('abms.crear_roles', rol = descripcion))
-    return render_template("abms/roles.html", form=form, permisos_en_rol=permisos_en_rol)
+    return render_template("abms/roles.html", form=form, permisos_en_rol=permisos_en_rol, descripcion_rol=descripcion_rol)
 
+@abms_bp.route("/admin/eliminarpermisosroles/<id_rol>", methods=['GET', 'POST'])
+@login_required
+@admin_required
+@not_initial_status
+def eliminar_permisos_roles(id_rol):
+    rol = Roles.get_all_by_id(id_rol)
+    rol.delete()    
+    flash ('Permiso eliminado correctamente del rol', 'alert-success')
+    return redirect(url_for('abms.crear_roles', rol = rol.descripcion))
+    

@@ -7,11 +7,29 @@ from werkzeug.utils import secure_filename
 
 from app.auth.decorators import admin_required, not_initial_status
 from app.auth.models import Users
-from app.models import PermisosPorUsuarios
+from app.models import  Permisos, Roles
 from . import admin_bp
-from .forms import UserAdminForm, PermisosUserForm
+from .forms import UserAdminForm, PermisosUserForm, RolesUserForm
 
 logger = logging.getLogger(__name__)
+
+#creo una tupla para usar en el campo select del form que quiera que necesite los permisos
+def permisos_select():
+    permisos = Permisos.get_all()
+    select_permisos =[( '','Seleccionar permiso')]
+    for rs in permisos:
+        sub_select_permisos = (str(rs.id), rs.descripcion)
+        select_permisos.append(sub_select_permisos)
+    return select_permisos
+
+#creo una tupla para usar en el campo select del form que quiera que necesite los roles
+def roles_select():
+    roles = Roles.get_all_descripcion_agrupada()
+    select_rol =[( '','Seleccionar permiso')]
+    for rs in roles:
+        sub_select_rol = (rs.nombre_rol, rs.nombre_rol)
+        select_rol.append(sub_select_rol)
+    return select_rol
 
 
 @admin_bp.route("/admin/")
@@ -75,17 +93,64 @@ def delete_user(user_id):
 def asignacion_permisos(user_id):
     # Aquí entra para actualizar un usuario existente
     user = Users.get_by_id(user_id)
-    permisos_en_usuario = PermisosPorUsuarios.get_all_by_id_user(user_id)
     form = PermisosUserForm()
+    form.id_permiso.choices = permisos_select()
+    
     if form.validate_on_submit():
-        descripcion = form.descripcion.data
-
-        permisos_usuarios = PermisosPorUsuarios(descripcion=descripcion)
-
-        user.permisos_usuario.append(permisos_usuarios)
+        permiso = Permisos.get_by_id(form.id_permiso.data)
+        for permiso_en_user in user.permisos:
+            if permiso_en_user.id == int(form.id_permiso.data):
+                flash ('El usuario ya tiene el permiso', 'alert-warning')
+                return redirect(url_for('admin.asignacion_permisos', user_id = user_id))
+        user.permisos.append(permiso)
 
         user.save()
+        
         flash ('Permiso asignado correctamente', 'alert-success')
         return redirect(url_for('admin.asignacion_permisos', user_id = user_id))
-    return render_template("admin/permisos_usuarios.html", form=form, user=user, permisos_en_usuario=permisos_en_usuario)
+    return render_template("admin/permisos_usuarios.html", form=form, user=user)
 
+
+@admin_bp.route("/admin/asignacionroles/<int:user_id>/", methods=['GET', 'POST'])
+@login_required
+@admin_required
+@not_initial_status
+def asignacion_roles(user_id):
+    # Aquí entra para actualizar un usuario existente
+    user = Users.get_by_id(user_id)
+    form = RolesUserForm()
+    form.rol.choices = roles_select()
+    
+    if form.validate_on_submit():
+        permisos_de_roles = Roles.get_all_by_descripcion(form.rol.data)
+        for permiso_en_rol in permisos_de_roles:
+            permiso = Permisos.get_by_id(permiso_en_rol.id_permiso) 
+            control = True
+            for permiso_en_user in user.permisos:
+                if permiso_en_user.id == permiso.id:
+                    control = False
+                
+            if control:
+                user.permisos.append(permiso)
+              
+        user.save()
+
+        flash ('Permiso asignado correctamente', 'alert-success')
+        return redirect(url_for('admin.asignacion_roles', user_id = user_id))
+    return render_template("admin/roles_usuarios.html", form=form, user=user)
+
+
+@admin_bp.route("/admin/eliminarpermisousuario/", methods=['GET', 'POST'])
+@login_required
+@admin_required
+@not_initial_status
+def eliminar_permiso_usuario():
+    user_id = request.args.get('user_id','')
+    id_permiso = request.args.get('id_permiso','')
+    user = Users.get_by_id(user_id)
+    permiso = Permisos.get_by_id(id_permiso)
+    
+    user.permisos.remove(permiso)
+    user.save()
+    flash ('Permiso eliminado correctamente', 'alert-success')
+    return redirect(url_for('admin.asignacion_permisos', user_id = user_id))

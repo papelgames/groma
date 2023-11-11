@@ -9,4 +9,7 @@ class UserAdminForm(FlaskForm):
     es_dibujante = BooleanField('¿Es dibujante?')
     
 class PermisosUserForm(FlaskForm):
-    descripcion = StringField('Nombre del permiso',validators=[DataRequired('Debe ingresar un permiso'),Length(max=256)])
+    id_permiso = SelectField('Permiso', choices =[], coerce = str, default = None, validators=[DataRequired('Seleccione un permiso')])
+
+class RolesUserForm(FlaskForm):
+    rol = SelectField('Rol', choices =[], coerce = str, default = None, validators=[DataRequired('Seleccione un rol')])

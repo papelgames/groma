@@ -14,7 +14,7 @@
             <div class="card-body">
 				<form action="" method="post" enctype="multipart/form-data" novalidate>	
 					{{ form.hidden_tag() }}
-					{{ render_input(form.descripcion,'', id= "descripcion" , class="form-control", placeholder="Nombre del permiso" ) }}
+					{{ render_input(form.descripcion,'', id= "descripcion" , value= descripcion_rol, class="form-control", placeholder="Nombre del permiso" ) }}
 					{{ render_input(form.id_permiso,'', id= "id_permiso" , class="form-control", placeholder="Nombre del permiso" ) }}
 					<button type="submmit" class="btn btn-primary" >Guardar</button>
 					
@@ -48,7 +48,7 @@
 												Acción
 										</button>
 										<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-											<a class="dropdown-item"  href="#">Eliminar</a>
+											<a class="dropdown-item"  href="{{url_for('abms.eliminar_permisos_roles', id_rol = permiso.id) }}">Eliminar</a>
 											
 										</div>
 									</td>

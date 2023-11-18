@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import (StringField, SubmitField, TextAreaField, BooleanField, IntegerField, DateField, SelectField)
 from wtforms.fields import FloatField, IntegerField
-from wtforms.validators import DataRequired, Length, Email, ValidationError
+from wtforms.validators import DataRequired, Length, Email, ValidationError, NumberRange
 
 
 class AltaPersonasForm(FlaskForm):
@@ -95,3 +95,6 @@ class TareasForm(FlaskForm):
 class RolesForm(FlaskForm):
     descripcion = StringField('Rol',validators=[DataRequired('Debe ingresar un rol'),Length(max=15)])
     id_permiso = SelectField('Permiso', choices =[], coerce = str, default = None, validators=[DataRequired('Seleccione un permiso')])
+
+class TareasPorTipoDeGestionForm(FlaskForm):
+    id_tarea = SelectField('Tarea', choices =[], coerce = int, validators=[NumberRange(min=1, message="Debe ingresar una tarea")])

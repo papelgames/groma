@@ -11,7 +11,7 @@ from app.auth.decorators import admin_required, not_initial_status
 from app.auth.models import Users
 from app.models import Personas, TiposGestiones, TiposBienes, Permisos, Roles, Tareas
 from . import abms_bp
-from .forms import AltaPersonasForm, TiposForm, PermisosForm, RolesForm, TareasForm
+from .forms import AltaPersonasForm, TiposForm, PermisosForm, RolesForm, TareasForm, TareasPorTipoDeGestionForm
 
 #from app.common.mail import send_email
 from time import strftime, gmtime
@@ -31,7 +31,7 @@ def permisos_select():
 #creo una tupla para usar en el campo select del form que quiera que necesite las tareas
 def tareas_correlativas_select():
     tareas = Tareas.get_all()
-    select_tareas =[(0,'Seleccionar permiso')]
+    select_tareas =[(0,'Seleccionar Tarea')]
     for rs in tareas:
         sub_select_tareas = (rs.id, rs.descripcion)
         select_tareas.append(sub_select_tareas)
@@ -169,7 +169,7 @@ def crear_roles():
         
         flash ('Permiso en rol correctamente', 'alert-success')
         return redirect(url_for('abms.crear_roles', rol = descripcion))
-    return render_template("abms/roles.html", form=form, permisos_en_rol=permisos_en_rol, descripcion_rol=descripcion_rol)
+    return render_template("abms/alta_roles.html", form=form, permisos_en_rol=permisos_en_rol, descripcion_rol=descripcion_rol)
 
 @abms_bp.route("/admin/eliminarpermisosroles/<id_rol>", methods=['GET', 'POST'])
 @login_required
@@ -205,4 +205,27 @@ def alta_tarea():
         flash("Nuevo tarea creado", "alert-success")
         return redirect(url_for('abms.alta_tarea'))
         #falta mostrar las tareas dadas de alta
-    return render_template("abms/alta_tarea.html", form=form)    
+    return render_template("abms/alta_tarea.html", form=form)
+
+@abms_bp.route("/abms/altatareasportipodegestion/", methods = ['GET', 'POST'])
+@login_required
+@admin_required
+@not_initial_status
+def alta_tareas_por_tipo_gestion():
+    id_tipo_gestion = request.args.get('id_tipo_gestion','')
+
+    form = TareasPorTipoDeGestionForm()
+    form.id_tarea.choices=tareas_correlativas_select()
+    tipos_gestiones_por_id = TiposGestiones.get_first_by_id(id_tipo_gestion)
+
+    if form.validate_on_submit():
+        id_tarea = form.id_tarea.data
+        tareas_por_id = Tareas.get_first_by_id(id_tarea)
+        tareas_por_id.tipos_gestiones.append(tipos_gestiones_por_id)
+        tareas_por_id.save()
+   
+        flash("Tarea vinculada", "alert-success")
+        return redirect(url_for('abms.alta_tareas_por_tipo_gestion', id_tipo_gestion = id_tipo_gestion))
+    
+    tareas_por_tipo_gestion=TiposGestiones.get_all_by_id(id_tipo_gestion) 
+    return render_template("abms/alta_tareas_default.html", form=form,tareas_por_tipo_gestion=tareas_por_tipo_gestion)

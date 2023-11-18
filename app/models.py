@@ -231,6 +231,10 @@ class TiposGestiones(Base):
 
     @staticmethod
     def get_all_by_id(id_tipo_gestion):
+        return TiposGestiones.query.filter_by(id = id_tipo_gestion).all()
+    
+    @staticmethod
+    def get_first_by_id(id_tipo_gestion):
         return TiposGestiones.query.filter_by(id = id_tipo_gestion).first()
 
     def save(self):
@@ -339,6 +343,10 @@ class Tareas(Base):
     @staticmethod
     def get_all():
         return Tareas.query.all()
+    
+    @staticmethod
+    def get_first_by_id(id_tarea):
+        return Tareas.query.filter_by(id = id_tarea).first()
 
 
 class TiposGestionesPorTareas(Base):

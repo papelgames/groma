@@ -9,9 +9,9 @@ from werkzeug.utils import secure_filename
 
 from app.auth.decorators import admin_required, not_initial_status
 from app.auth.models import Users
-from app.models import Personas, TiposGestiones, TiposBienes, Permisos, Roles
+from app.models import Personas, TiposGestiones, TiposBienes, Permisos, Roles, Tareas
 from . import abms_bp
-from .forms import AltaPersonasForm, TiposForm, PermisosForm, RolesForm
+from .forms import AltaPersonasForm, TiposForm, PermisosForm, RolesForm, TareasForm
 
 #from app.common.mail import send_email
 from time import strftime, gmtime
@@ -27,6 +27,15 @@ def permisos_select():
         sub_select_permisos = (str(rs.id), rs.descripcion)
         select_permisos.append(sub_select_permisos)
     return select_permisos
+
+#creo una tupla para usar en el campo select del form que quiera que necesite las tareas
+def tareas_correlativas_select():
+    tareas = Tareas.get_all()
+    select_tareas =[(0,'Seleccionar permiso')]
+    for rs in tareas:
+        sub_select_tareas = (rs.id, rs.descripcion)
+        select_tareas.append(sub_select_tareas)
+    return select_tareas
 
 
 @abms_bp.route("/abms/altapersonas/", methods = ['GET', 'POST'])
@@ -171,4 +180,29 @@ def eliminar_permisos_roles(id_rol):
     rol.delete()    
     flash ('Permiso eliminado correctamente del rol', 'alert-success')
     return redirect(url_for('abms.crear_roles', rol = rol.descripcion))
-    
+
+@abms_bp.route("/abms/altatareas/", methods = ['GET', 'POST'])
+@login_required
+@admin_required
+@not_initial_status
+def alta_tarea():
+    form = TareasForm()
+    form.correlativa_de.choices=tareas_correlativas_select()
+
+    if form.validate_on_submit():
+        descripcion = form.descripcion.data
+        correlativa_de = form.correlativa_de.data
+        dias_para_vencimiento = form.dias_para_vencimiento.data
+        
+        tarea = Tareas(descripcion=descripcion, 
+                           correlativa_de=correlativa_de,
+                           dias_para_vencimiento=dias_para_vencimiento,
+                           usuario_alta=current_user.username)
+
+        #tarea.tipos_gestiones.append(tipos)
+
+        tarea.save()
+        flash("Nuevo tarea creado", "alert-success")
+        return redirect(url_for('abms.alta_tarea'))
+        #falta mostrar las tareas dadas de alta
+    return render_template("abms/alta_tarea.html", form=form)    

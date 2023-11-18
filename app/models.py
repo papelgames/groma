@@ -223,12 +223,16 @@ class TiposGestiones(Base):
     __tablename__ = "tiposgestiones"
     descripcion = db.Column(db.String(50))
     limitada = db.Column(db.Boolean)
-    tareas = db.relationship('Tareas', secondary='tiposgestionesportareas', back_populates='tiposgestiones')
+    tareas = db.relationship('Tareas', secondary='tiposgestionesportareas', back_populates='tipos_gestiones')
     
     @staticmethod
     def get_all():
         return TiposGestiones.query.all()
-        
+
+    @staticmethod
+    def get_all_by_id(id_tipo_gestion):
+        return TiposGestiones.query.filter_by(id = id_tipo_gestion).first()
+
     def save(self):
         if not self.id:
             db.session.add(self)
@@ -326,6 +330,16 @@ class Tareas(Base):
     usuario_modificacion = db.Column(db.String(256))
     gestiones = db.relationship('Gestiones', secondary='gestionesportareas', back_populates='tareas')
     tipos_gestiones = db.relationship('TiposGestiones', secondary='tiposgestionesportareas', back_populates='tareas')
+
+    def save(self):
+        if not self.id:
+            db.session.add(self)
+        db.session.commit()
+
+    @staticmethod
+    def get_all():
+        return Tareas.query.all()
+
 
 class TiposGestionesPorTareas(Base):
     __tablename__ = "tiposgestionesportareas"

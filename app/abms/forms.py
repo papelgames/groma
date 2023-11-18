@@ -87,6 +87,10 @@ class TiposForm(FlaskForm):
 class PermisosForm(FlaskForm):
     permiso = StringField('Nuevo permiso', validators=[DataRequired('Escriba una descripción' )])
 
+class TareasForm(FlaskForm):
+    descripcion = StringField('Nueva tarea', validators=[DataRequired('Escriba una descripción' )])
+    correlativa_de = SelectField('Correlativa de', choices =[], coerce = int)
+    dias_para_vencimiento = IntegerField('Dias para el vencimiento')
 
 class RolesForm(FlaskForm):
     descripcion = StringField('Rol',validators=[DataRequired('Debe ingresar un rol'),Length(max=15)])

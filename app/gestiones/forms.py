@@ -75,3 +75,6 @@ class ImportesCobrosForm(FlaskForm):
 
 class PasoForm(FlaskForm):
     observacion = TextAreaField('Observación', validators=[Length(max=256)])
+
+class GestionesTareasForm(FlaskForm):
+    id_tarea = SelectField('Nueva tarea', choices =[], coerce = int, validators=[NumberRange(min=1, message="Debe ingresar una tarea")])

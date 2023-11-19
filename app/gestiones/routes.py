@@ -9,9 +9,9 @@ from flask_login import login_required, current_user
 
 from app.auth.decorators import admin_required, not_initial_status
 from app.auth.models import Users
-from app.models import Personas, TiposGestiones, TiposBienes, Gestiones, Observaciones, Cobros, ImportesCobros
+from app.models import Personas, TiposGestiones, TiposBienes, Gestiones, Observaciones, Cobros, ImportesCobros, Tareas
 from . import gestiones_bp 
-from .forms import AltaGestionesForm, BusquedaForm, CobrosForm, ImportesCobrosForm, PasoForm
+from .forms import AltaGestionesForm, BusquedaForm, CobrosForm, ImportesCobrosForm, PasoForm, GestionesTareasForm
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +37,14 @@ def tipo_bien_select():
         select_tipo_bien.append(sub_select_tipo_bien)
     return select_tipo_bien
 
+#creo una tupla para usar en el campo select del form que quiera que necesite las tareas
+def tareas_select():
+    tareas = Tareas.get_all()
+    select_tareas =[(0,'Seleccionar Tarea')]
+    for rs in tareas:
+        sub_select_tareas = (rs.id, rs.descripcion)
+        select_tareas.append(sub_select_tareas)
+    return select_tareas
 
 @gestiones_bp.route("/gestiones/altagestiones/<int:id_cliente>", methods = ['GET', 'POST'])
 @login_required
@@ -258,3 +266,26 @@ def nuevo_paso(id_gestion):
         return redirect(url_for('consultas.bitacora', id_gestion = id_gestion))
     
     return render_template("gestiones/nuevo_paso.html", form = form,  gestion = gestion)
+
+@gestiones_bp.route("/gestiones/gestionestareas/", methods = ['GET', 'POST'])
+@login_required
+@not_initial_status
+def gestiones_tareas():
+    id_gestion = request.args.get('id_gestion','')
+
+    form = GestionesTareasForm()
+    form.id_tarea.choices = tareas_select()
+    gestion = Gestiones.get_by_id(id_gestion)
+
+    if form.validate_on_submit():
+
+        id_tarea = form.id_tarea.data
+        tarea = Tareas.get_first_by_id(id_tarea)
+        tarea.gestiones.append(gestion.Gestiones)
+        #validar que no cargue mas de una
+        tarea.save()
+        flash('Tarea incorporada correctamente.','alert-success')
+        return redirect(url_for('gestiones.gestiones_tareas', id_gestion = id_gestion))
+    
+    return render_template("gestiones/gestiones_tareas.html", form = form,  gestion = gestion)
+

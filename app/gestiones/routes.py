@@ -38,8 +38,8 @@ def tipo_bien_select():
     return select_tipo_bien
 
 #creo una tupla para usar en el campo select del form que quiera que necesite las tareas
-def tareas_select():
-    tareas = Tareas.get_all()
+def tareas_select(id_gestion):
+    tareas = Tareas.get_tareas_no_relacionadas(id_gestion)
     select_tareas =[(0,'Seleccionar Tarea')]
     for rs in tareas:
         sub_select_tareas = (rs.id, rs.descripcion)
@@ -92,6 +92,10 @@ def alta_gestiones(id_cliente):
 
         if observacion:
             nueva_gestion.observaciones.append(observacion_gestion)
+        tareas_por_tipo_gestion= TiposGestiones.get_first_by_id(id_tipo_gestion)
+        for tarea_por_tipo_gestion in tareas_por_tipo_gestion.tareas:
+            nueva_gestion.tareas.append(tarea_por_tipo_gestion)
+
         nueva_gestion.save()
 
         flash("Se ha creado la gestion correctamente.", "alert-success")
@@ -274,15 +278,14 @@ def gestiones_tareas():
     id_gestion = request.args.get('id_gestion','')
 
     form = GestionesTareasForm()
-    form.id_tarea.choices = tareas_select()
-    gestion = Gestiones.get_by_id(id_gestion)
-
+    form.id_tarea.choices = tareas_select(id_gestion)
+    gestion = Gestiones.get_first_by_id(id_gestion)
+    
     if form.validate_on_submit():
 
         id_tarea = form.id_tarea.data
         tarea = Tareas.get_first_by_id(id_tarea)
-        tarea.gestiones.append(gestion.Gestiones)
-        #validar que no cargue mas de una
+        tarea.gestiones.append(gestion)
         tarea.save()
         flash('Tarea incorporada correctamente.','alert-success')
         return redirect(url_for('gestiones.gestiones_tareas', id_gestion = id_gestion))

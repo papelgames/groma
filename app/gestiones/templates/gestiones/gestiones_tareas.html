@@ -16,5 +16,37 @@
             </form>
     </div>
 </div>
+{% if gestion %}
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">TAREA</th>
+                <th scope="col">ACCION</th>
+                
+            </tr>
+        </thead>
+              
+        <tbody>
+            {% for tarea in gestion.tareas %}  
+                <tr>
+                    <th scope="row">{{ tarea.descripcion }}</th>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Acción
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item"  href="#">Modificar gestión</a>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+            
+    </table>
+        
+    
+{% endif %}
 
 {% endblock %}

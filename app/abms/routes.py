@@ -193,10 +193,12 @@ def alta_tarea():
         descripcion = form.descripcion.data
         correlativa_de = form.correlativa_de.data
         dias_para_vencimiento = form.dias_para_vencimiento.data
+        fecha_unica = form.fecha_unica.data
         
         tarea = Tareas(descripcion=descripcion, 
                            correlativa_de=correlativa_de,
                            dias_para_vencimiento=dias_para_vencimiento,
+                           fecha_unica=fecha_unica,
                            usuario_alta=current_user.username)
 
         #tarea.tipos_gestiones.append(tipos)
@@ -204,8 +206,9 @@ def alta_tarea():
         tarea.save()
         flash("Nuevo tarea creado", "alert-success")
         return redirect(url_for('abms.alta_tarea'))
-        #falta mostrar las tareas dadas de alta
-    return render_template("abms/alta_tarea.html", form=form)
+    #falta paginar tareas
+    tareas = Tareas.get_all()    
+    return render_template("abms/alta_tarea.html", form=form, tareas=tareas)
 
 @abms_bp.route("/abms/altatareasportipodegestion/", methods = ['GET', 'POST'])
 @login_required

@@ -6,7 +6,7 @@ from types import ClassMethodDescriptorType
 from typing import Text
 
 from slugify import slugify
-from sqlalchemy import func, or_, alias
+from sqlalchemy import func, or_, alias, not_
 from sqlalchemy.orm import aliased
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -63,7 +63,6 @@ class Personas (Base):
             .filter(Personas.descripcion_nombre.contains(descripcion_))\
             .paginate(page=page, per_page=per_page, error_out=False)
 
-
 personas_cliente = aliased(Personas)
 personas_dibujante = aliased(Personas)
 
@@ -114,8 +113,11 @@ class Gestiones (Base):
             .filter(Gestiones.id_tipo_bienes == TiposBienes.id)\
             .filter(Gestiones.id == id_)\
             .first()
-            
-
+    
+    @staticmethod
+    def get_first_by_id(id):
+        return Gestiones.query.filter_by(id = id).first()
+        
     @staticmethod
     def get_like_descripcion_all_paginated(descripcion_, page=1, per_page=20):
         descripcion_ = descripcion_.replace(' ','%')
@@ -332,6 +334,7 @@ class Tareas(Base):
     dias_para_vencimiento = db.Column(db.Integer)
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))
+    fecha_unica = db.Column(db.Boolean)
     gestiones = db.relationship('Gestiones', secondary='gestionesportareas', back_populates='tareas')
     tipos_gestiones = db.relationship('TiposGestiones', secondary='tiposgestionesportareas', back_populates='tareas')
 
@@ -348,7 +351,10 @@ class Tareas(Base):
     def get_first_by_id(id_tarea):
         return Tareas.query.filter_by(id = id_tarea).first()
 
-
+    @staticmethod
+    def get_tareas_no_relacionadas(id_gestion): 
+        return  Tareas.query.filter(~Tareas.gestiones.any(id=id_gestion)).all()
+    
 class TiposGestionesPorTareas(Base):
     __tablename__ = "tiposgestionesportareas"
     id_tipo_gestion = db.Column(db.Integer, db.ForeignKey('tiposgestiones.id'))

@@ -112,7 +112,7 @@
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     <a class="dropdown-item"  href="{{ url_for('gestiones.modificacion_gestiones', id_gestion = gestiones.Gestiones.id) }}">Modificar gestión</a>
                     <a class="dropdown-item"  href="{{ url_for('gestiones.alta_cobros_cabecera', id_gestion = gestiones.Gestiones.id) }}">Crear presupuesto cobro</a>
-                    <a class="dropdown-item"  href="{{ url_for('gestiones.gestiones_tareas', id_gestion = gestion.Gestiones.id) }}">Tareas</a>
+                    <a class="dropdown-item"  href="{{ url_for('gestiones.gestiones_tareas', id_gestion = gestiones.Gestiones.id) }}">Tareas</a>
                     <a class="dropdown-item"  href="{{ url_for('consultas.cobro', id_gestion = gestiones.Gestiones.id) }}">Ver presupuesto cobro</a>
                     <a class="dropdown-item"  href="{{ url_for('consultas.caratula', id_gestion = gestiones.Gestiones.id)}} ">Carátula</a>
                     <a class="dropdown-item"  href="{{ url_for('consultas.bitacora', id_gestion = gestiones.Gestiones.id)}} ">Bitácora</a>

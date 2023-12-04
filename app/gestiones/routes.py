@@ -213,7 +213,7 @@ def alta_importe_cobro(id_cobro):
 def modificacion_gestiones(id_gestion):
     if not id_gestion:
         return redirect(url_for('gestiones.gestiones'))
-    gestion = Gestiones.get_by_id(id_gestion)
+    gestion = Gestiones.get_first_by_id(id_gestion)
     form = AltaGestionesForm(request.form)                                                                                                                   
     clientes = Personas.get_all()
     form.id_tipo_gestion.choices = tipo_gestion_select()
@@ -221,9 +221,9 @@ def modificacion_gestiones(id_gestion):
     dibujantes = Users.get_by_id_dibujante()
 
     if form.validate_on_submit():
-        form.populate_obj(gestion.Gestiones)  # Actualizar la gestión con los datos del formulario
-        gestion.Gestiones.id_dibujante = form.id_dibujante.data.split('|',)[0]
-        gestion.Gestiones.usuario_modificacion = current_user.username
+        form.populate_obj(gestion)  # Actualizar la gestión con los datos del formulario
+        gestion.id_dibujante = form.id_dibujante.data.split('|',)[0]
+        gestion.usuario_modificacion = current_user.username
         observacion = form.observacion.data
         
         observacion_gestion = Observaciones(
@@ -232,17 +232,17 @@ def modificacion_gestiones(id_gestion):
         )
 
         if observacion:
-            gestion.Gestiones.observaciones.append(observacion_gestion)
-        gestion.Gestiones.save()
+            gestion.observaciones.append(observacion_gestion)
+        gestion.save()
     
         flash("Se ha modificado la gestion correctamente.", "alert-success")
-        return redirect(url_for('consultas.caratula', id_gestion = gestion.Gestiones.id))
+        return redirect(url_for('consultas.caratula', id_gestion = gestion.id))
     
     for campo in list(request.form.items())[1:11]:
         data_campo = getattr(form,campo[0]).data
-        setattr(gestion.Gestiones,campo[0], data_campo)
+        setattr(gestion,campo[0], data_campo)
     if request.form:
-        gestion.Gestiones.id_dibujante = form.id_dibujante.data.split('|',)[0]
+        gestion.id_dibujante = form.id_dibujante.data.split('|',)[0]
       
     return render_template("gestiones/modificacion_gestiones.html", form = form, clientes = clientes, gestion = gestion, dibujantes = dibujantes)
 
@@ -251,7 +251,7 @@ def modificacion_gestiones(id_gestion):
 @not_initial_status
 def nuevo_paso(id_gestion):
     form = PasoForm()
-    gestion = Gestiones.get_by_id(id_gestion)
+    gestion = Gestiones.get_first_by_id(id_gestion)
 
     if form.validate_on_submit():
 
@@ -264,8 +264,8 @@ def nuevo_paso(id_gestion):
         )
 
         if observacion:
-            gestion.Gestiones.observaciones.append(observacion_gestion)
-        gestion.Gestiones.save()
+            gestion.observaciones.append(observacion_gestion)
+        gestion.save()
         flash("Se ha dado de alta un paso en la bitácora correctamente.", "alert-success")
         return redirect(url_for('consultas.bitacora', id_gestion = id_gestion))
     

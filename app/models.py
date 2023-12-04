@@ -58,17 +58,15 @@ class Personas (Base):
         
     @staticmethod
     def get_like_descripcion_all_paginated(descripcion_, page=1, per_page=20):
-        descripcion_ = descripcion_.replace(' ','%')
+        descripcion_ = f"%{descripcion_}%"
         return db.session.query(Personas)\
             .filter(Personas.descripcion_nombre.contains(descripcion_))\
             .paginate(page=page, per_page=per_page, error_out=False)
 
-personas_cliente = aliased(Personas)
-personas_dibujante = aliased(Personas)
 
 class Gestiones (Base):
     __tablename__ = "gestiones"
-    id_cliente = db.Column(db.Integer)
+    id_cliente = db.Column(db.Integer, db.ForeignKey('personas.id'))
     titular = db.Column(db.String(50), nullable = False)
     ubicacion_gestion= db.Column(db.String(50))
     coordenadas=db.Column(db.String(50))
@@ -78,10 +76,10 @@ class Gestiones (Base):
     fecha_asignacion_dibujante = db.Column(db.DateTime)
     fecha_devolucion_dibujante = db.Column(db.DateTime)
     fecha_fin_gestion = db.Column(db.DateTime)
-    id_dibujante = db.Column(db.Integer)
+    id_dibujante = db.Column(db.Integer, db.ForeignKey('personas.id'))
     id_analista_responsable = db.Column(db.Integer)
-    id_tipo_gestion = db.Column(db.Integer)
-    id_tipo_bienes = db.Column(db.Integer)
+    id_tipo_gestion = db.Column(db.Integer, db.ForeignKey('tiposgestiones.id'))
+    id_tipo_bienes = db.Column(db.Integer, db.ForeignKey('tiposbienes.id'))
     id_estado = db.Column(db.Integer)
     numero_partido= db.Column(db.String(4))
     numero_partida= db.Column(db.String(8))
@@ -89,30 +87,17 @@ class Gestiones (Base):
     usuario_modificacion = db.Column(db.String(256))
     observaciones = db.relationship('Observaciones', backref='gestiones', uselist=True, lazy=True)
     tareas = db.relationship('Tareas', secondary='gestionesportareas', back_populates='gestiones')
-     
+    dibujante = db.relationship('Personas', backref='persona_dibujante', foreign_keys='Gestiones.id_dibujante', uselist=False, lazy=True)
+    cliente = db.relationship('Personas', backref='persona_cliente', foreign_keys='Gestiones.id_cliente', uselist=False, lazy=True)
+    
     def save(self):
         if not self.id:
             db.session.add(self)
         db.session.commit()
 
     @staticmethod
-    def get_all(page=1, per_page=20):
-        return db.session.query(Gestiones, personas_cliente, personas_dibujante, TiposGestiones, TiposBienes)\
-            .filter(Gestiones.id_cliente == personas_cliente.id)\
-            .filter(Gestiones.id_dibujante == personas_dibujante.id)\
-            .filter(Gestiones.id_tipo_gestion == TiposGestiones.id)\
-            .filter(Gestiones.id_tipo_bienes == TiposBienes.id)\
-            .paginate(page=page, per_page=per_page, error_out=False)
-
-    @staticmethod
-    def get_by_id(id_):
-        return db.session.query(Gestiones, personas_cliente, personas_dibujante, TiposGestiones, TiposBienes)\
-            .filter(Gestiones.id_cliente == personas_cliente.id)\
-            .filter(Gestiones.id_dibujante == personas_dibujante.id)\
-            .filter(Gestiones.id_tipo_gestion == TiposGestiones.id)\
-            .filter(Gestiones.id_tipo_bienes == TiposBienes.id)\
-            .filter(Gestiones.id == id_)\
-            .first()
+    def get_all_paginated(page=1, per_page=20):
+        return Gestiones.query.paginate(page=page, per_page=per_page, error_out=False)
     
     @staticmethod
     def get_first_by_id(id):
@@ -120,22 +105,15 @@ class Gestiones (Base):
         
     @staticmethod
     def get_like_descripcion_all_paginated(descripcion_, page=1, per_page=20):
-        descripcion_ = descripcion_.replace(' ','%')
-        return db.session.query(Gestiones, personas_cliente, personas_dibujante, TiposGestiones, TiposBienes)\
-            .filter(Gestiones.id_cliente == personas_cliente.id)\
-            .filter(Gestiones.id_dibujante == personas_dibujante.id)\
-            .filter(Gestiones.id_tipo_gestion == TiposGestiones.id)\
-            .filter(Gestiones.id_tipo_bienes == TiposBienes.id)\
-            .filter(personas_cliente.descripcion_nombre.contains(descripcion_))\
-            .paginate(page=page, per_page=per_page, error_out=False)
+        descripcion_ = f"%{descripcion_}%"
+        return Gestiones.query.join(
+        Personas, (Gestiones.id_cliente == Personas.id)
+        ).filter(or_(Personas.descripcion_nombre.ilike(descripcion_),)
+        ).paginate(page=page, per_page=per_page, error_out=False)    
 
     @staticmethod
     def get_gestiones_by_id_cliente_all_paginated(id_cliente_, page=1, per_page=20):
-        return db.session.query(Gestiones, personas_cliente, personas_dibujante, TiposGestiones)\
-            .filter(Gestiones.id_cliente == personas_cliente.id)\
-            .filter(Gestiones.id_dibujante == personas_dibujante.id)\
-            .filter(Gestiones.id_tipo_gestion == TiposGestiones.id)\
-            .filter(Gestiones.id_cliente == id_cliente_)\
+        return Gestiones.query.filter_by(id_cliente = id_cliente_)\
             .paginate(page=page, per_page=per_page, error_out=False)
 
 class Cobros (Base):
@@ -226,7 +204,8 @@ class TiposGestiones(Base):
     descripcion = db.Column(db.String(50))
     limitada = db.Column(db.Boolean)
     tareas = db.relationship('Tareas', secondary='tiposgestionesportareas', back_populates='tipos_gestiones')
-    
+    gestiones = db.relationship('Gestiones', backref='tipos_gestiones', uselist=False)
+
     @staticmethod
     def get_all():
         return TiposGestiones.query.all()
@@ -247,6 +226,7 @@ class TiposGestiones(Base):
 class TiposBienes(Base):
     __tablename__ = "tiposbienes"
     descripcion = db.Column(db.String(50))
+    gestiones = db.relationship('Gestiones', backref='tipos_bienes', uselist=False)
     
     @staticmethod
     def get_all():

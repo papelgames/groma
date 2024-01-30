@@ -1,10 +1,10 @@
 
-from ast import Str
+#from ast import Str
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import (StringField, SubmitField, TextAreaField, BooleanField, DateField,  SelectField, HiddenField, DecimalField)
 from wtforms.fields import FloatField, IntegerField 
-from wtforms.validators import DataRequired, Length, Email, NumberRange, ValidationError
+from wtforms.validators import DataRequired, Length, Email, NumberRange, ValidationError, Optional
 from app.models import Personas
 from app.auth.models import Users
 
@@ -78,3 +78,8 @@ class PasoForm(FlaskForm):
 
 class GestionesTareasForm(FlaskForm):
     id_tarea = SelectField('Nueva tarea', choices =[], coerce = int, validators=[NumberRange(min=1, message="Debe ingresar una tarea")])
+
+class DetallesGdTForm(FlaskForm):
+    fecha_inicio = DateField('Fecha de inicio', validators=[DataRequired('Debe cargar la fecha de inicio de la tarea' )])
+    fecha_fin = DateField('Fecha de fin', validators=[Optional()])
+    observacion = TextAreaField('Observación', validators=[Length(max=256)])

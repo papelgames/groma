@@ -67,7 +67,7 @@
 			{% if page %}
 
 				{% if page != lista_de_personas.page %}
-					<li class="page-item"><a class="page-link" href="{{ url_for('consultas.consulta_personas', criterio= criterio, page=page) }}">{{ page }}</a>
+					<li class="page-item"><a class="page-link" href="{{ url_for('gestiones.gestiones', criterio= criterio, page=page) }}">{{ page }}</a>
 				{% else %}
 					<li class="page-item active">
 						<span class="page-link">

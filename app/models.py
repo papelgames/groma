@@ -86,7 +86,7 @@ class Gestiones (Base):
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))
     observaciones = db.relationship('Observaciones', backref='gestiones', uselist=True, lazy=True)
-    tareas = db.relationship('Tareas', secondary='gestionesportareas', back_populates='gestiones')
+    gestiones_de_tareas = db.relationship('GestionesDeTareas', backref='gestiones', uselist=True, lazy=True)
     dibujante = db.relationship('Personas', backref='persona_dibujante', foreign_keys='Gestiones.id_dibujante', uselist=False, lazy=True)
     cliente = db.relationship('Personas', backref='persona_cliente', foreign_keys='Gestiones.id_cliente', uselist=False, lazy=True)
     
@@ -172,7 +172,7 @@ class Observaciones (Base):
     id_gestion = db.Column(db.Integer, db.ForeignKey('gestiones.id'))
     id_cobro = db.Column(db.Integer, db.ForeignKey('cobros.id'))
     id_importe_cobro = db.Column(db.Integer, db.ForeignKey('importescobros.id'))
-    id_detalle_gxt = db.Column(db.Integer, db.ForeignKey('detallesgxt.id'))
+    id_gestion_de_tarea = db.Column(db.Integer, db.ForeignKey('gestionesdetareas.id'))
     observacion = db.Column(db.String(256))
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))
@@ -290,23 +290,31 @@ class Permisos(Base):
     @staticmethod
     def get_by_id(id_permiso):
         return Permisos.query.filter_by(id = id_permiso).first()
-    
-class GestionesPorTareas(Base):
-    __tablename__ = "gestionesportareas"
+   
+class GestionesDeTareas(Base):
+    __tablename__ = "gestionesdetareas"
     id_gestion = db.Column(db.Integer, db.ForeignKey('gestiones.id'))
     id_tarea = db.Column(db.Integer, db.ForeignKey('tareas.id'))
-    detallesgxt = db.relationship('DetallesGxT', backref='gestionesportareas', uselist=False)
-
-class DetallesGxT(Base):
-    __tablename__ = "detallesgxt"
-    id_gestion_por_tarea =db.Column(db.Integer, db.ForeignKey('gestionesportareas.id'))
     fecha_inicio = db.Column(db.DateTime)
     fecha_fin = db.Column(db.DateTime)
     fecha_vencimiento = db.Column(db.DateTime)
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))
-    observaciones = db.relationship('Observaciones', backref='detallesgxt', uselist=True, lazy=True)
+    observaciones = db.relationship('Observaciones', backref='gestionesdetareas', uselist=True, lazy=True)
     
+    def save(self):
+        if not self.id:
+            db.session.add(self)
+        db.session.commit()
+    
+    @staticmethod
+    def get_all_by_id_gestion(id_gestion):
+        return GestionesDeTareas.query.filter_by(id_gestion = id_gestion).all()
+    
+    @staticmethod
+    def get_all_by_id_gestion_de_tarea(id_gestion_de_tarea):
+        return GestionesDeTareas.query.filter_by(id = id_gestion_de_tarea).first()
+
 class Tareas(Base):
     __tablename__ = "tareas"
     descripcion = db.Column(db.String(50))
@@ -315,8 +323,8 @@ class Tareas(Base):
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))
     fecha_unica = db.Column(db.Boolean)
-    gestiones = db.relationship('Gestiones', secondary='gestionesportareas', back_populates='tareas')
     tipos_gestiones = db.relationship('TiposGestiones', secondary='tiposgestionesportareas', back_populates='tareas')
+    gestiones_de_tareas = db.relationship('GestionesDeTareas', backref='tareas', uselist=False, lazy=True)
 
     def save(self):
         if not self.id:
@@ -333,7 +341,7 @@ class Tareas(Base):
 
     @staticmethod
     def get_tareas_no_relacionadas(id_gestion): 
-        return  Tareas.query.filter(~Tareas.gestiones.any(id=id_gestion)).all()
+        return  Tareas.query.filter(~Tareas.gestiones_de_tareas.has(id_gestion = id_gestion)).all()
     
 class TiposGestionesPorTareas(Base):
     __tablename__ = "tiposgestionesportareas"

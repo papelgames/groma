@@ -9,9 +9,9 @@ from flask_login import login_required, current_user
 
 from app.auth.decorators import admin_required, not_initial_status
 from app.auth.models import Users
-from app.models import Personas, TiposGestiones, TiposBienes, Gestiones, Observaciones, Cobros, ImportesCobros, Tareas
+from app.models import Personas, TiposGestiones, TiposBienes, Gestiones, Observaciones, Cobros, ImportesCobros, Tareas, GestionesDeTareas
 from . import gestiones_bp 
-from .forms import AltaGestionesForm, BusquedaForm, CobrosForm, ImportesCobrosForm, PasoForm, GestionesTareasForm
+from .forms import AltaGestionesForm, BusquedaForm, CobrosForm, ImportesCobrosForm, PasoForm, GestionesTareasForm, DetallesGdTForm
 
 logger = logging.getLogger(__name__)
 
@@ -92,10 +92,13 @@ def alta_gestiones(id_cliente):
 
         if observacion:
             nueva_gestion.observaciones.append(observacion_gestion)
+        
         tareas_por_tipo_gestion= TiposGestiones.get_first_by_id(id_tipo_gestion)
         for tarea_por_tipo_gestion in tareas_por_tipo_gestion.tareas:
-            nueva_gestion.tareas.append(tarea_por_tipo_gestion)
-
+            nueva_gestion_de_tarea = GestionesDeTareas(id_tarea = tarea_por_tipo_gestion.id,
+                                                       usuario_alta = current_user.username,
+                                                       )
+            nueva_gestion.gestiones_de_tareas.append(nueva_gestion_de_tarea)
         nueva_gestion.save()
 
         flash("Se ha creado la gestion correctamente.", "alert-success")
@@ -219,7 +222,6 @@ def modificacion_gestiones(id_gestion):
     form.id_tipo_gestion.choices = tipo_gestion_select()
     form.id_tipo_bienes.choices = tipo_bien_select()
     dibujantes = Users.get_by_id_dibujante()
-
     if form.validate_on_submit():
         form.populate_obj(gestion)  # Actualizar la gestión con los datos del formulario
         gestion.id_dibujante = form.id_dibujante.data.split('|',)[0]
@@ -237,13 +239,13 @@ def modificacion_gestiones(id_gestion):
     
         flash("Se ha modificado la gestion correctamente.", "alert-success")
         return redirect(url_for('consultas.caratula', id_gestion = gestion.id))
-    
+       
     for campo in list(request.form.items())[1:11]:
         data_campo = getattr(form,campo[0]).data
         setattr(gestion,campo[0], data_campo)
     if request.form:
         gestion.id_dibujante = form.id_dibujante.data.split('|',)[0]
-      
+    
     return render_template("gestiones/modificacion_gestiones.html", form = form, clientes = clientes, gestion = gestion, dibujantes = dibujantes)
 
 @gestiones_bp.route("/gestiones/nuevopaso/<int:id_gestion>", methods = ['GET', 'POST'])
@@ -284,11 +286,44 @@ def gestiones_tareas():
     if form.validate_on_submit():
 
         id_tarea = form.id_tarea.data
-        tarea = Tareas.get_first_by_id(id_tarea)
-        tarea.gestiones.append(gestion)
-        tarea.save()
+        nueva_gestion_de_tarea = GestionesDeTareas(id_tarea = id_tarea,
+                                                       usuario_alta = current_user.username,
+                                                       )
+        gestion.gestiones_de_tareas.append(nueva_gestion_de_tarea)
+        gestion.save()
+        
         flash('Tarea incorporada correctamente.','alert-success')
         return redirect(url_for('gestiones.gestiones_tareas', id_gestion = id_gestion))
     
     return render_template("gestiones/gestiones_tareas.html", form = form,  gestion = gestion)
 
+@gestiones_bp.route("/gestiones/detallegxt/", methods = ['GET', 'POST'])
+@login_required
+@not_initial_status
+def detalle_gdt():
+    id_gestion_de_tarea = request.args.get('id_gestion_de_tarea','')
+
+    form = DetallesGdTForm()
+    gestion_de_tarea = GestionesDeTareas.get_all_by_id_gestion_de_tarea(id_gestion_de_tarea)
+    
+    if form.validate_on_submit():
+        form.populate_obj(gestion_de_tarea) 
+        gestion_de_tarea.usuario_modificacion = current_user.username
+        observacion = form.observacion.data 
+        
+        observacion_gestion = Observaciones(
+            observacion = observacion,
+            usuario_alta = current_user.username
+        )
+
+        if observacion:
+            gestion_de_tarea.observaciones.append(observacion_gestion)
+        gestion_de_tarea.save()
+        
+        flash('Tarea actualizada correctamente.','alert-success')
+        return redirect(url_for('gestiones.detalle_gdt', id_gestion_de_tarea =id_gestion_de_tarea))
+    
+    for campo in list(request.form.items())[1:3]:
+        data_campo = getattr(form,campo[0]).data
+        setattr(gestion_de_tarea,campo[0], data_campo)
+    return render_template("gestiones/detalle_gdt.html", form = form, gestion_de_tarea = gestion_de_tarea)

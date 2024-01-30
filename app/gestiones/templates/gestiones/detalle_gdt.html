@@ -1,0 +1,41 @@
+{% extends "base_template.html" %}
+{% from "_render_elements.html" import render_input %}
+
+{% block title %}
+    Groma | Detalle de tarea
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+	<div class="offset-md-2 col-md-8">
+		<h1>Detalle de tarea</h1> 
+
+		<h1>Tarea: {{ gestion_de_tarea.tareas.descripcion }}</h1>
+        
+		<form action="" method="post" class = "form-horizontal" enctype="multipart/form-data" novalidate="true">	
+			{{ form.hidden_tag() }}
+			{{ render_input(form.fecha_inicio,'', id= "fecha_cobro" ,value = gestion_de_tarea.fecha_inicio.strftime('%Y-%m-%d'),  class="form-control" ) }}
+			{{ render_input(form.fecha_fin,'', id= "fecha_cobro" ,value = gestion_de_tarea.fecha_fin.strftime('%Y-%m-%d'),  class="form-control" ) }}
+			{{ render_input(form.observacion,'', id= "observacion" , class="form-control", placeholder = "Observaciones"  ) }}
+			
+			<button type="submmit" class="btn btn-primary">Guardar</button>
+			
+		</form>
+            
+		<div class="offset-md-2 col-md-8">
+			{% for observacion in observacione %}
+				<div class="card ml-5">
+					<span class="border border-danger">        
+						<div class="card-body ">
+							<h6 class="card-title">Bitacora de cobro - {{observacion.usuario_alta}} - {{observacion.created.strftime('%d-%m-%Y')}}</h6>
+							{{ observacion.observacion }}
+						</div>
+					</span>  
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+</div>
+
+{% endblock %}

@@ -242,7 +242,12 @@ def modificacion_gestiones(id_gestion):
        
     for campo in list(request.form.items())[1:11]:
         data_campo = getattr(form,campo[0]).data
-        setattr(gestion,campo[0], data_campo)
+        #valido que que estos campos no queden string porque da error autoflush no agrego id_dibujante porque lo tengo que sacar de acá-
+        if campo[0] == 'id_tipo_bienes' or campo[0] == 'id_tipo_gestion' and data_campo == '':
+            data_campo = None
+            setattr(gestion,campo[0], data_campo)
+        else:
+            setattr(gestion,campo[0], data_campo)
     if request.form:
         gestion.id_dibujante = form.id_dibujante.data.split('|',)[0]
     
@@ -303,9 +308,10 @@ def gestiones_tareas():
 def detalle_gdt():
     id_gestion_de_tarea = request.args.get('id_gestion_de_tarea','')
 
-    form = DetallesGdTForm()
-    gestion_de_tarea = GestionesDeTareas.get_all_by_id_gestion_de_tarea(id_gestion_de_tarea)
     
+    gestion_de_tarea = GestionesDeTareas.get_all_by_id_gestion_de_tarea(id_gestion_de_tarea)
+    form = DetallesGdTForm(obj=gestion_de_tarea)
+
     if form.validate_on_submit():
         form.populate_obj(gestion_de_tarea) 
         gestion_de_tarea.usuario_modificacion = current_user.username

@@ -15,8 +15,16 @@
         
 		<form action="" method="post" class = "form-horizontal" enctype="multipart/form-data" novalidate="true">	
 			{{ form.hidden_tag() }}
-			{{ render_input(form.fecha_inicio,'', id= "fecha_cobro" ,value = gestion_de_tarea.fecha_inicio.strftime('%Y-%m-%d'),  class="form-control" ) }}
-			{{ render_input(form.fecha_fin,'', id= "fecha_cobro" ,value = gestion_de_tarea.fecha_fin.strftime('%Y-%m-%d'),  class="form-control" ) }}
+			{% if gestion_de_tarea.fecha_inicio %}
+				{{ render_input(form.fecha_inicio,'', id= "fecha_inicio" ,value = gestion_de_tarea.fecha_inicio.strftime('%Y-%m-%d'),  class="form-control" ) }}
+			{% else %}
+				{{ render_input(form.fecha_inicio,'', id= "fecha_inicio" ,  class="form-control" ) }}
+			{% endif %}
+			{% if gestion_de_tarea.fecha_fin %}
+				{{ render_input(form.fecha_fin,'', id= "fecha_fin" ,value = gestion_de_tarea.fecha_fin.strftime('%Y-%m-%d'),  class="form-control" ) }}
+			{% else %}
+				{{ render_input(form.fecha_fin,'', id= "fecha_fin" ,  class="form-control" ) }}
+			{% endif %}
 			{{ render_input(form.observacion,'', id= "observacion" , class="form-control", placeholder = "Observaciones"  ) }}
 			
 			<button type="submmit" class="btn btn-primary">Guardar</button>

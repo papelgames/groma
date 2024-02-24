@@ -186,6 +186,11 @@ class Observaciones (Base):
     def get_all_by_id_gestion(id_gestion):
         return Observaciones.query.filter_by(id_gestion = id_gestion).all()
 
+    @staticmethod
+    def get_all_by_id_gestion_de_tarea(id_gestion_de_tarea):
+        return Observaciones.query.filter_by(id_gestion_de_tarea = id_gestion_de_tarea).all()
+
+
 class Estados(Base):
     __tablename__ = "estados"
     clave = db.Column(db.Integer)

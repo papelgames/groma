@@ -312,12 +312,15 @@ def detalle_gdt():
     gestion_de_tarea = GestionesDeTareas.get_all_by_id_gestion_de_tarea(id_gestion_de_tarea)
     form = DetallesGdTForm(obj=gestion_de_tarea)
 
+    observaciones_gestion_tareas = Observaciones.get_all_by_id_gestion_de_tarea(id_gestion_de_tarea)
+
     if form.validate_on_submit():
         form.populate_obj(gestion_de_tarea) 
         gestion_de_tarea.usuario_modificacion = current_user.username
         observacion = form.observacion.data 
         
         observacion_gestion = Observaciones(
+            id_gestion = gestion_de_tarea.id_gestion,
             observacion = observacion,
             usuario_alta = current_user.username
         )
@@ -332,4 +335,4 @@ def detalle_gdt():
     for campo in list(request.form.items())[1:3]:
         data_campo = getattr(form,campo[0]).data
         setattr(gestion_de_tarea,campo[0], data_campo)
-    return render_template("gestiones/detalle_gdt.html", form = form, gestion_de_tarea = gestion_de_tarea)
+    return render_template("gestiones/detalle_gdt.html", form = form, gestion_de_tarea = gestion_de_tarea, observaciones_gestion_tareas = observaciones_gestion_tareas)

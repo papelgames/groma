@@ -9,56 +9,48 @@
 <h1>Creacion de roles</h1>
 <div class="row">
 
-	<div class="col-md-6">
-        <div class="card">       
-            <div class="card-body">
-				<form action="" method="post" enctype="multipart/form-data" novalidate>	
+	<div class="offset-md-3 col-md-6">
+        		<form action="" method="post" enctype="multipart/form-data" novalidate>	
 					{{ form.hidden_tag() }}
-					{{ render_input(form.descripcion,'', id= "descripcion" , value= descripcion_rol, class="form-control", placeholder="Nombre del permiso" ) }}
-					{{ render_input(form.id_permiso,'', id= "id_permiso" , class="form-control", placeholder="Nombre del permiso" ) }}
+					{{ render_input(form.descripcion,'', id= "descripcion" , value= descripcion_rol, class="form-control", placeholder="Nombre del Rol" ) }}
 					<button type="submmit" class="btn btn-primary" >Guardar</button>
 					
 				</form>
-			</div>
-		</div>
+		
 	</div>
-	<div class="col-md-6">
-        <div class="card">       
-            <div class="card-body">
-				{% if permisos_en_rol %}
-					
-				
-					<table class="table table-striped">
-						<thead>
-							<tr>
-								<th scope="col">PERMISO</th>
-								<th scope="col">ACCION</th>
-								
-							</tr>
-						</thead>
-						
-						{% for permiso in permisos_en_rol %}
-							<tbody>
-								<tr>
-									<td>{{ permiso.permisos.descripcion }}</td>
-									
-									<td>
-										<div class="dropdown">
-											<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-												Acción
-										</button>
-										<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-											<a class="dropdown-item"  href="{{url_for('abms.eliminar_permisos_roles', id_rol = permiso.id) }}">Eliminar</a>
-											
-										</div>
-									</td>
-								</tr>
-							</tbody>
-						{% endfor %}
-					</table>
-				{% endif %}
-			</div>
-		</div>
+	<div class="offset-md-3 col-md-6">
+		{% if todos_los_roles %}
+		<div class="offset-md-1 col-md-9">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th scope="col">ID</th>
+						<th scope="col">ROL</th>
+						<th scope="col">ACCION</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for rol in todos_los_roles %}
+						<tr>
+							<th scope="row">{{ rol.id }}</th>
+							<th scope="row">{{ rol.descripcion }}</th>
+							<td>
+								<div class="dropdown">
+									<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+										Acción
+								</button>
+								<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+									<a class="dropdown-item"  href="{{ url_for('abms.asignar_permisos_roles', id_rol = rol.id) }}">Asignar permisos</a>
+								</div>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>	
+		{% endif %}
 	</div>
+
+
 </div>
 {% endblock %}

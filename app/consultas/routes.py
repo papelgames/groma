@@ -63,7 +63,7 @@ def lista_gestiones(criterio = ""):
         return redirect(url_for("consultas.lista_gestiones", criterio = buscar))
     
     if criterio.isdigit() == True:
-        gestiones = Gestiones.get_first_by_id(criterio)
+        gestiones = Gestiones.get_by_id(criterio)
     elif cuit_cliente:
         id_cliente = Personas.get_by_cuit(cuit_cliente)
         gestiones = Gestiones.get_gestiones_by_id_cliente_all_paginated(id_cliente.id)
@@ -95,14 +95,14 @@ def cobro(id_gestion):
 @login_required
 @not_initial_status
 def caratula(id_gestion):
-    gestion = Gestiones.get_first_by_id(id_gestion)
+    gestion = Gestiones.get_by_id(id_gestion)
     return render_template("consultas/caratula.html", gestion = gestion)
     
 @consultas_bp.route("/consultas/bitacora/<id_gestion>")
 @login_required
 @not_initial_status
 def bitacora(id_gestion):
-    gestion = Gestiones.get_first_by_id(id_gestion)
+    gestion = Gestiones.get_by_id(id_gestion)
     bitacora_completa = Observaciones.get_all_by_id_gestion(id_gestion)
 
     return render_template("consultas/bitacora.html", gestion = gestion, bitacora_completa=bitacora_completa)

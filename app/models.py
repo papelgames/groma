@@ -100,9 +100,9 @@ class Gestiones (Base):
         return Gestiones.query.paginate(page=page, per_page=per_page, error_out=False)
     
     @staticmethod
-    def get_first_by_id(id):
-        return Gestiones.query.filter_by(id = id).first()
-        
+    def get_by_id(id):
+        return Gestiones.query.get(id)
+
     @staticmethod
     def get_like_descripcion_all_paginated(descripcion_, page=1, per_page=20):
         descripcion_ = f"%{descripcion_}%"
@@ -250,9 +250,9 @@ class PermisosPorUsuarios(Base):
 class Roles(Base):
     __tablename__ = "roles"
     descripcion = db.Column(db.String(50))
-    id_permiso = db.Column(db.Integer, db.ForeignKey('permisos.id'))
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))
+    permisos = db.relationship('Permisos', secondary='permisosenroles', back_populates='roles')
 
     def save(self):
         if not self.id:
@@ -264,21 +264,30 @@ class Roles(Base):
         db.session.commit()
     
     @staticmethod
-    def get_all_by_id(id_rol):
-        return Roles.query.filter_by(id = id_rol).first()
+    def get_by_id(id):
+        return Roles.query.get(id)
 
     @staticmethod
-    def get_all_by_descripcion(descripcion):
-        return Roles.query.filter_by(descripcion = descripcion).all()
+    def get_all_by_id(id):
+        return Roles.query.filter_by(id = id).all()
+    
+    @staticmethod
+    def get_all():
+        return Roles.query.all()
 
     @staticmethod
     def get_all_descripcion_agrupada():
         return db.session.query(Roles.descripcion.label('nombre_rol')).distinct().all()
 
+class PermisosEnRoles(Base):
+    __tablename__ = "permisosenroles"
+    id_permiso = db.Column(db.Integer, db.ForeignKey('permisos.id'))
+    id_roles =db.Column(db.Integer, db.ForeignKey('roles.id'))
+
 class Permisos(Base):
     __tablename__ = "permisos"
     descripcion = db.Column(db.String(50))
-    roles = db.relationship('Roles', backref='permisos', uselist=True, lazy=True)
+    roles = db.relationship('Roles', secondary='permisosenroles', back_populates='permisos')
     users = db.relationship('Users', secondary='permisosporusuarios', back_populates='permisos')
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))

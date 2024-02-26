@@ -216,7 +216,7 @@ def alta_importe_cobro(id_cobro):
 def modificacion_gestiones(id_gestion):
     if not id_gestion:
         return redirect(url_for('gestiones.gestiones'))
-    gestion = Gestiones.get_first_by_id(id_gestion)
+    gestion = Gestiones.get_by_id(id_gestion)
     form = AltaGestionesForm(request.form)                                                                                                                   
     clientes = Personas.get_all()
     form.id_tipo_gestion.choices = tipo_gestion_select()
@@ -258,7 +258,7 @@ def modificacion_gestiones(id_gestion):
 @not_initial_status
 def nuevo_paso(id_gestion):
     form = PasoForm()
-    gestion = Gestiones.get_first_by_id(id_gestion)
+    gestion = Gestiones.get_by_id(id_gestion)
 
     if form.validate_on_submit():
 
@@ -286,7 +286,7 @@ def gestiones_tareas():
 
     form = GestionesTareasForm()
     form.id_tarea.choices = tareas_select(id_gestion)
-    gestion = Gestiones.get_first_by_id(id_gestion)
+    gestion = Gestiones.get_by_id(id_gestion)
     
     if form.validate_on_submit():
 

@@ -24,10 +24,10 @@ def permisos_select():
 
 #creo una tupla para usar en el campo select del form que quiera que necesite los roles
 def roles_select():
-    roles = Roles.get_all_descripcion_agrupada()
+    roles = Roles.get_all()
     select_rol =[( '','Seleccionar permiso')]
     for rs in roles:
-        sub_select_rol = (rs.nombre_rol, rs.nombre_rol)
+        sub_select_rol = (str(rs.id), rs.descripcion)
         select_rol.append(sub_select_rol)
     return select_rol
 
@@ -122,9 +122,8 @@ def asignacion_roles(user_id):
     form.rol.choices = roles_select()
     
     if form.validate_on_submit():
-        permisos_de_roles = Roles.get_all_by_descripcion(form.rol.data)
-        for permiso_en_rol in permisos_de_roles:
-            permiso = Permisos.get_by_id(permiso_en_rol.id_permiso) 
+        permisos_de_roles = Roles.get_by_id(form.rol.data)
+        for permiso in permisos_de_roles.permisos:
             control = True
             for permiso_en_user in user.permisos:
                 if permiso_en_user.id == permiso.id:

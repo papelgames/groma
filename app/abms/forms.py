@@ -39,7 +39,9 @@ class TareasForm(FlaskForm):
 
 class RolesForm(FlaskForm):
     descripcion = StringField('Rol',validators=[DataRequired('Debe ingresar un rol'),Length(max=15)])
-    id_permiso = SelectField('Permiso', choices =[], coerce = str, default = None, validators=[DataRequired('Seleccione un permiso')])
-
+    
 class TareasPorTipoDeGestionForm(FlaskForm):
     id_tarea = SelectField('Tarea', choices =[], coerce = int, validators=[NumberRange(min=1, message="Debe ingresar una tarea")])
+
+class PermisosSelectForm(FlaskForm):
+    id_permiso = SelectField('Permiso', choices =[], coerce = str, default = None, validators=[DataRequired('Seleccione un permiso')])

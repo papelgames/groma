@@ -11,7 +11,7 @@ from app.auth.decorators import admin_required, not_initial_status
 from app.auth.models import Users
 from app.models import Personas, TiposGestiones, TiposBienes, Permisos, Roles, Tareas
 from . import abms_bp
-from .forms import AltaPersonasForm, TiposForm, PermisosForm, RolesForm, TareasForm, TareasPorTipoDeGestionForm
+from .forms import AltaPersonasForm, TiposForm, PermisosForm, RolesForm, TareasForm, TareasPorTipoDeGestionForm, PermisosSelectForm
 
 #from app.common.mail import send_email
 from time import strftime, gmtime
@@ -143,35 +143,50 @@ def alta_permiso():
 
     return render_template("abms/alta_permisos.html", form=form, permisos=permisos)
 
-@abms_bp.route("/admin/crearroles/", methods=['GET', 'POST'])
+@abms_bp.route("/abms/crearroles/", methods=['GET', 'POST'])
 @login_required
 @admin_required
 @not_initial_status
 def crear_roles():
-    descripcion_rol = request.args.get('rol','')
-    permisos_en_rol = Roles.get_all_by_descripcion(descripcion_rol)
-    
     form = RolesForm()
-    form.id_permiso.choices= permisos_select()
+    
+    todos_los_roles = Roles.get_all()
 
     if form.validate_on_submit():
-        id_permiso = form.id_permiso.data
+        rol = Roles(descripcion = form.descripcion.data.upper(),
+                    usuario_alta = current_user.username
+        )
+        rol.save() 
         
-        descripcion = form.descripcion.data.upper()
-        
-        permiso=Permisos.get_by_id(id_permiso)
-        
-        rol = Roles(descripcion=descripcion)
+        flash ('Rol creado correctamente', 'alert-success')
+        return redirect(url_for('abms.crear_roles'))
+    return render_template("abms/alta_roles.html", form=form, todos_los_roles=todos_los_roles)
 
-        permiso.roles.append(rol)
-
-        permiso.save()
+@abms_bp.route("/abms/asignarpermisosroles/", methods=['GET', 'POST'])
+@login_required
+@admin_required
+@not_initial_status
+def asignar_permisos_roles():
+    id_rol = request.args.get('id_rol','')
+    permisos_en_rol = Roles.get_by_id(id_rol)
+    
+    form = PermisosSelectForm()
+    form.id_permiso.choices=permisos_select()
+    if form.validate_on_submit():
+        permiso = Permisos.get_by_id(form.id_permiso.data)
+        for permiso_en_rol in permisos_en_rol.permisos:
+            if permiso_en_rol.id == int(form.id_permiso.data):
+                flash ('El rol ya tiene el permiso', 'alert-warning')
+                return redirect(url_for('abms.asignar_permisos_roles', id_rol = id_rol))    
         
-        flash ('Permiso en rol correctamente', 'alert-success')
-        return redirect(url_for('abms.crear_roles', rol = descripcion))
-    return render_template("abms/alta_roles.html", form=form, permisos_en_rol=permisos_en_rol, descripcion_rol=descripcion_rol)
+        permisos_en_rol.permisos.append(permiso)
+        permisos_en_rol.save()
+        print ("llego")
+        flash ('Permiso asignado correctamente del rol', 'alert-success')
+        return redirect(url_for('abms.asignar_permisos_roles', id_rol = id_rol))
+    return render_template("abms/alta_permisos_en_roles.html", form=form, permisos_en_rol=permisos_en_rol)
 
-@abms_bp.route("/admin/eliminarpermisosroles/<id_rol>", methods=['GET', 'POST'])
+@abms_bp.route("/abms/eliminarpermisosroles/<id_rol>", methods=['GET', 'POST'])
 @login_required
 @admin_required
 @not_initial_status

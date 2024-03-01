@@ -19,26 +19,10 @@ class AltaGestionesForm(FlaskForm):
     fecha_inicio_gestion = DateField('Fecha de inicio de gestión', validators=[Optional('Debe cargar la fecha de inicio de gestión')])
     fecha_probable_medicion = DateField('Fecha probable de medición', validators=[DataRequired('Debe cargar una fecha probable de medición')])
     id_tipo_gestion = SelectField('Tipo de gestión', choices =[], coerce = str, default = None, validators=[DataRequired('Seleccione tipo de gestión')])
-    id_dibujante = StringField('Dibujante')
     numero_partido= StringField("Partido",validators=[Length(max=4)])
     numero_partida= StringField("Partida",validators=[Length(max=8)])
     observacion = TextAreaField('Observación', validators=[Length(max=256)])
 
-    # descripcion_nombre = StringField("Nombre/Razón Social")
-    # cuit = StringField('CUIT', validators=[Length(max=11)])
-    
-    # def validate_id_titular(self, id_titular ):
-    #     if (not self.cuit.data or not self.descripcion_nombre.data) and len(id_titular.data.split('|',)) == 1:
-    #         raise ValidationError('Debe elegir un titular o en su defecto crearlo')
-    #     elif id_titular.data != '':
-    #         titular_x_id = Personas.get_by_id(id_titular.data.split('|',)[0])
-    #         #valido que las personas existan en la tabla de personas. 
-    #         if not titular_x_id:
-    #             raise ValidationError('El titular no existe, debe crearlo.')
-    #     #valido el formato de la lista de car
-    #     if len(id_titular.data.split('|',)) != 3 and len(id_titular.data.split('|',)) > 0 and id_titular.data != '':
-    #         raise ValidationError('El titular cargado no es valido.')
-    
     def validate_id_dibujante(self, id_dibujante ):
         #valido el formato de la lista de carga
         if len(id_dibujante.data.split('|',)) != 3:

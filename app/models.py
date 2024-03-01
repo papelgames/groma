@@ -337,6 +337,7 @@ class Tareas(Base):
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))
     fecha_unica = db.Column(db.Boolean)
+    carga_dibujante = db.Column(db.Boolean)
     tipos_gestiones = db.relationship('TiposGestiones', secondary='tiposgestionesportareas', back_populates='tareas')
     gestiones_de_tareas = db.relationship('GestionesDeTareas', backref='tareas', uselist=False, lazy=True)
 

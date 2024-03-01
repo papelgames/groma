@@ -209,11 +209,13 @@ def alta_tarea():
         correlativa_de = form.correlativa_de.data
         dias_para_vencimiento = form.dias_para_vencimiento.data
         fecha_unica = form.fecha_unica.data
+        carga_dibujante = form.carga_dibujante.data
         
         tarea = Tareas(descripcion=descripcion, 
                            correlativa_de=correlativa_de,
                            dias_para_vencimiento=dias_para_vencimiento,
                            fecha_unica=fecha_unica,
+                           carga_dibujante=carga_dibujante,
                            usuario_alta=current_user.username)
 
         #tarea.tipos_gestiones.append(tipos)

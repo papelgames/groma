@@ -50,7 +50,7 @@ class Users(db.Model, UserMixin):
         return Users.query.all()
 
     @staticmethod
-    def get_by_id_dibujante():
+    def get_by_es_dibujante():
         return Users.query.filter_by(es_dibujante=1).all()    
     
     @staticmethod

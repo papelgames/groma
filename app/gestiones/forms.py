@@ -67,3 +67,6 @@ class DetallesGdTForm(FlaskForm):
     fecha_inicio = DateField('Fecha de inicio', validators=[DataRequired('Debe cargar la fecha de inicio de la tarea' )])
     fecha_fin = DateField('Fecha de fin', validators=[Optional()])
     observacion = TextAreaField('Observación', validators=[Length(max=256)])
+
+class DetallesGdTDibujanteForm(DetallesGdTForm):
+    dibujante = StringField('Dibujante')

@@ -73,8 +73,6 @@ class Gestiones (Base):
     fecha_inicio_gestion = db.Column(db.DateTime)
     fecha_probable_medicion = db.Column(db.DateTime)
     fecha_medicion = db.Column(db.DateTime)
-    fecha_asignacion_dibujante = db.Column(db.DateTime)
-    fecha_devolucion_dibujante = db.Column(db.DateTime)
     fecha_fin_gestion = db.Column(db.DateTime)
     id_dibujante = db.Column(db.Integer, db.ForeignKey('personas.id'))
     id_analista_responsable = db.Column(db.Integer)

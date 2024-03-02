@@ -314,7 +314,7 @@ def detalle_gdt():
     observaciones_gestion_tareas = Observaciones.get_all_by_id_gestion_de_tarea(id_gestion_de_tarea)
 
     dibujantes = Users.get_by_es_dibujante()
-
+    ## falta que traiga precargado al dibujante que le envie mail al dibujante y en caso que lo cambie que se lo avise por mail al anterior.
     if form.validate_on_submit():
         form.populate_obj(gestion_de_tarea) 
         gestion_de_tarea.usuario_modificacion = current_user.username
@@ -326,8 +326,19 @@ def detalle_gdt():
             usuario_alta = current_user.username
         )
         if carga_dibujante_valor:
-            carga_dibujante = form.carga_dibujante.data
-            #falta grabar el dibujante!!!
+            id_dibujante = form.id_dibujante.data.split('|',)[0]
+            gestion = Gestiones.get_by_id(gestion_de_tarea.id_gestion)
+            gestion.id_dibujante = id_dibujante
+            gestion.usuario_modificacion = current_user.username
+            gestion.save()
+            observacion_dibujante = Observaciones(
+                                    id_gestion = gestion_de_tarea.id_gestion,
+                                    observacion = 'Se asignó al dibujante: ' + form.id_dibujante.data,
+                                    usuario_alta = current_user.username
+                                )
+            
+            gestion_de_tarea.observaciones.append(observacion_dibujante)
+
         if observacion:
             gestion_de_tarea.observaciones.append(observacion_gestion)
         gestion_de_tarea.save()

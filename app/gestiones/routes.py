@@ -13,6 +13,8 @@ from app.models import Personas, TiposGestiones, TiposBienes, Gestiones, Observa
 from . import gestiones_bp 
 from .forms import AltaGestionesForm, BusquedaForm, CobrosForm, ImportesCobrosForm, PasoForm, GestionesTareasForm, DetallesGdTForm, DetallesGdTDibujanteForm
 
+from app.common.mail import send_email
+
 logger = logging.getLogger(__name__)
 
 def control_vencimiento (fecha):
@@ -307,6 +309,11 @@ def detalle_gdt():
     gestion_de_tarea = GestionesDeTareas.get_all_by_id_gestion_de_tarea(id_gestion_de_tarea)
     if gestion_de_tarea.tareas.carga_dibujante == True:
         form = DetallesGdTDibujanteForm(obj=gestion_de_tarea)
+        gestion = Gestiones.get_by_id(gestion_de_tarea.id_gestion)
+        dibujante_actual = gestion.id_dibujante
+        if dibujante_actual:
+            nombre_dibujante_actual = gestion.dibujante.descripcion_nombre
+            correo_dibujante_actual = gestion.dibujante.correo_electronico
         carga_dibujante_valor = True
     else:
         form = DetallesGdTForm(obj=gestion_de_tarea)
@@ -314,7 +321,7 @@ def detalle_gdt():
     observaciones_gestion_tareas = Observaciones.get_all_by_id_gestion_de_tarea(id_gestion_de_tarea)
 
     dibujantes = Users.get_by_es_dibujante()
-    ## falta que traiga precargado al dibujante que le envie mail al dibujante y en caso que lo cambie que se lo avise por mail al anterior.
+    
     if form.validate_on_submit():
         form.populate_obj(gestion_de_tarea) 
         gestion_de_tarea.usuario_modificacion = current_user.username
@@ -325,10 +332,10 @@ def detalle_gdt():
             observacion = observacion,
             usuario_alta = current_user.username
         )
-        if carga_dibujante_valor:
+        if carga_dibujante_valor: #si estamos modificando una tarea de dibujante
             id_dibujante = form.id_dibujante.data.split('|',)[0]
-            gestion = Gestiones.get_by_id(gestion_de_tarea.id_gestion)
-            gestion.id_dibujante = id_dibujante
+            
+            gestion.id_dibujante = int(id_dibujante)
             gestion.usuario_modificacion = current_user.username
             gestion.save()
             observacion_dibujante = Observaciones(
@@ -338,6 +345,21 @@ def detalle_gdt():
                                 )
             
             gestion_de_tarea.observaciones.append(observacion_dibujante)
+            #enviamos el correo avisando que se lo asigno como dibujante
+            if int(id_dibujante) != dibujante_actual:
+                nuevo_dibujante = Personas.get_by_id(id_dibujante)
+                send_email(subject='Asignación de dibujo',
+                            sender=current_app.config['DONT_REPLY_FROM_EMAIL'],
+                            recipients=[nuevo_dibujante.correo_electronico, ],
+                            text_body=f'Hola {nuevo_dibujante.descripcion_nombre}, has sido asignado como dibujante en la gestión {gestion.id} de {gestion.titular}',
+                            html_body=f'<p>Hola <strong>{nuevo_dibujante.descripcion_nombre}</strong>, has sido asignado como dibujante en la gestión {gestion.id} de {gestion.titular}</p>')
+                if dibujante_actual:
+                    send_email(subject='Dibujo cancelado',
+                            sender=current_app.config['DONT_REPLY_FROM_EMAIL'],
+                            recipients=[correo_dibujante_actual, ],
+                            text_body=f'Hola {nombre_dibujante_actual}, dibujo cancelado',
+                            html_body=f'<p>Hola <strong>{nombre_dibujante_actual}</strong>, el dibujo de la gestión {gestion.id} de {gestion.titular} ha sido cancelado </p>')
+
 
         if observacion:
             gestion_de_tarea.observaciones.append(observacion_gestion)
@@ -349,4 +371,10 @@ def detalle_gdt():
     for campo in list(request.form.items())[1:3]:
         data_campo = getattr(form,campo[0]).data
         setattr(gestion_de_tarea,campo[0], data_campo)
-    return render_template("gestiones/detalle_gdt.html", form = form, gestion_de_tarea = gestion_de_tarea, observaciones_gestion_tareas = observaciones_gestion_tareas, carga_dibujante_valor = carga_dibujante_valor, dibujantes = dibujantes)
+    return render_template("gestiones/detalle_gdt.html", 
+                           form = form, 
+                           gestion_de_tarea = gestion_de_tarea, 
+                           observaciones_gestion_tareas = observaciones_gestion_tareas, 
+                           carga_dibujante_valor = carga_dibujante_valor, 
+                           dibujantes = dibujantes, 
+                           gestion = gestion)

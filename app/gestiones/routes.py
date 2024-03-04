@@ -216,14 +216,13 @@ def modificacion_gestiones(id_gestion):
     if not id_gestion:
         return redirect(url_for('gestiones.gestiones'))
     gestion = Gestiones.get_by_id(id_gestion)
-    form = AltaGestionesForm(request.form)                                                                                                                   
+    form = AltaGestionesForm(obj=gestion)                                                                                                                   
     clientes = Personas.get_all()
     form.id_tipo_gestion.choices = tipo_gestion_select()
     form.id_tipo_bienes.choices = tipo_bien_select()
     
     if form.validate_on_submit():
         form.populate_obj(gestion)  # Actualizar la gestión con los datos del formulario
-        gestion.id_dibujante = form.id_dibujante.data.split('|',)[0]
         gestion.usuario_modificacion = current_user.username
         observacion = form.observacion.data
         

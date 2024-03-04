@@ -336,12 +336,17 @@ class Tareas(Base):
     usuario_modificacion = db.Column(db.String(256))
     fecha_unica = db.Column(db.Boolean)
     carga_dibujante = db.Column(db.Boolean)
+    activo = db.Column(db.Boolean)
     tipos_gestiones = db.relationship('TiposGestiones', secondary='tiposgestionesportareas', back_populates='tareas')
     gestiones_de_tareas = db.relationship('GestionesDeTareas', backref='tareas', uselist=False, lazy=True)
 
     def save(self):
         if not self.id:
             db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
         db.session.commit()
 
     @staticmethod
@@ -354,7 +359,12 @@ class Tareas(Base):
 
     @staticmethod
     def get_tareas_no_relacionadas(id_gestion): 
-        return  Tareas.query.filter(~Tareas.gestiones_de_tareas.has(id_gestion = id_gestion)).all()
+        return  Tareas.query.filter(~Tareas.gestiones_de_tareas.has(id_gestion = id_gestion),Tareas.activo == True).all()
+    
+    @staticmethod
+    def get_tareas_no_relacionadas_tipo_gestion(id_tipo_gestion): 
+        return  Tareas.query.filter(~Tareas.tipos_gestiones.any(id = id_tipo_gestion),Tareas.activo == True ).all()
+    
     
 class TiposGestionesPorTareas(Base):
     __tablename__ = "tiposgestionesportareas"

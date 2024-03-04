@@ -37,6 +37,14 @@ def tareas_correlativas_select():
         select_tareas.append(sub_select_tareas)
     return select_tareas
 
+#creo una tupla para usar en el campo select del form que quiera que necesite las tareas
+def tareas_select(id_tipo_gestion):
+    tareas = Tareas.get_tareas_no_relacionadas_tipo_gestion(id_tipo_gestion)
+    select_tareas =[(0,'Seleccionar Tarea')]
+    for rs in tareas:
+        sub_select_tareas = (rs.id, rs.descripcion)
+        select_tareas.append(sub_select_tareas)
+    return select_tareas
 
 @abms_bp.route("/abms/altapersonas/", methods = ['GET', 'POST'])
 @login_required
@@ -216,6 +224,7 @@ def alta_tarea():
                            dias_para_vencimiento=dias_para_vencimiento,
                            fecha_unica=fecha_unica,
                            carga_dibujante=carga_dibujante,
+                           activo= True,
                            usuario_alta=current_user.username)
 
         #tarea.tipos_gestiones.append(tipos)
@@ -227,6 +236,48 @@ def alta_tarea():
     tareas = Tareas.get_all()    
     return render_template("abms/alta_tarea.html", form=form, tareas=tareas)
 
+@abms_bp.route("/abms/modificatarea/", methods = ['GET', 'POST'])
+@login_required
+@admin_required
+@not_initial_status
+def modificar_tarea():
+    id_tarea = request.args.get('id_tarea','')
+    
+    tarea = Tareas.get_first_by_id(id_tarea)
+        
+    form = TareasForm(obj=tarea)
+    form.correlativa_de.choices=tareas_correlativas_select()
+
+    if form.validate_on_submit():
+        form.populate_obj(tarea)
+        tarea.usuario_modificacion = current_user.username
+        
+        tarea.save()
+        flash("La tarea ha sido actualizada", "alert-success")
+        return redirect(url_for('abms.alta_tarea'))
+    
+    for campo in list(request.form.items())[1:]:
+        data_campo = getattr(form,campo[0]).data
+        setattr(tarea,campo[0], data_campo)
+  
+    return render_template("abms/modificacion_tarea.html", form=form, tarea=tarea)
+
+
+@abms_bp.route("/abms/eliminartarea/", methods=['GET', 'POST'])
+@login_required
+@admin_required
+@not_initial_status
+def eliminar_tarea():
+    id_tarea = request.args.get('id_tarea','')
+    tarea = Tareas.get_first_by_id(id_tarea)
+    if tarea.gestiones_de_tareas:
+        tarea.activo = False
+        tarea.save()
+    else:
+        tarea.delete()    
+        flash ('Tarea eliminada correctamente del rol', 'alert-success')
+    return redirect(url_for('abms.alta_tarea'))
+
 @abms_bp.route("/abms/altatareasportipodegestion/", methods = ['GET', 'POST'])
 @login_required
 @admin_required
@@ -235,7 +286,7 @@ def alta_tareas_por_tipo_gestion():
     id_tipo_gestion = request.args.get('id_tipo_gestion','')
 
     form = TareasPorTipoDeGestionForm()
-    form.id_tarea.choices=tareas_correlativas_select()
+    form.id_tarea.choices=tareas_select(id_tipo_gestion)
     tipos_gestiones_por_id = TiposGestiones.get_first_by_id(id_tipo_gestion)
 
     if form.validate_on_submit():

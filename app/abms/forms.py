@@ -37,6 +37,7 @@ class TareasForm(FlaskForm):
     dias_para_vencimiento = IntegerField('Dias para el vencimiento')
     fecha_unica = BooleanField('¿es fecha única?')
     carga_dibujante = BooleanField('¿Carga dibujante?')
+    activo = BooleanField('¿Activo?')
 
 class RolesForm(FlaskForm):
     descripcion = StringField('Rol',validators=[DataRequired('Debe ingresar un rol'),Length(max=15)])

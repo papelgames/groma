@@ -300,3 +300,19 @@ def alta_tareas_por_tipo_gestion():
     
     tareas_por_tipo_gestion=TiposGestiones.get_all_by_id(id_tipo_gestion) 
     return render_template("abms/alta_tareas_default.html", form=form,tareas_por_tipo_gestion=tareas_por_tipo_gestion)
+
+@abms_bp.route("/abms/eliminartareaportipogestion/", methods=['GET', 'POST'])
+@login_required
+@admin_required
+@not_initial_status
+def eliminar_tarea_por_tipo_gestion():
+    id_tarea = request.args.get('id_tarea','')
+    id_tipo_gestion = request.args.get('id_tipo_gestion','')
+    tarea = Tareas.get_first_by_id(id_tarea)
+    tipo_gestion = TiposGestiones.get_first_by_id(id_tipo_gestion)
+    tipo_gestion.tareas.remove(tarea)
+    tipo_gestion.save()
+ 
+       
+    flash ('Tarea eliminada correctamente del tipo de gestion', 'alert-success')
+    return redirect(url_for('abms.alta_tareas_por_tipo_gestion', id_tipo_gestion = id_tipo_gestion))

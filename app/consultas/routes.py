@@ -7,7 +7,7 @@ from flask_login import login_required, current_user
 
 from app.auth.decorators import admin_required, not_initial_status
 from app.auth.models import Users
-from app.models import Gestiones, Cobros, ImportesCobros, Estados, TiposGestiones, Observaciones, Personas
+from app.models import Gestiones, Cobros, ImportesCobros, Estados, TiposGestiones, Observaciones, Personas, GestionesDeTareas
 
 from . import consultas_bp 
 from .forms import BusquedaForm
@@ -107,3 +107,13 @@ def bitacora(id_gestion):
 
     return render_template("consultas/bitacora.html", gestion = gestion, bitacora_completa=bitacora_completa)
     
+@consultas_bp.route("/consultas/tareaspendientes/", methods = ['GET', 'POST'])
+@login_required
+@not_initial_status
+def tareas_pendientes():
+    page = int(request.args.get('page', 1))
+    per_page = current_app.config['ITEMS_PER_PAGE']
+    
+    tareas_pendientes_totales = GestionesDeTareas.get_gestiones_tareas_pendientes_all_paginated(page, per_page)
+    
+    return render_template("consultas/tareas_pendientes.html", tareas_pendientes_totales = tareas_pendientes_totales )

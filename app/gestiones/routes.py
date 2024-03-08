@@ -306,6 +306,7 @@ def detalle_gdt():
 
     
     gestion_de_tarea = GestionesDeTareas.get_all_by_id_gestion_de_tarea(id_gestion_de_tarea)
+    gestion = None
     if gestion_de_tarea.tareas.carga_dibujante == True:
         form = DetallesGdTDibujanteForm(obj=gestion_de_tarea)
         gestion = Gestiones.get_by_id(gestion_de_tarea.id_gestion)

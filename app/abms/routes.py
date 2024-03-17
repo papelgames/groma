@@ -251,6 +251,9 @@ def modificar_tarea():
     if form.validate_on_submit():
         form.populate_obj(tarea)
         tarea.usuario_modificacion = current_user.username
+        print (form.fecha_unica.data)
+        print (form.carga_dibujante.data)
+        print (form.activo.data)
         
         tarea.save()
         flash("La tarea ha sido actualizada", "alert-success")

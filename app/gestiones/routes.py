@@ -69,6 +69,7 @@ def alta_gestiones(id_cliente):
         id_tipo_gestion = form.id_tipo_gestion.data
         numero_partido = form.numero_partido.data
         numero_partida = form.numero_partida.data
+        nomenclatura = form.nomenclatura.data
         observacion = form.observacion.data
 
         nueva_gestion = Gestiones(id_cliente = id_cliente,
@@ -81,6 +82,7 @@ def alta_gestiones(id_cliente):
                                 id_tipo_gestion = id_tipo_gestion,
                                 numero_partido = numero_partido,
                                 numero_partida = numero_partida,
+                                nomenclatura = nomenclatura,
                                 usuario_alta = current_user.username
                                 )
         observacion_gestion = Observaciones(

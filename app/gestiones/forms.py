@@ -21,6 +21,7 @@ class AltaGestionesForm(FlaskForm):
     id_tipo_gestion = SelectField('Tipo de gestión', choices =[], coerce = str, default = None, validators=[DataRequired('Seleccione tipo de gestión')])
     numero_partido= StringField("Partido",validators=[Length(max=4)])
     numero_partida= StringField("Partida",validators=[Length(max=8)])
+    nomenclatura = StringField('Nomenclatura',validators=[Length(max=50)])
     observacion = TextAreaField('Observación', validators=[Length(max=256)])
 
     def validate_id_dibujante(self, id_dibujante ):

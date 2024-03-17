@@ -81,6 +81,7 @@ class Gestiones (Base):
     id_estado = db.Column(db.Integer)
     numero_partido= db.Column(db.String(4))
     numero_partida= db.Column(db.String(8))
+    nomenclatura = db.Column(db.String(50))
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))
     observaciones = db.relationship('Observaciones', backref='gestiones', uselist=True, lazy=True)

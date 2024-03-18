@@ -118,8 +118,6 @@ class Gestiones (Base):
 class Cobros (Base):
     __tablename__ = "cobros"
     id_gestion = db.Column(db.Integer, nullable = False)
-    fecha_probable_cobro = db.Column(db.DateTime, nullable = False)
-    fecha_vencimiento = db.Column(db.DateTime, nullable = False)
     importe_total = db.Column(db.Numeric(precision=15, scale=2))
     moneda = db.Column(db.String(25))
     estado = db.Column(db.Integer)

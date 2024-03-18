@@ -147,15 +147,11 @@ def alta_cobros_cabecera(id_gestion):
         return redirect(url_for('consultas.cobro', id_gestion = id_gestion))
     
     if form.validate_on_submit():
-        fecha_probable_cobro = form.fecha_probable_cobro.data
-        fecha_vencimiento = form.fecha_vencimiento.data
         importe_total = form.importe_total.data
         moneda = form.moneda.data        
         observacion = form.observacion.data
         
         nuevo_cobro = Cobros(id_gestion=id_gestion, 
-                             fecha_probable_cobro = fecha_probable_cobro,
-                             fecha_vencimiento = fecha_vencimiento,
                              importe_total = importe_total,
                              moneda = moneda,
                              usuario_alta = current_user.username)        
@@ -181,6 +177,7 @@ def alta_importe_cobro(id_cobro):
         return redirect(url_for('consultas.lista_gestiones'))
     form = ImportesCobrosForm()                                                                                                                   
     cabecera_cobro = Cobros.get_all_by_id_cobro(id_cobro)
+    hoy = datetime.today()
 
     if form.validate_on_submit():
         fecha_cobro = form.fecha_cobro.data
@@ -211,7 +208,7 @@ def alta_importe_cobro(id_cobro):
 
         flash("El importe se ha cargado correctamente.", "alert-success")
         return redirect(url_for('public.index'))
-    return render_template("gestiones/alta_importe_cobro.html", form = form)
+    return render_template("gestiones/alta_importe_cobro.html", form = form, hoy=hoy)
 
 
 @gestiones_bp.route("/gestiones/modificaciongestiones/<int:id_gestion>", methods = ['GET', 'POST'])

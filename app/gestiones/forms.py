@@ -43,8 +43,6 @@ class ModificacionGestionesForm(AltaGestionesForm):
     fecha_medicion = DateField('Fecha de medicion')
 
 class CobrosForm(FlaskForm):
-    fecha_probable_cobro = DateField('Fecha Probable de cobro', validators=[DataRequired('Debe cargar la fecha probable de cobro' )])
-    fecha_vencimiento = DateField('Fecha de vencimiento')
     importe_total = FloatField('Importe total')
     moneda = SelectField('Moneda', choices =[( '','Seleccionar acción'),( "peso",'Pesos'),( "dolar",'Dolar')], coerce = str, default = None, validators=[DataRequired('Seleccione moneda de cobro')])
     #estado = db.Column(db.Integer)

@@ -58,7 +58,10 @@ def alta_gestiones(id_cliente):
     clientes = Personas.get_all()
     form.id_tipo_gestion.choices = tipo_gestion_select()
     form.id_tipo_bienes.choices = tipo_bien_select()
-    
+    hoy = datetime.today()
+    q_dias_para_medicion = current_app.config['DIAS_MEDICION']
+    fecha_probable_medicion_default= hoy + timedelta(days=q_dias_para_medicion)
+
     if form.validate_on_submit():
         titular = form.titular.data
         ubicacion_gestion = form.ubicacion_gestion.data 
@@ -104,7 +107,7 @@ def alta_gestiones(id_cliente):
 
         flash("Se ha creado la gestion correctamente.", "alert-success")
         return redirect(url_for('consultas.caratula', id_gestion = nueva_gestion.id))
-    return render_template("gestiones/alta_gestiones.html", form = form, clientes = clientes)
+    return render_template("gestiones/alta_gestiones.html", form = form, clientes = clientes, hoy=hoy, fecha_probable_medicion_default=fecha_probable_medicion_default)
 
 @gestiones_bp.route("/gestiones/gestiones/<criterio>", methods = ['GET', 'POST'])
 @gestiones_bp.route("/gestiones/gestiones/", methods = ['GET', 'POST'])

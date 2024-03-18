@@ -169,7 +169,7 @@ def alta_cobros_cabecera(id_gestion):
         nuevo_cobro.save()
 
         flash("El cobro se ha proyectado correctamente.", "alert-success")
-        return redirect(url_for('public.index'))
+        return redirect(url_for('consultas.lista_gestiones', criterio = id_gestion))
     return render_template("gestiones/alta_cobros_cabecera.html", form = form, cobros = cobros)
 
 @gestiones_bp.route("/gestiones/altacobros/<int:id_cobro>", methods = ['GET', 'POST'])

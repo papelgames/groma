@@ -306,7 +306,7 @@ def gestiones_tareas():
 def detalle_gdt():
     id_gestion_de_tarea = request.args.get('id_gestion_de_tarea','')
 
-    
+    hoy = datetime.today()
     gestion_de_tarea = GestionesDeTareas.get_all_by_id_gestion_de_tarea(id_gestion_de_tarea)
     gestion = None
     if gestion_de_tarea.tareas.carga_dibujante == True:
@@ -368,15 +368,16 @@ def detalle_gdt():
         gestion_de_tarea.save()
         
         flash('Tarea actualizada correctamente.','alert-success')
-        return redirect(url_for('gestiones.detalle_gdt', id_gestion_de_tarea =id_gestion_de_tarea))
+        return redirect(url_for('consultas.tareas_pendientes', id_gestion=gestion_de_tarea.id_gestion))
     
-    for campo in list(request.form.items())[1:3]:
+    for campo in list(request.form.items())[2:]:
         data_campo = getattr(form,campo[0]).data
         setattr(gestion_de_tarea,campo[0], data_campo)
     return render_template("gestiones/detalle_gdt.html", 
-                           form = form, 
-                           gestion_de_tarea = gestion_de_tarea, 
-                           observaciones_gestion_tareas = observaciones_gestion_tareas, 
-                           carga_dibujante_valor = carga_dibujante_valor, 
-                           dibujantes = dibujantes, 
-                           gestion = gestion)
+                           form=form, 
+                           gestion_de_tarea=gestion_de_tarea, 
+                           observaciones_gestion_tareas=observaciones_gestion_tareas, 
+                           carga_dibujante_valor=carga_dibujante_valor, 
+                           dibujantes=dibujantes, 
+                           gestion=gestion,
+                           hoy=hoy)

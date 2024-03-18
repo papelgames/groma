@@ -68,4 +68,4 @@ class DetallesGdTForm(FlaskForm):
     observacion = TextAreaField('Observación', validators=[Length(max=256)])
 
 class DetallesGdTDibujanteForm(DetallesGdTForm):
-    id_dibujante = StringField('Dibujante')
+    id_dibujante = StringField('Dibujante', validators=[DataRequired('Debe elegir un dibujante de la lista' )])

@@ -324,6 +324,11 @@ class GestionesDeTareas(Base):
             .paginate(page=page, per_page=per_page, error_out=False)
 
     @staticmethod
+    def get_gestiones_tareas_pendientes__por_gestiones_all_paginated(id_gestion, page=1, per_page=20):
+        return GestionesDeTareas.query.filter_by(id_gestion = id_gestion, fecha_fin = None)\
+            .paginate(page=page, per_page=per_page, error_out=False)
+
+    @staticmethod
     def get_all_by_id_gestion(id_gestion):
         return GestionesDeTareas.query.filter_by(id_gestion = id_gestion).all()
     

@@ -111,9 +111,13 @@ def bitacora(id_gestion):
 @login_required
 @not_initial_status
 def tareas_pendientes():
+    id_gestion = request.args.get('id_gestion','')
     page = int(request.args.get('page', 1))
     per_page = current_app.config['ITEMS_PER_PAGE']
     
-    tareas_pendientes_totales = GestionesDeTareas.get_gestiones_tareas_pendientes_all_paginated(page, per_page)
+    if id_gestion:
+        tareas_pendientes_por_gestion = GestionesDeTareas.get_gestiones_tareas_pendientes__por_gestiones_all_paginated(id_gestion, page, per_page)
+    else:
+        tareas_pendientes_por_gestion = GestionesDeTareas.get_gestiones_tareas_pendientes_all_paginated(page, per_page)
     
-    return render_template("consultas/tareas_pendientes.html", tareas_pendientes_totales = tareas_pendientes_totales )
+    return render_template("consultas/tareas_pendientes.html", tareas_pendientes_por_gestion = tareas_pendientes_por_gestion )

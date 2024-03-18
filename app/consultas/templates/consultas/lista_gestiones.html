@@ -48,6 +48,7 @@
                         <a class="dropdown-item"  href="{{ url_for('gestiones.modificacion_gestiones', id_gestion = gestion.id) }}">Modificar gestión</a>
                         <a class="dropdown-item"  href="{{ url_for('gestiones.alta_cobros_cabecera', id_gestion = gestion.id) }}">Crear presupuesto cobro</a>
                         <a class="dropdown-item"  href="{{ url_for('gestiones.gestiones_tareas', id_gestion = gestion.id) }}">Tareas</a>
+                        <a class="dropdown-item"  href="{{ url_for('consultas.tareas_pendientes', id_gestion = gestion.id) }}">Tareas pendientes</a>
                         <a class="dropdown-item"  href="{{ url_for('consultas.cobro', id_gestion = gestion.id) }}">Ver presupuesto cobro</a>
                         <a class="dropdown-item"  href="{{ url_for('consultas.caratula', id_gestion = gestion.id)}} ">Carátula</a>
                         <a class="dropdown-item"  href="{{ url_for('consultas.bitacora', id_gestion = gestion.id) }}">Bitácora</a>

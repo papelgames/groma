@@ -6,7 +6,7 @@
 
 {% block content %}
 
-{% if tareas_pendientes_totales.items %}
+{% if tareas_pendientes_por_gestion.items %}
 <table class="table table-striped">
     <thead>
         <tr>
@@ -22,7 +22,7 @@
     </thead>
     
     <tbody>
-        {% for tarea_pendiente in tareas_pendientes_totales.items %}
+        {% for tarea_pendiente in tareas_pendientes_por_gestion.items %}
             <tr>
                 <th scope="row">{{ tarea_pendiente.tareas.descripcion }}</th>
                 <td> {{ tarea_pendiente.gestiones.cliente.descripcion_nombre }}</td>
@@ -52,10 +52,10 @@
 <nav aria-label="Page navigation example">
 	<ul class="pagination justify-content-center">
 
-        {%- for page in tareas_pendientes_totales.iter_pages() %}
+        {%- for page in tareas_pendientes_por_gestion.iter_pages() %}
 			{% if page %}
 
-				{% if page != tareas_pendientes_totales.page %}
+				{% if page != tareas_pendientes_por_gestion.page %}
 					<li class="page-item"><a class="page-link" href="{{ url_for('consultas.tareas_pendientes', page=page) }}">{{ page }}</a>
 				{% else %}
 					<li class="page-item active">

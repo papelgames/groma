@@ -12,4 +12,4 @@ SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostnam
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-DIAS_MEDICION = os.getenv('DIAS_MEDICION')
+DIAS_MEDICION = int(os.getenv('DIAS_MEDICION'))

@@ -354,13 +354,13 @@ def detalle_gdt():
                             sender=(current_app.config['MAIL_DEFAULT_SENDER'], current_app.config['MAIL_USERNAME'] ),
                             recipients=[nuevo_dibujante.correo_electronico, ],
                             text_body=f'Hola {nuevo_dibujante.descripcion_nombre}, has sido asignado como dibujante en la gestión {gestion.id} de {gestion.titular}',
-                            html_body=f'<p>Hola <strong>{nuevo_dibujante.descripcion_nombre}</strong>, has sido asignado como dibujante en la gestión {gestion.id} de {gestion.titular}</p>')
+                            html_body=f'<p>Hola <strong>{nuevo_dibujante.descripcion_nombre}</strong>, has sido asignado como dibujante en la gestión {gestion.id} de {gestion.titular}</p> {observacion}')
                 if dibujante_actual:
                     send_email(subject='Dibujo cancelado',
                             sender=(current_app.config['MAIL_DEFAULT_SENDER'], current_app.config['MAIL_USERNAME'] ),
                             recipients=[correo_dibujante_actual, ],
                             text_body=f'Hola {nombre_dibujante_actual}, dibujo cancelado',
-                            html_body=f'<p>Hola <strong>{nombre_dibujante_actual}</strong>, el dibujo de la gestión {gestion.id} de {gestion.titular} ha sido cancelado </p>')
+                            html_body=f'<p>Hola <strong>{nombre_dibujante_actual}</strong>, el dibujo de la gestión {gestion.id} de {gestion.titular} ha sido cancelado </p> ')
 
 
         if observacion:

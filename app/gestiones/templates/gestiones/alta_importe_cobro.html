@@ -25,6 +25,44 @@
 		</form>
             
 	</div>
+	{% if cobros %}
+	<div class="offset-md-1 col-md-9">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th scope="col">Fecha de cobro</th>
+					<th scope="col">MEDIO DE COBRO</th>
+					<th scope="col">MONEDA</th>
+					<th scope="col">TIPO DE CAMBIO</th>
+					<th scope="col">IMPORTE</th>
+					<th scope="col">ACCION</th>
+				</tr>
+			</thead>
+				
+			<tbody>
+				{% for cobro in cobros %}  
+					<tr>
+						<th scope="row">{{ cobro.fecha_cobro.strftime('%d-%m-%y') }}</th>
+						<th scope="row">{{ cobro.medio_cobro }}</th>
+						<th scope="row">{{ cobro.moneda }}</th>
+						<th scope="row">{{ cobro.tipo_cambio }}</th>
+						<th scope="row">{{ cobro.importe }}</th>
+						<td>
+							<div class="dropdown">
+								<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									Acción
+							</button>
+							<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+								<a class="dropdown-item"  href="#">Modificar Cobro</a>
+								<a class="dropdown-item"  href="#">Eliminar Cobro</a>
+							</div>
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>	
+	{% endif %}
 </div>
 
 {% endblock %}

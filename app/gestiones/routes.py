@@ -178,6 +178,7 @@ def alta_importe_cobro(id_cobro):
     form = ImportesCobrosForm()                                                                                                                   
     cabecera_cobro = Cobros.get_all_by_id_cobro(id_cobro)
     hoy = datetime.today()
+    cobros = ImportesCobros.get_all_by_id_cobro(id_cobro)
 
     if form.validate_on_submit():
         fecha_cobro = form.fecha_cobro.data
@@ -207,8 +208,8 @@ def alta_importe_cobro(id_cobro):
         nuevo_importe_cobro.save()
 
         flash("El importe se ha cargado correctamente.", "alert-success")
-        return redirect(url_for('public.index'))
-    return render_template("gestiones/alta_importe_cobro.html", form = form, hoy=hoy)
+        return redirect(url_for('gestiones.alta_importe_cobro', id_cobro=id_cobro ))
+    return render_template("gestiones/alta_importe_cobro.html", form=form, cobros=cobros, hoy=hoy)
 
 
 @gestiones_bp.route("/gestiones/modificaciongestiones/<int:id_gestion>", methods = ['GET', 'POST'])

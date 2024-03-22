@@ -164,6 +164,11 @@ class ImportesCobros (Base):
             db.session.add(self)
         db.session.commit()
 
+    @staticmethod
+    def get_all_by_id_cobro(id_cobro):
+        return ImportesCobros.query.filter_by(id_cobro = id_cobro).all()
+
+
 class Observaciones (Base):
     __tablename__ = "observaciones"
     id_gestion = db.Column(db.Integer, db.ForeignKey('gestiones.id'))

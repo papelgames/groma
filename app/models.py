@@ -88,7 +88,8 @@ class Gestiones (Base):
     gestiones_de_tareas = db.relationship('GestionesDeTareas', backref='gestiones', uselist=True, lazy=True)
     dibujante = db.relationship('Personas', backref='persona_dibujante', foreign_keys='Gestiones.id_dibujante', uselist=False, lazy=True)
     cliente = db.relationship('Personas', backref='persona_cliente', foreign_keys='Gestiones.id_cliente', uselist=False, lazy=True)
-    
+    cobro = db.relationship('Cobros', backref='cobros', uselist=False)
+
     def save(self):
         if not self.id:
             db.session.add(self)
@@ -117,7 +118,7 @@ class Gestiones (Base):
 
 class Cobros (Base):
     __tablename__ = "cobros"
-    id_gestion = db.Column(db.Integer, nullable = False)
+    id_gestion = db.Column(db.Integer, db.ForeignKey('gestiones.id'))
     importe_total = db.Column(db.Numeric(precision=15, scale=2))
     moneda = db.Column(db.String(25))
     estado = db.Column(db.Integer)
@@ -125,6 +126,7 @@ class Cobros (Base):
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))
     observaciones = db.relationship('Observaciones', backref='cobros', uselist=False)
+    importes_cobros = db.relationship('ImportesCobros', backref='cobro', uselist=True)
     
     def save(self):
         if not self.id:
@@ -149,7 +151,7 @@ class Cobros (Base):
     
 class ImportesCobros (Base):
     __tablename__ = "importescobros"
-    id_cobro = db.Column(db.Integer, nullable = False)
+    id_cobro = db.Column(db.Integer, db.ForeignKey('cobros.id'))
     fecha_cobro = db.Column(db.DateTime, nullable = False)
     importe = db.Column(db.Numeric(precision=15, scale=2))
     tipo_cambio = db.Column(db.Numeric(precision=15, scale=2))
@@ -157,7 +159,7 @@ class ImportesCobros (Base):
     medio_cobro = db.Column(db.String(25))
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))
-    observaciones = db.relationship('Observaciones', backref='importe_cobro', uselist=False)
+    observaciones = db.relationship('Observaciones', backref='importe_cobro', uselist=True)
 
     def save(self):
         if not self.id:

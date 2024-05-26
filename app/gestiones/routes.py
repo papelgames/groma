@@ -140,7 +140,7 @@ def alta_cobros_cabecera(id_gestion):
     if not id_gestion:
         return redirect(url_for('consultas.lista_gestiones'))
     form = CobrosForm()                                                                                                                   
-    
+    nuevo_cobro_gestion = Gestiones.get_by_id(id_gestion)
     cobros = Cobros.get_all_by_id_gestion(id_gestion)
     if cobros:
         flash('No puede crear un nuevo presupuesto porque ya existe','alert-warning')
@@ -162,24 +162,28 @@ def alta_cobros_cabecera(id_gestion):
 
         if observacion:
             nuevo_cobro.observaciones = observacion_cobro_cabecera
-        nuevo_cobro.save()
+        nuevo_cobro_gestion.cobro = nuevo_cobro
+        nuevo_cobro_gestion.save()
+
 
         flash("El cobro se ha proyectado correctamente.", "alert-success")
         return redirect(url_for('consultas.lista_gestiones', criterio = id_gestion))
     return render_template("gestiones/alta_cobros_cabecera.html", form = form, cobros = cobros)
 
-@gestiones_bp.route("/gestiones/altacobros/<int:id_cobro>", methods = ['GET', 'POST'])
+@gestiones_bp.route("/gestiones/altacobros/>", methods = ['GET', 'POST'])
 @login_required
 @admin_required
 @not_initial_status
-def alta_importe_cobro(id_cobro):
-    if not id_cobro:
-        return redirect(url_for('consultas.lista_gestiones'))
+def alta_importe_cobro():
+    
+    id_gestion = request.args.get('id_gestion','')
+    if not id_gestion:
+         return redirect(url_for('consultas.lista_gestiones'))
     form = ImportesCobrosForm()                                                                                                                   
-    cabecera_cobro = Cobros.get_all_by_id_cobro(id_cobro)
+    print(id_gestion)
+    cabecera_cobro = Gestiones.get_by_id(id_gestion)
     hoy = datetime.today()
-    cobros = ImportesCobros.get_all_by_id_cobro(id_cobro)
-
+    
     if form.validate_on_submit():
         fecha_cobro = form.fecha_cobro.data
         importe = form.importe.data
@@ -188,7 +192,7 @@ def alta_importe_cobro(id_cobro):
         medio_cobro = form.medio_cobro.data
         observacion = form.observacion.data
         
-        nuevo_importe_cobro = ImportesCobros(id_cobro = id_cobro,
+        nuevo_importe_cobro = ImportesCobros(
                              fecha_cobro = fecha_cobro,
                              importe = importe,
                              tipo_cambio = tipo_cambio,
@@ -197,19 +201,21 @@ def alta_importe_cobro(id_cobro):
                              usuario_alta = current_user.username)
         
         observacion_importe_cobro = Observaciones(
-            id_gestion = cabecera_cobro.id_gestion,
-            id_cobro = id_cobro,
+            id_gestion = cabecera_cobro.id,
+            id_cobro = cabecera_cobro.cobro.id,
             observacion = observacion,
             usuario_alta = current_user.username
         )
 
         if observacion:
-            nuevo_importe_cobro.observaciones = observacion_importe_cobro
-        nuevo_importe_cobro.save()
+            nuevo_importe_cobro.observaciones.append(observacion_importe_cobro)
+        print(cabecera_cobro)
+        cabecera_cobro.cobro.importes_cobros.append(nuevo_importe_cobro)
+        cabecera_cobro.save()
 
         flash("El importe se ha cargado correctamente.", "alert-success")
-        return redirect(url_for('gestiones.alta_importe_cobro', id_cobro=id_cobro ))
-    return render_template("gestiones/alta_importe_cobro.html", form=form, cobros=cobros, hoy=hoy)
+        return redirect(url_for('gestiones.alta_importe_cobro', id_gestion=id_gestion ))
+    return render_template("gestiones/alta_importe_cobro.html", form=form, hoy=hoy)
 
 
 @gestiones_bp.route("/gestiones/modificaciongestiones/<int:id_gestion>", methods = ['GET', 'POST'])

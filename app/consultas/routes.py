@@ -91,6 +91,19 @@ def cobro(id_gestion):
     flash("La gestión no tiene dado de alta un presupuesto","alert-warning")
     return redirect(url_for("consultas.lista_gestiones", criterio = id_gestion))
 
+@consultas_bp.route("/consultas/vercobros/", methods = ['GET', 'POST'])
+@login_required
+@admin_required
+@not_initial_status
+def ver_cobros():
+    id_gestion = request.args.get('id_gestion','')
+
+    hoy = datetime.today()
+    cobros = Gestiones.get_by_id(id_gestion)
+
+    return render_template("consultas/ver_cobros.html", cobros=cobros, hoy=hoy)
+
+
 @consultas_bp.route("/consultas/caratula/<id_gestion>")
 @login_required
 @not_initial_status

@@ -8,4 +8,4 @@ from wtforms.validators import DataRequired, Length, Email, NumberRange
 
 
 class BusquedaForm(FlaskForm):
-    buscar = StringField('Buscar')
+    buscar = StringField('')

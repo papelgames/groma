@@ -6,13 +6,23 @@
 
 {% block content %}
 
-<div class="offset-md-3 col-md-6">
-	<h1>Lista de cobros</h1>
-	<h2>Cobro de gestión: {{cobros.id}} </h2>
-	<h2>Cliente: {{cobros.cliente.descripcion_nombre }} </h2>	
+<div class="row mb-3">
+	<div class="col-md-12 d-flex justify-content-between align-items-center">
+		<h5 class="mb-0">Lista de Cobros</h5>
+		<span class="badge badge-secondary">Gestión: {{ cobros.id }}</span>
+	</div>
 </div>
-
 <div class="row">
+	<div class="col-md-6">
+		<p class="mb-1 text-muted">Cliente</p>
+		<p class="mb-0">{{ cobros.cliente.descripcion_nombre }}</p>
+	</div>
+	<div class="col-md-6">
+		<p class="mb-1 text-muted">Titular</p>
+		<p class="mb-0">{{ cobros.titular }}</p>
+	</div>
+</div>
+<div class="row mt-4">
 	{% if cobros %}
 	<div class="offset-md-1 col-md-9">
 		<table class="table table-striped">

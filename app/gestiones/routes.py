@@ -183,6 +183,7 @@ def alta_importe_cobro():
     print(id_gestion)
     cabecera_cobro = Gestiones.get_by_id(id_gestion)
     hoy = datetime.today()
+    importes_cobrados = sum(importe_cobro.importe for importe_cobro in cabecera_cobro.cobro.importes_cobros)
     
     if form.validate_on_submit():
         fecha_cobro = form.fecha_cobro.data
@@ -206,15 +207,17 @@ def alta_importe_cobro():
             observacion = observacion,
             usuario_alta = current_user.username
         )
-
+        cabecera_cobro.cobro.importe_cobrado = float(importes_cobrados) + importe
         if observacion:
             nuevo_importe_cobro.observaciones.append(observacion_importe_cobro)
         print(cabecera_cobro)
         cabecera_cobro.cobro.importes_cobros.append(nuevo_importe_cobro)
+        
+        
         cabecera_cobro.save()
 
         flash("El importe se ha cargado correctamente.", "alert-success")
-        return redirect(url_for('gestiones.alta_importe_cobro', id_gestion=id_gestion ))
+        return redirect(url_for('consultas.cobro', id_gestion=id_gestion ))
     return render_template("gestiones/alta_importe_cobro.html", form=form, hoy=hoy)
 
 

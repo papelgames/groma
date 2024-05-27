@@ -120,6 +120,7 @@ class Cobros (Base):
     __tablename__ = "cobros"
     id_gestion = db.Column(db.Integer, db.ForeignKey('gestiones.id'))
     importe_total = db.Column(db.Numeric(precision=15, scale=2))
+    importe_cobrado = db.Column(db.Numeric(precision=15, scale=2))
     moneda = db.Column(db.String(25))
     estado = db.Column(db.Integer)
     limitada = db.Column(db.Boolean)

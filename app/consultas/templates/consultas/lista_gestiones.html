@@ -6,15 +6,15 @@
 {% endblock %}
 
 {% block content %}
-<div class="row">
-	<div class="offset-md-3 col-md-6">
-		<h1>Consulta de Gestiones</h1>
-            <form action="" method="post" enctype="multipart/form-data" novalidate>	
-                {{ form.hidden_tag() }}
-                {{ render_input(form.buscar,'', id= "buscar" , class="form-control", placeholder="Ingrese nombre/razón social o número de gestión" ) }}
-                <button type="submmit" class="btn btn-primary" >Buscar</button>
-            </form>
-    </div>
+<div class="row mb-3">
+	<div class="col-md-12 d-flex justify-content-between align-items-center">
+		<h5 class="mb-0">Consulta de gestiones</h5>
+		<form action="" class="form-inline mt-3" method="post" enctype="multipart/form-data" novalidate>	
+            {{ form.hidden_tag() }}
+            {{ render_input(form.buscar,'', id= "buscar" , class="form-control mr-sm-3", placeholder="Ingrese nombre/razón social o número de gestión" ) }}
+            <button class="btn btn-light my-2 my-sm-0" type="submit">Buscar</button>
+        </form>
+	</div>
 </div>
 {% if gestiones.items %}
 <table class="table table-striped">
@@ -26,6 +26,7 @@
             <th scope="col">UBICACION</th>
             <th scope="col">DIBUJANTE</th>
             <th scope="col">TIPO DE GESTION</th>
+            <th scope="col">IMPORTE COBRADO</th>
             <th scope="col">ACCION</th> 
         </tr>
     </thead>
@@ -39,6 +40,8 @@
                 <td> {{ gestion.ubicacion_gestion }}</td>
                 <td> {{ gestion.dibujante.descripcion_nombre }}</td>
                 <td> {{ gestion.tipos_gestiones.descripcion }}</td>
+                <td> {{ gestion.cobro.importe_cobrado }}</td>
+
                 <td>
                     <div class="dropdown">
                         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -98,6 +101,7 @@
             <th scope="col">UBICACION</th>
             <th scope="col">DIBUJANTE</th>
             <th scope="col">TIPO DE GESTION</th>
+            <th scope="col">IMPORTE COBRADO</th>
             <th scope="col">ACCION</th>
             
         </tr>
@@ -111,6 +115,8 @@
             <td> {{ gestiones.ubicacion_gestion }}</td>
             <td> {{ gestiones.dibujante.descripcion_nombre }}</td>
             <td> {{ gestiones.tipos_gestiones.descripcion }}</td>
+            <td> {{ gestiones.cobro.importe_cobrado }}</td>
+
             <td>
                 <div class="dropdown">
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

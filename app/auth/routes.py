@@ -152,7 +152,30 @@ def forgot_password():
 
     return render_template('auth/forgot_password.html', form=form)
 
+@auth_bp.route('/forgotpasswordbyadmin', methods=['GET', 'POST'])
+def forgot_password_by_admin():
+    username = request.args.get('username','')
+    user = Users.get_by_username(username)
+    
+    if user:
+        new_password = 'groma' + str(strftime('%d%m%y%H%m%s', gmtime()))
+        user.set_password(new_password)
+        user.id_estado = 1
+        user.save()
 
+        correo_electronico = user.persona.correo_electronico        
+        name = user.persona.descripcion_nombre
+        url_login = url_for('auth.login', _external=True)
+
+        send_email(subject='DIAZ Agrimensura | Blanqueo de contraseña',
+                    sender = current_app.config['DONT_REPLY_FROM_EMAIL'],
+                    recipients=[correo_electronico, ],
+                    text_body=f'Hola {name}, te enviamos un correo para poder blanquear la contraseña',
+                    html_body=f'<p>Hola <strong>{name}</strong>, ingresando al siguiente link podrás generar una nueva contraseña <a href="{url_login}">Link</a> tu contraseña temporal es: <br><strong>{new_password}</strong> </p>')
+        
+        flash('Se ha enviado una notificación al correo del usuario para generar una nueva contraseña','alert-success')
+        return redirect(url_for('admin.update_user_form', user_id = user.id))
+    
 @auth_bp.route('/forgotusername', methods=['GET', 'POST'])
 def forgot_username():
     form = FindUserForm()

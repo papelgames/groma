@@ -15,6 +15,12 @@
                 <div>
                     Email: <strong>{{ user.persona.correo_electronico }}</strong>
                 </div>
+                <div>
+                    Username: <strong>{{ user.username }}</strong>
+                </div>
+                <a href="{{ url_for('auth.forgot_password_by_admin', username=user.username) }}" >
+                    <button class="btn btn-primary mt-2">Restablecer contraseña</button>
+                </a>
             </div>
         </div>
     </div>

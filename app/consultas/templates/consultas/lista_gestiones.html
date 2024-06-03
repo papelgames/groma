@@ -26,7 +26,7 @@
             <th scope="col">UBICACION</th>
             <th scope="col">DIBUJANTE</th>
             <th scope="col">TIPO DE GESTION</th>
-            <th scope="col">IMPORTE COBRADO</th>
+            <th scope="col">ESTADO COBRO</th>
             <th scope="col">ACCION</th> 
         </tr>
     </thead>
@@ -40,8 +40,11 @@
                 <td> {{ gestion.ubicacion_gestion }}</td>
                 <td> {{ gestion.dibujante.descripcion_nombre }}</td>
                 <td> {{ gestion.tipos_gestiones.descripcion }}</td>
-                <td> {{ gestion.cobro.importe_cobrado }}</td>
-
+                {% if (gestion.cobro.importe_total|float - gestion.cobro.importe_cobrado|float) > 0 %}
+                    <td> CON DEUDA </td>
+                {% else %}
+                    <td> COBRADO </td>
+                {% endif %}
                 <td>
                     <div class="dropdown">
                         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -101,7 +104,7 @@
             <th scope="col">UBICACION</th>
             <th scope="col">DIBUJANTE</th>
             <th scope="col">TIPO DE GESTION</th>
-            <th scope="col">IMPORTE COBRADO</th>
+            <th scope="col">ESTADO COBRO</th>
             <th scope="col">ACCION</th>
             
         </tr>
@@ -115,8 +118,11 @@
             <td> {{ gestiones.ubicacion_gestion }}</td>
             <td> {{ gestiones.dibujante.descripcion_nombre }}</td>
             <td> {{ gestiones.tipos_gestiones.descripcion }}</td>
-            <td> {{ gestiones.cobro.importe_cobrado }}</td>
-
+            {% if (gestiones.cobro.importe_total|float - gestiones.cobro.importe_cobrado|float) > 0 %}
+                <td> CON DEUDA </td>
+            {% else %}
+                <td> COBRADO </td>
+            {% endif %}
             <td>
                 <div class="dropdown">
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -124,9 +130,15 @@
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     <a class="dropdown-item"  href="{{ url_for('gestiones.modificacion_gestiones', id_gestion = gestiones.id) }}">Modificar gestión</a>
-                    <a class="dropdown-item"  href="{{ url_for('gestiones.alta_cobros_cabecera', id_gestion = gestiones.id) }}">Crear presupuesto cobro</a>
                     <a class="dropdown-item"  href="{{ url_for('gestiones.gestiones_tareas', id_gestion = gestiones.id) }}">Tareas</a>
-                    <a class="dropdown-item"  href="{{ url_for('consultas.cobro', id_gestion = gestiones.id) }}">Ver presupuesto cobro</a>
+                    {% if not gestiones.cobro %}
+                        <a class="dropdown-item"  href="{{ url_for('gestiones.alta_cobros_cabecera', id_gestion = gestiones.id) }}">Crear presupuesto cobro</a>
+                    {% else %}
+                        <a class="dropdown-item"  href="{{ url_for('consultas.cobro', id_gestion = gestiones.id) }}">Ver presupuesto cobro</a>
+                        {% if gestiones.cobro.importes_cobros %}
+                            <a class="dropdown-item"  href="{{ url_for('consultas.ver_cobros', id_gestion = gestiones.id) }}">Ver cobros</a>
+                        {% endif %}
+                    {% endif %}
                     <a class="dropdown-item"  href="{{ url_for('consultas.caratula', id_gestion = gestiones.id)}} ">Carátula</a>
                     <a class="dropdown-item"  href="{{ url_for('consultas.bitacora', id_gestion = gestiones.id)}} ">Bitácora</a>
                 </div>

@@ -180,7 +180,6 @@ def alta_importe_cobro():
     if not id_gestion:
          return redirect(url_for('consultas.lista_gestiones'))
     form = ImportesCobrosForm()                                                                                                                   
-    print(id_gestion)
     cabecera_cobro = Gestiones.get_by_id(id_gestion)
     hoy = datetime.today()
     importes_cobrados = sum(importe_cobro.importe for importe_cobro in cabecera_cobro.cobro.importes_cobros)
@@ -210,7 +209,6 @@ def alta_importe_cobro():
         cabecera_cobro.cobro.importe_cobrado = float(importes_cobrados) + importe
         if observacion:
             nuevo_importe_cobro.observaciones.append(observacion_importe_cobro)
-        print(cabecera_cobro)
         cabecera_cobro.cobro.importes_cobros.append(nuevo_importe_cobro)
         
         

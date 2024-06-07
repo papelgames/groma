@@ -40,9 +40,9 @@
                 <td> {{ gestion.ubicacion_gestion }}</td>
                 <td> {{ gestion.dibujante.descripcion_nombre }}</td>
                 <td> {{ gestion.tipos_gestiones.descripcion }}</td>
-                {% if (gestion.cobro.importe_total|float - gestion.cobro.importe_cobrado|float) > 0 %}
+                {% if not gestion.cobro.importe_total or (gestion.cobro.importe_total|float - gestion.cobro.importe_cobrado|float) > 0 %}
                     <td> CON DEUDA </td>
-                {% else %}
+                {% elif (gestion.cobro.importe_total|float - gestion.cobro.importe_cobrado|float) <= 0%}
                     <td> COBRADO </td>
                 {% endif %}
                 <td>
@@ -118,9 +118,9 @@
             <td> {{ gestiones.ubicacion_gestion }}</td>
             <td> {{ gestiones.dibujante.descripcion_nombre }}</td>
             <td> {{ gestiones.tipos_gestiones.descripcion }}</td>
-            {% if (gestiones.cobro.importe_total|float - gestiones.cobro.importe_cobrado|float) > 0 %}
+            {% if not gestiones.cobro.importe_total or (gestiones.cobro.importe_total|float - gestiones.cobro.importe_cobrado|float) > 0 %}
                 <td> CON DEUDA </td>
-            {% else %}
+            {% elif (gestiones.cobro.importe_total|float - gestiones.cobro.importe_cobrado|float) <= 0%}
                 <td> COBRADO </td>
             {% endif %}
             <td>

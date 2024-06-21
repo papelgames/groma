@@ -230,8 +230,7 @@ def firstin():
         
     else:
         # Creamos el usuario admin
-        user = Users(name="Admin",
-                    username=username, 
+        user = Users(username=username, 
                     id_estado=1, 
                     is_admin=True
                     )

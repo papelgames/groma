@@ -78,7 +78,7 @@ class Gestiones (Base):
     id_analista_responsable = db.Column(db.Integer)
     id_tipo_gestion = db.Column(db.Integer, db.ForeignKey('tiposgestiones.id'))
     id_tipo_bienes = db.Column(db.Integer, db.ForeignKey('tiposbienes.id'))
-    id_estado = db.Column(db.Integer)
+    id_estado = db.Column(db.Integer, db.ForeignKey('estados.id'))
     numero_partido= db.Column(db.String(4))
     numero_partida= db.Column(db.String(8))
     nomenclatura = db.Column(db.String(50))
@@ -203,18 +203,31 @@ class Estados(Base):
     tabla = db.Column(db.String(50))
     inicial = db.Column(db.Boolean)
     final = db.Column(db.Boolean)
+    usuario_alta = db.Column(db.String(256))
+    usuario_modificacion = db.Column(db.String(256))
+    gestion = db.relationship('Gestiones', backref='estados', uselist=False)
 
     def save(self):
         if not self.id:
             db.session.add(self)
         db.session.commit()
 
+    @staticmethod
+    def get_all():
+        return Estados.query.all()
+    
+    @staticmethod
+    def get_first_by_clave_tabla(clave, tabla):
+        return Estados.query.filter_by(clave = clave, tabla = tabla).first()
+    
 class TiposGestiones(Base):
     __tablename__ = "tiposgestiones"
     descripcion = db.Column(db.String(50))
     limitada = db.Column(db.Boolean)
     tareas = db.relationship('Tareas', secondary='tiposgestionesportareas', back_populates='tipos_gestiones')
     gestiones = db.relationship('Gestiones', backref='tipos_gestiones', uselist=False)
+    usuario_alta = db.Column(db.String(256))
+    usuario_modificacion = db.Column(db.String(256))
 
     @staticmethod
     def get_all():
@@ -237,6 +250,8 @@ class TiposBienes(Base):
     __tablename__ = "tiposbienes"
     descripcion = db.Column(db.String(50))
     gestiones = db.relationship('Gestiones', backref='tipos_bienes', uselist=False)
+    usuario_alta = db.Column(db.String(256))
+    usuario_modificacion = db.Column(db.String(256))
     
     @staticmethod
     def get_all():

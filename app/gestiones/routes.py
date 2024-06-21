@@ -14,6 +14,7 @@ from . import gestiones_bp
 from .forms import AltaGestionesForm, BusquedaForm, CobrosForm, ImportesCobrosForm, PasoForm, GestionesTareasForm, DetallesGdTForm, DetallesGdTDibujanteForm
 
 from app.common.mail import send_email
+from app.common.funciones import calcular_estado_gestion
 
 logger = logging.getLogger(__name__)
 
@@ -83,6 +84,7 @@ def alta_gestiones(id_cliente):
                                 fecha_inicio_gestion = fecha_inicio_gestion,
                                 fecha_probable_medicion = fecha_probable_medicion,
                                 id_tipo_gestion = id_tipo_gestion,
+                                id_estado = calcular_estado_gestion(None),
                                 numero_partido = numero_partido,
                                 numero_partida = numero_partida,
                                 nomenclatura = nomenclatura,
@@ -302,7 +304,7 @@ def gestiones_tareas():
                                                        )
         gestion.gestiones_de_tareas.append(nueva_gestion_de_tarea)
         gestion.save()
-        
+        calcular_estado_gestion(id_gestion)
         flash('Tarea incorporada correctamente.','alert-success')
         return redirect(url_for('gestiones.gestiones_tareas', id_gestion = id_gestion))
     
@@ -313,7 +315,7 @@ def gestiones_tareas():
 @not_initial_status
 def detalle_gdt():
     id_gestion_de_tarea = request.args.get('id_gestion_de_tarea','')
-
+    
     hoy = datetime.today()
     gestion_de_tarea = GestionesDeTareas.get_all_by_id_gestion_de_tarea(id_gestion_de_tarea)
     gestion = None
@@ -331,7 +333,7 @@ def detalle_gdt():
     observaciones_gestion_tareas = Observaciones.get_all_by_id_gestion_de_tarea(id_gestion_de_tarea)
 
     dibujantes = Users.get_by_es_dibujante()
-    
+
     if form.validate_on_submit():
         form.populate_obj(gestion_de_tarea) 
         gestion_de_tarea.usuario_modificacion = current_user.username
@@ -370,11 +372,11 @@ def detalle_gdt():
                             text_body=f'Hola {nombre_dibujante_actual}, dibujo cancelado',
                             html_body=f'<p>Hola <strong>{nombre_dibujante_actual}</strong>, el dibujo de la gestión {gestion.id} de {gestion.titular} ha sido cancelado </p> ')
 
-
+        
         if observacion:
             gestion_de_tarea.observaciones.append(observacion_gestion)
         gestion_de_tarea.save()
-        
+        calcular_estado_gestion(gestion_de_tarea.id_gestion)
         flash('Tarea actualizada correctamente.','alert-success')
         return redirect(url_for('consultas.tareas_pendientes', id_gestion=gestion_de_tarea.id_gestion))
     

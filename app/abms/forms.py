@@ -31,6 +31,13 @@ class TiposForm(FlaskForm):
 class PermisosForm(FlaskForm):
     permiso = StringField('Nuevo permiso', validators=[DataRequired('Escriba una descripción' )])
 
+class EstadosForm(FlaskForm):
+    clave = IntegerField('Clave', validators=[DataRequired('Escriba una clave')])
+    descripcion = StringField('Nuevo estado', validators=[DataRequired('Escriba una descripción'),Length(max=50)])
+    tabla = StringField('Tabla de referencia', validators=[DataRequired('Escriba una descripción'),Length(max=50)])
+    inicial = BooleanField('¿Es inicial?')
+    final = BooleanField('¿Es final?')
+
 class TareasForm(FlaskForm):
     descripcion = StringField('Nueva tarea', validators=[DataRequired('Escriba una descripción' )])
     correlativa_de = SelectField('Correlativa de', choices =[], coerce = int)

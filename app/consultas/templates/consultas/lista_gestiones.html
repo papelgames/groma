@@ -26,6 +26,7 @@
             <th scope="col">UBICACION</th>
             <th scope="col">DIBUJANTE</th>
             <th scope="col">TIPO DE GESTION</th>
+            <th scope="col">ESTADO GESTION</th>
             <th scope="col">ESTADO COBRO</th>
             <th scope="col">ACCION</th> 
         </tr>
@@ -40,6 +41,7 @@
                 <td> {{ gestion.ubicacion_gestion }}</td>
                 <td> {{ gestion.dibujante.descripcion_nombre }}</td>
                 <td> {{ gestion.tipos_gestiones.descripcion }}</td>
+                <td> {{ gestion.estados.descripcion }}</td>
                 {% if not gestion.cobro.importe_total or (gestion.cobro.importe_total|float - gestion.cobro.importe_cobrado|float) > 0 %}
                     <td> CON DEUDA </td>
                 {% elif (gestion.cobro.importe_total|float - gestion.cobro.importe_cobrado|float) <= 0%}
@@ -105,6 +107,7 @@
             <th scope="col">DIBUJANTE</th>
             <th scope="col">TIPO DE GESTION</th>
             <th scope="col">ESTADO COBRO</th>
+            <th scope="col">ESTADO GESTION</th>
             <th scope="col">ACCION</th>
             
         </tr>
@@ -118,6 +121,7 @@
             <td> {{ gestiones.ubicacion_gestion }}</td>
             <td> {{ gestiones.dibujante.descripcion_nombre }}</td>
             <td> {{ gestiones.tipos_gestiones.descripcion }}</td>
+            <td> {{ gestiones.estados.descripcion }}</td>
             {% if not gestiones.cobro.importe_total or (gestiones.cobro.importe_total|float - gestiones.cobro.importe_cobrado|float) > 0 %}
                 <td> CON DEUDA </td>
             {% elif (gestiones.cobro.importe_total|float - gestiones.cobro.importe_cobrado|float) <= 0%}

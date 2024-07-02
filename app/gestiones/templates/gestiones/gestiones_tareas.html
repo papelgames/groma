@@ -17,20 +17,32 @@
     </div>
 </div>
 {% if gestion %}
-    
     <table class="table table-striped">
         <thead>
             <tr>
                 <th scope="col">TAREA</th>
-                <th scope="col">ACCION</th>
-                
+                <th scope="col">CLIENTE</th>
+                <th scope="col">TITULAR</th>
+                <th scope="col">UBICACION</th>
+                <th scope="col">DIBUJANTE</th>
+                <th scope="col">TIPO DE GESTION</th>
+                <th scope="col">FECHA INICIO</th>
+                <th scope="col">ESTADO</th>               
+                <th scope="col">ACCION</th> 
             </tr>
         </thead>
-              
+        
         <tbody>
-            {% for tarea in gestion.gestiones_de_tareas %}  
+            {% for tarea in gestion.gestiones_de_tareas %}
                 <tr>
                     <th scope="row">{{ tarea.tareas.descripcion }}</th>
+                    <td> {{ tarea.gestiones.cliente.descripcion_nombre }}</td>
+                    <td> {{ tarea.gestiones.titular }} </td>
+                    <td> {{ tarea.gestiones.ubicacion_gestion }}</td>
+                    <td> {{ tarea.gestiones.dibujante.descripcion_nombre }}</td>
+                    <td> {{ tarea.gestiones.tipos_gestiones.descripcion }}</td>
+                    <td> {{ tarea.fecha_inicio }}</td>
+                    <td> {{ tarea.estado_gestiones_de_tareas.descripcion }}</td>
                     <td>
                         <div class="dropdown">
                             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -38,12 +50,12 @@
                         </button>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                             <a class="dropdown-item"  href="{{ url_for('gestiones.detalle_gdt', id_gestion_de_tarea = tarea.id) }}">Modificar Tarea</a>
+                            
                         </div>
                     </td>
                 </tr>
             {% endfor %}
         </tbody>
-            
     </table>
         
     

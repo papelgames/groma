@@ -9,12 +9,12 @@ from flask_login import login_required, current_user
 
 from app.auth.decorators import admin_required, not_initial_status
 from app.auth.models import Users
-from app.models import Personas, TiposGestiones, TiposBienes, Gestiones, Observaciones, Cobros, ImportesCobros, Tareas, GestionesDeTareas
+from app.models import Personas, TiposGestiones, TiposBienes, Gestiones, Observaciones, Cobros, ImportesCobros, Tareas, GestionesDeTareas, Estados
 from . import gestiones_bp 
 from .forms import AltaGestionesForm, BusquedaForm, CobrosForm, ImportesCobrosForm, PasoForm, GestionesTareasForm, DetallesGdTForm, DetallesGdTDibujanteForm
 
 from app.common.mail import send_email
-from app.common.funciones import calcular_estado_gestion
+from app.common.funciones import calcular_estado_gestion,calcular_estado_gestion_tarea
 
 logger = logging.getLogger(__name__)
 
@@ -100,9 +100,12 @@ def alta_gestiones(id_cliente):
             nueva_gestion.observaciones.append(observacion_gestion)
         
         tareas_por_tipo_gestion= TiposGestiones.get_first_by_id(id_tipo_gestion)
+        #el estado inicial el el 2
+        estado = Estados.get_first_by_clave_tabla(2,'gestionesdetareas')
         for tarea_por_tipo_gestion in tareas_por_tipo_gestion.tareas:
             nueva_gestion_de_tarea = GestionesDeTareas(id_tarea = tarea_por_tipo_gestion.id,
                                                        usuario_alta = current_user.username,
+                                                       id_estado = estado.id
                                                        )
             nueva_gestion.gestiones_de_tareas.append(nueva_gestion_de_tarea)
         nueva_gestion.save()
@@ -305,6 +308,7 @@ def gestiones_tareas():
         gestion.gestiones_de_tareas.append(nueva_gestion_de_tarea)
         gestion.save()
         calcular_estado_gestion(id_gestion)
+        calcular_estado_gestion_tarea(nueva_gestion_de_tarea.id)
         flash('Tarea incorporada correctamente.','alert-success')
         return redirect(url_for('gestiones.gestiones_tareas', id_gestion = id_gestion))
     
@@ -377,6 +381,7 @@ def detalle_gdt():
             gestion_de_tarea.observaciones.append(observacion_gestion)
         gestion_de_tarea.save()
         calcular_estado_gestion(gestion_de_tarea.id_gestion)
+        calcular_estado_gestion_tarea(gestion_de_tarea.id)
         flash('Tarea actualizada correctamente.','alert-success')
         return redirect(url_for('consultas.tareas_pendientes', id_gestion=gestion_de_tarea.id_gestion))
     

@@ -205,7 +205,8 @@ class Estados(Base):
     final = db.Column(db.Boolean)
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))
-    gestion = db.relationship('Gestiones', backref='estados', uselist=False)
+    gestion = db.relationship('Gestiones', backref='estado_gestiones', uselist=False)
+    gestiondetarea = db.relationship('GestionesDeTareas', backref='estado_gestiones_de_tareas', uselist=False)
 
     def save(self):
         if not self.id:
@@ -329,6 +330,7 @@ class GestionesDeTareas(Base):
     __tablename__ = "gestionesdetareas"
     id_gestion = db.Column(db.Integer, db.ForeignKey('gestiones.id'))
     id_tarea = db.Column(db.Integer, db.ForeignKey('tareas.id'))
+    id_estado = db.Column(db.Integer, db.ForeignKey('estados.id'))
     fecha_inicio = db.Column(db.DateTime)
     fecha_fin = db.Column(db.DateTime)
     fecha_vencimiento = db.Column(db.DateTime)

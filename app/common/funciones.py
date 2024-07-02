@@ -1,4 +1,4 @@
-from app.models import Gestiones, Estados
+from app.models import Gestiones, Estados, GestionesDeTareas
 
 def calcular_estado_gestion(id_gestion):
     gestion = Gestiones.get_by_id(id_gestion)
@@ -22,5 +22,28 @@ def calcular_estado_gestion(id_gestion):
             estado = Estados.get_first_by_clave_tabla(3,'gestiones')
             gestion.id_estado = estado.id
             gestion.save()
+            break
     gestion.id_estado = estado.id
     gestion.save()
+
+def calcular_estado_gestion_tarea(id_gestion_tarea):
+    '''
+    Estados:
+    1=Pendiente
+    2=Sin iniciar
+    3=Finalizado 
+    '''
+    tarea_pendiente = GestionesDeTareas.get_all_by_id_gestion_de_tarea(id_gestion_tarea)
+
+    if not tarea_pendiente.fecha_inicio:
+        estado = Estados.get_first_by_clave_tabla(2,'gestionesdetareas')
+        tarea_pendiente.id_estado = estado.id
+        tarea_pendiente.save()
+    elif not tarea_pendiente.fecha_fin:
+        estado = Estados.get_first_by_clave_tabla(1,'gestionesdetareas')
+        tarea_pendiente.id_estado = estado.id
+        tarea_pendiente.save()
+    else:
+        estado = Estados.get_first_by_clave_tabla(3,'gestionesdetareas')
+        tarea_pendiente.id_estado = estado.id
+        tarea_pendiente.save()

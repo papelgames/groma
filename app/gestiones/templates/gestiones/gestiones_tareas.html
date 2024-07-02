@@ -41,7 +41,11 @@
                     <td> {{ tarea.gestiones.ubicacion_gestion }}</td>
                     <td> {{ tarea.gestiones.dibujante.descripcion_nombre }}</td>
                     <td> {{ tarea.gestiones.tipos_gestiones.descripcion }}</td>
-                    <td> {{ tarea.fecha_inicio }}</td>
+                    {% if tarea.fecha_inicio %}
+                        <td> {{ tarea.fecha_inicio.strftime('%d-%m-%y') }}</td>
+                    {% else %}
+                        <td></td>
+                    {% endif %}
                     <td> {{ tarea.estado_gestiones_de_tareas.descripcion }}</td>
                     <td>
                         <div class="dropdown">

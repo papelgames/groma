@@ -31,7 +31,11 @@
                 <td> {{ tarea_pendiente.gestiones.ubicacion_gestion }}</td>
                 <td> {{ tarea_pendiente.gestiones.dibujante.descripcion_nombre }}</td>
                 <td> {{ tarea_pendiente.gestiones.tipos_gestiones.descripcion }}</td>
-                <td> {{ tarea_pendiente.fecha_inicio }}</td>
+                {% if tarea_pendiente.fecha_inicio %}
+                    <td> {{ tarea_pendiente.fecha_inicio.strftime('%d-%m-%y') }}</td>
+                {% else %}
+                    <td></td>
+                {% endif %}
                 <td> {{ tarea_pendiente.estado_gestiones_de_tareas.descripcion }}</td>
                 <td>
                     <div class="dropdown">

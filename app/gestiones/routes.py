@@ -7,7 +7,7 @@ from datetime import date, datetime, timedelta
 from flask import render_template, redirect, url_for, current_app, flash, send_file, request #, make_response, abort
 from flask_login import login_required, current_user
 
-from app.auth.decorators import admin_required, not_initial_status
+from app.auth.decorators import admin_required, not_initial_status, nocache
 from app.auth.models import Users
 from app.models import Personas, TiposGestiones, TiposBienes, Gestiones, Observaciones, Cobros, ImportesCobros, Tareas, GestionesDeTareas, Estados
 from . import gestiones_bp 
@@ -49,10 +49,12 @@ def tareas_select(id_gestion):
         select_tareas.append(sub_select_tareas)
     return select_tareas
 
-@gestiones_bp.route("/gestiones/altagestiones/<int:id_cliente>", methods = ['GET', 'POST'])
+@gestiones_bp.route("/gestiones/altagestiones/", methods = ['GET', 'POST'])
 @login_required
 @not_initial_status
-def alta_gestiones(id_cliente):
+@nocache
+def alta_gestiones():
+    id_cliente = request.args.get('id_cliente','')
     if not id_cliente:
         return redirect(url_for('gestiones.gestiones'))
     form = AltaGestionesForm()                                                                                                                   
@@ -118,6 +120,7 @@ def alta_gestiones(id_cliente):
 @gestiones_bp.route("/gestiones/gestiones/", methods = ['GET', 'POST'])
 @login_required
 @not_initial_status
+@nocache
 def gestiones(criterio = ""):
     form = BusquedaForm()
     lista_de_personas = []
@@ -137,11 +140,12 @@ def gestiones(criterio = ""):
 
     return render_template("gestiones/gestiones.html", form = form, criterio = criterio, lista_de_personas= lista_de_personas )
 
-@gestiones_bp.route("/gestiones/altacobroscabecera/<int:id_gestion>", methods = ['GET', 'POST'])
+@gestiones_bp.route("/gestiones/altacobroscabecera/", methods = ['GET', 'POST'])
 @login_required
 @admin_required
 @not_initial_status
-def alta_cobros_cabecera(id_gestion):
+def alta_cobros_cabecera():
+    id_gestion = request.args.get('id_gestion','')
     if not id_gestion:
         return redirect(url_for('consultas.lista_gestiones'))
     form = CobrosForm()                                                                                                                   
@@ -175,12 +179,12 @@ def alta_cobros_cabecera(id_gestion):
         return redirect(url_for('consultas.lista_gestiones', criterio = id_gestion))
     return render_template("gestiones/alta_cobros_cabecera.html", form = form, cobros = cobros)
 
-@gestiones_bp.route("/gestiones/altacobros/>", methods = ['GET', 'POST'])
+@gestiones_bp.route("/gestiones/altacobros/", methods = ['GET', 'POST'])
 @login_required
 @admin_required
 @not_initial_status
+@nocache
 def alta_importe_cobro():
-    
     id_gestion = request.args.get('id_gestion','')
     if not id_gestion:
          return redirect(url_for('consultas.lista_gestiones'))
@@ -224,10 +228,11 @@ def alta_importe_cobro():
     return render_template("gestiones/alta_importe_cobro.html", form=form, hoy=hoy)
 
 
-@gestiones_bp.route("/gestiones/modificaciongestiones/<int:id_gestion>", methods = ['GET', 'POST'])
+@gestiones_bp.route("/gestiones/modificaciongestiones/", methods = ['GET', 'POST'])
 @login_required
 @not_initial_status
-def modificacion_gestiones(id_gestion):
+def modificacion_gestiones():
+    id_gestion = request.args.get('id_gestion','')
     if not id_gestion:
         return redirect(url_for('gestiones.gestiones'))
     gestion = Gestiones.get_by_id(id_gestion)
@@ -264,21 +269,21 @@ def modificacion_gestiones(id_gestion):
 
     return render_template("gestiones/modificacion_gestiones.html", form = form, clientes = clientes, gestion = gestion)
 
-@gestiones_bp.route("/gestiones/nuevopaso/<int:id_gestion>", methods = ['GET', 'POST'])
+@gestiones_bp.route("/gestiones/nuevopaso/", methods = ['GET', 'POST'])
 @login_required
 @not_initial_status
-def nuevo_paso(id_gestion):
+@nocache
+def nuevo_paso():
+    id_gestion = request.args.get('id_gestion','')
     form = PasoForm()
     gestion = Gestiones.get_by_id(id_gestion)
 
     if form.validate_on_submit():
-
         observacion = form.observacion.data
         
         observacion_gestion = Observaciones(
             observacion = observacion,
             usuario_alta = current_user.username
-
         )
 
         if observacion:
@@ -286,7 +291,6 @@ def nuevo_paso(id_gestion):
         gestion.save()
         flash("Se ha dado de alta un paso en la bitácora correctamente.", "alert-success")
         return redirect(url_for('consultas.bitacora', id_gestion = id_gestion))
-    
     return render_template("gestiones/nuevo_paso.html", form = form,  gestion = gestion)
 
 @gestiones_bp.route("/gestiones/gestionestareas/", methods = ['GET', 'POST'])
@@ -300,23 +304,21 @@ def gestiones_tareas():
     gestion = Gestiones.get_by_id(id_gestion)
     
     if form.validate_on_submit():
-
         id_tarea = form.id_tarea.data
         nueva_gestion_de_tarea = GestionesDeTareas(id_tarea = id_tarea,
-                                                       usuario_alta = current_user.username,
-                                                       )
+                                                       usuario_alta = current_user.username)
         gestion.gestiones_de_tareas.append(nueva_gestion_de_tarea)
         gestion.save()
         calcular_estado_gestion(id_gestion)
         calcular_estado_gestion_tarea(nueva_gestion_de_tarea.id)
         flash('Tarea incorporada correctamente.','alert-success')
         return redirect(url_for('gestiones.gestiones_tareas', id_gestion = id_gestion))
-    
-    return render_template("gestiones/gestiones_tareas.html", form = form,  gestion = gestion)
+    return render_template("gestiones/gestiones_tareas.html", form = form, gestion = gestion)
 
 @gestiones_bp.route("/gestiones/detallegxt/", methods = ['GET', 'POST'])
 @login_required
 @not_initial_status
+@nocache
 def detalle_gdt():
     id_gestion_de_tarea = request.args.get('id_gestion_de_tarea','')
     
@@ -376,7 +378,6 @@ def detalle_gdt():
                             text_body=f'Hola {nombre_dibujante_actual}, dibujo cancelado',
                             html_body=f'<p>Hola <strong>{nombre_dibujante_actual}</strong>, el dibujo de la gestión {gestion.id} de {gestion.titular} ha sido cancelado </p> ')
 
-        
         if observacion:
             gestion_de_tarea.observaciones.append(observacion_gestion)
         gestion_de_tarea.save()

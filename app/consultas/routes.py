@@ -5,7 +5,7 @@ from datetime import date, datetime, timedelta
 from flask import render_template, redirect, url_for, abort, current_app, flash, request
 from flask_login import login_required, current_user
 
-from app.auth.decorators import admin_required, not_initial_status
+from app.auth.decorators import admin_required, not_initial_status, nocache
 from app.auth.models import Users
 from app.models import Gestiones, Cobros, ImportesCobros, Estados, TiposGestiones, Observaciones, Personas, GestionesDeTareas
 
@@ -23,6 +23,7 @@ def control_vencimiento (fecha):
 @consultas_bp.route("/consultas/consultapersonas/", methods = ['GET', 'POST'])
 @login_required
 @not_initial_status
+@nocache
 def consulta_personas(criterio = ""):
     form = BusquedaForm()
     lista_de_personas = []
@@ -46,6 +47,7 @@ def consulta_personas(criterio = ""):
 @consultas_bp.route("/consultas/listagestiones/", methods = ['GET', 'POST'])
 @login_required
 @not_initial_status
+@nocache
 def lista_gestiones(criterio = ""):
     form = BusquedaForm()
     
@@ -92,8 +94,6 @@ def cobro():
         importe_cobrado = sum(importe_cobro.importe for importe_cobro in cobro_individual.cobro.importes_cobros)
         return render_template("consultas/cobro.html", cobro_individual = cobro_individual, importe_cobrado=importe_cobrado)
     flash("La gestión no tiene dado de alta un presupuesto","alert-warning")
-    
-    
     return redirect(url_for("consultas.lista_gestiones", criterio = id_gestion))
 
 @consultas_bp.route("/consultas/vercobros/", methods = ['GET', 'POST'])
@@ -105,29 +105,31 @@ def ver_cobros():
 
     hoy = datetime.today()
     cobros = Gestiones.get_by_id(id_gestion)
-
     return render_template("consultas/ver_cobros.html", cobros=cobros, hoy=hoy)
 
 
-@consultas_bp.route("/consultas/caratula/<id_gestion>")
+@consultas_bp.route("/consultas/caratula/")
 @login_required
 @not_initial_status
-def caratula(id_gestion):
+def caratula():
+    id_gestion = request.args.get('id_gestion','')
     gestion = Gestiones.get_by_id(id_gestion)
     return render_template("consultas/caratula.html", gestion = gestion)
     
-@consultas_bp.route("/consultas/bitacora/<id_gestion>")
+@consultas_bp.route("/consultas/bitacora/")
 @login_required
 @not_initial_status
-def bitacora(id_gestion):
+@nocache
+def bitacora():
+    id_gestion = request.args.get('id_gestion','')
     gestion = Gestiones.get_by_id(id_gestion)
     bitacora_completa = Observaciones.get_all_by_id_gestion(id_gestion)
-
     return render_template("consultas/bitacora.html", gestion = gestion, bitacora_completa=bitacora_completa)
     
 @consultas_bp.route("/consultas/tareaspendientes/", methods = ['GET', 'POST'])
 @login_required
 @not_initial_status
+@nocache
 def tareas_pendientes():
     id_gestion = request.args.get('id_gestion','')
     page = int(request.args.get('page', 1))

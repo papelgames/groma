@@ -7,7 +7,7 @@ from flask_login import login_required, current_user
 
 from werkzeug.utils import secure_filename
 
-from app.auth.decorators import admin_required, not_initial_status
+from app.auth.decorators import admin_required, not_initial_status, nocache
 from app.auth.models import Users
 from app.models import Personas, TiposGestiones, TiposBienes, Permisos, Roles, Tareas, Estados
 from . import abms_bp
@@ -49,6 +49,7 @@ def tareas_select(id_tipo_gestion):
 @abms_bp.route("/abms/altapersonas/", methods = ['GET', 'POST'])
 @login_required
 @not_initial_status
+@nocache
 def alta_persona():
     form = AltaPersonasForm()                                                                                                                   
 
@@ -77,10 +78,11 @@ def alta_persona():
     return render_template("abms/alta_datos_persona.html", form = form)
 
 
-@abms_bp.route("/abms/actualizacionpersona/<int:id_persona>", methods = ['GET', 'POST'])
+@abms_bp.route("/abms/actualizacionpersona/", methods = ['GET', 'POST'])
 @login_required
 @not_initial_status
-def actualizacion_persona(id_persona):
+def actualizacion_persona():
+    id_persona = request.args.get('id_persona','')
     form=AltaPersonasForm()
     persona = Personas.get_by_id(id_persona)
     if form.validate_on_submit():
@@ -194,11 +196,12 @@ def asignar_permisos_roles():
         return redirect(url_for('abms.asignar_permisos_roles', id_rol = id_rol))
     return render_template("abms/alta_permisos_en_roles.html", form=form, permisos_en_rol=permisos_en_rol)
 
-@abms_bp.route("/abms/eliminarpermisosroles/<id_rol>", methods=['GET', 'POST'])
+@abms_bp.route("/abms/eliminarpermisosroles/", methods=['GET', 'POST'])
 @login_required
 @admin_required
 @not_initial_status
-def eliminar_permisos_roles(id_rol):
+def eliminar_permisos_roles():
+    id_rol = request.args.get('id_rol','')
     rol = Roles.get_all_by_id(id_rol)
     rol.delete()    
     flash ('Permiso eliminado correctamente del rol', 'alert-success')
@@ -315,7 +318,6 @@ def eliminar_tarea_por_tipo_gestion():
     tipo_gestion = TiposGestiones.get_first_by_id(id_tipo_gestion)
     tipo_gestion.tareas.remove(tarea)
     tipo_gestion.save()
- 
        
     flash ('Tarea eliminada correctamente del tipo de gestion', 'alert-success')
     return redirect(url_for('abms.alta_tareas_por_tipo_gestion', id_tipo_gestion = id_tipo_gestion))

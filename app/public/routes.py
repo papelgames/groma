@@ -15,3 +15,9 @@ logger = logging.getLogger(__name__)
 def index():
    
     return render_template("public/index.html")
+
+@public_bp.route("/chart")
+def chart():
+    labels = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio']
+    values = [51, 19, 3, 5, 2, 3]
+    return render_template("public/charts.html", labels=labels, values=values)

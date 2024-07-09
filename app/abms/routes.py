@@ -13,6 +13,7 @@ from app.models import Personas, TiposGestiones, TiposBienes, Permisos, Roles, T
 from . import abms_bp
 from .forms import AltaPersonasForm, TiposForm, PermisosForm, RolesForm, TareasForm, TareasPorTipoDeGestionForm, PermisosSelectForm, EstadosForm
 
+from app.common.funciones import listar_endpoints
 #from app.common.mail import send_email
 from time import strftime, gmtime
 
@@ -143,12 +144,20 @@ def alta_permiso():
     form = PermisosForm()
     permisos = Permisos.get_all()
     if form.validate_on_submit():
-        descripcion = form.permiso.data
-
-        permiso = Permisos(descripcion=descripcion)
-
-        permiso.save()
-        flash("Nuevo permiso creado", "alert-success")
+        permisos_obj = []
+        
+        for item in listar_endpoints(current_app):
+            check_permiso = Permisos.get_by_descripcion(item.get('descripcion'))
+            #print (check_permiso.descripcion)
+            if not check_permiso:
+                permiso = Permisos(**item)
+                permisos_obj.append(permiso)
+        if permisos_obj:
+            q_altas = len(permisos_obj)
+            permiso.save_masivo(permisos_obj)
+            flash(f"Se han creado {q_altas} permisos", "alert-success")
+        else:
+            flash(f"No hay nuevos permisos", "alert-warning")
         return redirect(url_for('abms.alta_permiso'))
 
     return render_template("abms/alta_permisos.html", form=form, permisos=permisos)

@@ -318,6 +318,10 @@ class Permisos(Base):
             db.session.add(self)
         db.session.commit()
     
+    def save_masivo(self, lista):
+        db.session.bulk_save_objects(lista)
+        db.session.commit()
+
     @staticmethod
     def get_all():
         return Permisos.query.all()
@@ -326,6 +330,10 @@ class Permisos(Base):
     def get_by_id(id_permiso):
         return Permisos.query.filter_by(id = id_permiso).first()
    
+    @staticmethod
+    def get_by_descripcion(descripcion):
+        return Permisos.query.filter_by(descripcion = descripcion).first()
+
 class GestionesDeTareas(Base):
     __tablename__ = "gestionesdetareas"
     id_gestion = db.Column(db.Integer, db.ForeignKey('gestiones.id'))

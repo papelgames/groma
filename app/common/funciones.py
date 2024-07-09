@@ -1,4 +1,5 @@
 from app.models import Gestiones, Estados, GestionesDeTareas
+from flask_login import current_user
 
 def calcular_estado_gestion(id_gestion):
     gestion = Gestiones.get_by_id(id_gestion)
@@ -47,3 +48,14 @@ def calcular_estado_gestion_tarea(id_gestion_tarea):
         estado = Estados.get_first_by_clave_tabla(3,'gestionesdetareas')
         tarea_pendiente.id_estado = estado.id
         tarea_pendiente.save()
+
+def listar_endpoints(app):
+    """
+    Lista todos los endpoints registrados en la aplicación Flask.
+    """
+    endpoints = []
+
+    for rule in app.url_map.iter_rules():
+        endpoints.append({'descripcion' :rule.endpoint, 
+                            'usuario_alta':current_user.username})
+    return endpoints

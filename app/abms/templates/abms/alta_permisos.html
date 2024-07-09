@@ -12,9 +12,7 @@
 
 		<form action="" method="post" enctype="multipart/form-data" novalidate>	
             {{ form.hidden_tag() }}
-			{{ render_input(form.permiso,'', id= "permiso" , class="form-control", placeholder="Permiso" ) }}
-			<button type="submmit" class="btn btn-primary" >Guardar</button>
-			
+			{{ render_input(form.proceso,'', id= "proceso" , class="btn btn-primary") }}
 		</form>
 	</div>
 
@@ -41,7 +39,7 @@
 							<div class="dropdown">
 								<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 									Acción
-							</button>
+							</button> 
 							<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
 								<a class="dropdown-item"  href="#">Anular</a>
 							</div>

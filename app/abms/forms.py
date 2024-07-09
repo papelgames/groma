@@ -29,7 +29,7 @@ class TiposForm(FlaskForm):
     tipo = StringField('Nuevo tipo', validators=[DataRequired('Escriba una descripción' )])
 
 class PermisosForm(FlaskForm):
-    permiso = StringField('Nuevo permiso', validators=[DataRequired('Escriba una descripción' )])
+    proceso = SubmitField('Procesar permisos')
 
 class EstadosForm(FlaskForm):
     clave = IntegerField('Clave', validators=[DataRequired('Escriba una clave')])

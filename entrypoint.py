@@ -35,7 +35,7 @@ def verificar_permisos():
         return
 
     # Verificar si ya hemos almacenado los permisos en la sesión
-    if 'permisos_del_usuario' not in session:
+    if current_user.is_authenticated and 'permisos_del_usuario' not in session:
         session['permisos_del_usuario'] = [permiso.descripcion for permiso in current_user.permisos]
     
     # Verificar si el endpoint actual está en la lista de permisos del usuario no sos admin

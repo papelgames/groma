@@ -141,3 +141,26 @@ def tareas_pendientes():
         tareas_pendientes_por_gestion = GestionesDeTareas.get_gestiones_tareas_pendientes_all_paginated(page, per_page)
     
     return render_template("consultas/tareas_pendientes.html", tareas_pendientes_por_gestion = tareas_pendientes_por_gestion )
+
+@consultas_bp.route("/consultas/reportes/")
+@login_required
+@not_initial_status
+@nocache
+def reportes():
+    q_inicio_x_mes = GestionesDeTareas.get_q_iniciadas_x_mes()
+    q_x_estados = GestionesDeTareas.get_q_x_estado()
+    iniciadas_por_mes = {'año':[],'q':[]}
+    abierto_por_estados = {'estado':[], 'q':[]}
+    
+    for datos in q_inicio_x_mes:
+        if datos.year:
+            iniciadas_por_mes['año'].append(f'{datos.month}-{datos.year}') 
+            iniciadas_por_mes['q'].append(datos.count)
+    print (q_x_estados)
+    for row in q_x_estados:
+        print(f"Estado ID: {row.estado}, Conteo: {row.count}")
+    for datos in q_x_estados:
+        abierto_por_estados['estado'].append(datos.estado)
+        abierto_por_estados['q'].append(datos.count)
+    
+    return render_template("/consultas/reportes.html", iniciadas_por_mes=iniciadas_por_mes, abierto_por_estados=abierto_por_estados)

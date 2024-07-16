@@ -360,7 +360,37 @@ class GestionesDeTareas(Base):
     def get_gestiones_tareas_pendientes__por_gestiones_all_paginated(id_gestion, page=1, per_page=20):
         return GestionesDeTareas.query.filter_by(id_gestion = id_gestion, fecha_fin = None)\
             .paginate(page=page, per_page=per_page, error_out=False)
+    
+    @staticmethod
+    def get_all():
+        return GestionesDeTareas.query
 
+    @staticmethod
+    def get_q_iniciadas_x_mes():
+        result = db.session.query(
+        func.year(GestionesDeTareas.fecha_inicio).label('year'),
+        func.month(GestionesDeTareas.fecha_inicio).label('month'),
+        func.count(GestionesDeTareas.id).label('count')
+        ).group_by(
+        func.year(GestionesDeTareas.fecha_inicio),
+        func.month(GestionesDeTareas.fecha_inicio)
+        ).order_by(
+        func.year(GestionesDeTareas.fecha_inicio).asc(),
+        func.month(GestionesDeTareas.fecha_inicio).asc()
+        ).all()
+        return result
+    
+    @staticmethod
+    def get_q_x_estado():
+        result = db.session.query(
+                Estados.descripcion.label('estado'),
+                func.count(GestionesDeTareas.id).label('count')
+            ).join(Estados, GestionesDeTareas.id_estado == Estados.id)\
+            .group_by(
+                Estados.descripcion
+            ).all()
+        return result
+    
     @staticmethod
     def get_all_by_id_gestion(id_gestion):
         return GestionesDeTareas.query.filter_by(id_gestion = id_gestion).all()

@@ -1,0 +1,42 @@
+{% extends "base_template.html" %}
+
+{% block title %}
+    Groma | Reportes
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2 class="text-center">Cantidad de tareas iniciadas por mes</h2>
+            <canvas id="barChart"></canvas>
+            <div id="chartDataBar" data-labels='{{ iniciadas_por_mes["año"]|tojson }}'
+                                data-values='{{ iniciadas_por_mes["q"]|tojson }}' 
+                                data-label="Gestiones"
+                                style="display: none;"></div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2 class="text-center">Tareas por estado</h2>
+            <canvas id="lineChart"></canvas>
+            <div id="chartDataLine" data-labels='{{ abierto_por_estados["estado"]|tojson }}'
+                                data-values='{{ abierto_por_estados["q"]|tojson }}'
+                                data-label="Gestiones"
+                                style="display: none;"></div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+
+<script src="{{ url_for('static', filename='js/barchart.js') }}"></script>
+<script src="{{ url_for('static', filename='js/linechart.js') }}"></script>
+<script src="{{ url_for('static', filename='js/Chart.js') }}"></script>
+
+{% endblock %}

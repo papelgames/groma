@@ -11,7 +11,7 @@
             <div class="col-md-8 offset-md-2">
                 <h2 class="text-center">Gráfico de Barras</h2>
                 <canvas id="barChart"></canvas>
-                <div id="chartData" data-labels='{{ labels|tojson }}'
+                <div id="chartDataBar" data-labels='{{ labels|tojson }}'
                                     data-values='{{ values|tojson }}' 
                                     data-label="Gestiones"
                                     style="display: none;"></div>
@@ -23,7 +23,7 @@
             <div class="col-md-8 offset-md-2">
                 <h2 class="text-center">Gráfico de linea</h2>
                 <canvas id="lineChart"></canvas>
-                <div id="chartData" data-labels='{{ labels|tojson }}'
+                <div id="chartDataLine" data-labels='{{ labels|tojson }}'
                                     data-values='{{ values|tojson }}' 
                                     data-label="Gestiones"
                                     style="display: none;"></div>
@@ -35,7 +35,7 @@
             <div class="col-md-8 offset-md-2">
                 <h2 class="text-center">Gráfico de torta</h2>
                 <canvas id="pieChart"></canvas>
-                <div id="chartData" data-labels='{{ labels|tojson }}'
+                <div id="chartDataPie" data-labels='{{ labels|tojson }}'
                                     data-values='{{ values|tojson }}' 
                                     data-label="Gestiones"
                                     style="display: none;"></div>
@@ -47,7 +47,7 @@
             <div class="col-md-8 offset-md-2">
                 <h2 class="text-center">Gráfico de radar</h2>
                 <canvas id="radarChart"></canvas>
-                <div id="chartData" data-labels='{{ labels|tojson }}'
+                <div id="chartDataRadar" data-labels='{{ labels|tojson }}'
                                     data-values='{{ values|tojson }}' 
                                     data-label="Gestiones"
                                     style="display: none;"></div>
@@ -59,7 +59,7 @@
             <div class="col-md-8 offset-md-2">
                 <h2 class="text-center">Gráfico de dona</h2>
                 <canvas id="doughnutChart"></canvas>
-                <div id="chartData" data-labels='{{ labels|tojson }}'
+                <div id="chartDataDoughnut" data-labels='{{ labels|tojson }}'
                                     data-values='{{ values|tojson }}' 
                                     data-label="Gestiones"
                                     style="display: none;"></div>
@@ -67,3 +67,12 @@
         </div>
     </div>
     {% endblock %}
+    {% block scripts %}
+
+<script src="{{ url_for('static', filename='js/Chart.js') }}"></script>
+<script src="{{ url_for('static', filename='js/barchart.js') }}"></script>
+<script src="{{ url_for('static', filename='js/linechart.js') }}"></script>
+<script src="{{ url_for('static', filename='js/piechart.js') }}"></script>
+<script src="{{ url_for('static', filename='js/radarchart.js') }}"></script>
+<script src="{{ url_for('static', filename='js/doughnutchart.js') }}"></script>
+{% endblock %}

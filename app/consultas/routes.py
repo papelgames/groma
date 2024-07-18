@@ -203,7 +203,7 @@ def reportes():
                                label_grafico = label_grafico)
     #cantidad de getiones pendientes por cliente
     elif reporte == 'qgpxc':
-        q_x_gestiones_pendientes_x_clientes = Gestiones.get_q_x_clientes(2)
+        q_x_gestiones_pendientes_x_clientes = Gestiones.get_q_x_clientes(4)
         diccionario = {'label':[], 'valor':[]}
         id_canvas = 'barChart'
         id_div_chartdata = 'chartDataBar'

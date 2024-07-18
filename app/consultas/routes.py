@@ -147,20 +147,73 @@ def tareas_pendientes():
 @not_initial_status
 @nocache
 def reportes():
-    q_inicio_x_mes = GestionesDeTareas.get_q_iniciadas_x_mes()
-    q_x_estados = GestionesDeTareas.get_q_x_estado()
-    iniciadas_por_mes = {'año':[],'q':[]}
-    abierto_por_estados = {'estado':[], 'q':[]}
+    #elijo un reporte a mostrar con un string
+    reporte = request.args.get('reporte','')
+    graficos = [[ 'tixm','Cantidad de tareas por mes'], 
+                [ 'qtxe','Tareas por estados'], 
+                [ 'qgxc','Gestiones por cliente'], 
+                [ 'qgpxc','Gestiones pendientes por cliente']]
     
-    for datos in q_inicio_x_mes:
-        if datos.year:
-            iniciadas_por_mes['año'].append(f'{datos.month}-{datos.year}') 
-            iniciadas_por_mes['q'].append(datos.count)
-    print (q_x_estados)
-    for row in q_x_estados:
-        print(f"Estado ID: {row.estado}, Conteo: {row.count}")
-    for datos in q_x_estados:
-        abierto_por_estados['estado'].append(datos.estado)
-        abierto_por_estados['q'].append(datos.count)
-    
-    return render_template("/consultas/reportes.html", iniciadas_por_mes=iniciadas_por_mes, abierto_por_estados=abierto_por_estados)
+    #cantidad de tareas ingresadas por mes grafico de barras 
+    if reporte == 'tixm':
+        q_inicio_x_mes = GestionesDeTareas.get_q_iniciadas_x_mes()
+        diccionario = {'label':[],'valor':[]}
+        id_canvas = 'barChart'
+        id_div_chartdata = 'chartDataBar'
+        label_grafico = 'Tareas iniciadas'
+        
+        for datos in q_inicio_x_mes:
+            if datos.year:
+                diccionario['label'].append(f'{datos.month}-{datos.year}') 
+                diccionario['valor'].append(datos.count)
+        return render_template("/consultas/reportes.html", diccionario=diccionario, 
+                               graficos = graficos, 
+                               id_canvas = id_canvas,
+                               id_div_chartdata = id_div_chartdata,
+                               label_grafico = label_grafico )    
+    #cantidad de tareas por estado, grafico de tortas
+    elif reporte == 'qtxe':
+        q_x_estados = GestionesDeTareas.get_q_x_estado()
+        diccionario = {'label':[], 'valor':[]}
+        id_canvas = 'pieChart'
+        id_div_chartdata = 'chartDataPie'
+        label_grafico = 'Tareas por estado'
+        for datos in q_x_estados:
+            diccionario['label'].append(datos.estado)
+            diccionario['valor'].append(datos.count)
+        return render_template("/consultas/reportes.html", diccionario=diccionario, 
+                               graficos = graficos, 
+                               id_canvas = id_canvas,
+                               id_div_chartdata = id_div_chartdata,
+                               label_grafico = label_grafico)
+    #cantidad de gestiones por cliente
+    elif reporte == 'qgxc':
+        q_x_gestiones_x_clientes = Gestiones.get_q_x_clientes()
+        diccionario = {'label':[], 'valor':[]}
+        id_canvas = 'barChart'
+        id_div_chartdata = 'chartDataBar'
+        label_grafico = 'Gestiones por cliente'
+        for datos in q_x_gestiones_x_clientes:
+            diccionario['label'].append(datos.cliente)
+            diccionario['valor'].append(datos.count)
+        return render_template("/consultas/reportes.html", diccionario=diccionario, 
+                               graficos = graficos, 
+                               id_canvas = id_canvas,
+                               id_div_chartdata = id_div_chartdata,
+                               label_grafico = label_grafico)
+    #cantidad de getiones pendientes por cliente
+    elif reporte == 'qgpxc':
+        q_x_gestiones_pendientes_x_clientes = Gestiones.get_q_x_clientes(2)
+        diccionario = {'label':[], 'valor':[]}
+        id_canvas = 'barChart'
+        id_div_chartdata = 'chartDataBar'
+        label_grafico = 'Gestiones pendientes por cliente'
+        for datos in q_x_gestiones_pendientes_x_clientes:
+            diccionario['label'].append(datos.cliente)
+            diccionario['valor'].append(datos.count)
+        return render_template("/consultas/reportes.html", diccionario=diccionario, 
+                               graficos = graficos, 
+                               id_canvas = id_canvas,
+                               id_div_chartdata = id_div_chartdata,
+                               label_grafico = label_grafico) 
+    return render_template("/consultas/reportes.html", graficos= graficos)

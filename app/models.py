@@ -116,6 +116,22 @@ class Gestiones (Base):
         return Gestiones.query.filter_by(id_cliente = id_cliente_)\
             .paginate(page=page, per_page=per_page, error_out=False)
 
+    #reportes    
+    @staticmethod
+    def get_q_x_clientes(clave_estado=None):
+        query = db.session.query(
+                Personas.descripcion_nombre.label('cliente'),
+                func.count(Gestiones.id).label('count')
+            ).join(Personas, Gestiones.id_cliente == Personas.id)\
+            .join(Estados, Gestiones.id_estado == Estados.id)
+        if clave_estado:
+            query = query.filter(Estados.clave != clave_estado)    
+            
+        result = query.group_by(
+                Personas.descripcion_nombre
+            ).all()
+        return result
+
 class Cobros (Base):
     __tablename__ = "cobros"
     id_gestion = db.Column(db.Integer, db.ForeignKey('gestiones.id'))
@@ -364,7 +380,7 @@ class GestionesDeTareas(Base):
     @staticmethod
     def get_all():
         return GestionesDeTareas.query
-
+    #reportes
     @staticmethod
     def get_q_iniciadas_x_mes():
         result = db.session.query(

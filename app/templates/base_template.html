@@ -63,6 +63,7 @@
                                 <a class="dropdown-item" href="{{ url_for('consultas.consulta_personas') }}">Consulta de personas</a>
                                 <a class="dropdown-item" href="{{ url_for('consultas.lista_gestiones') }}">Consulta de gestiones</a>
                                 <a class="dropdown-item" href="{{ url_for('consultas.tareas_pendientes') }}">Tareas pendientes</a>
+                                <a class="dropdown-item" href="{{ url_for('consultas.reportes') }}">Reportes</a>
                             </div>
                     </li>
                     <li class="nav-item">
@@ -86,6 +87,13 @@
 <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/bootstrap/bootstrap.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/Chart.js') }}"></script>
+<script src="{{ url_for('static', filename='js/barchart.js') }}"></script>
+<script src="{{ url_for('static', filename='js/linechart.js') }}"></script>
+<script src="{{ url_for('static', filename='js/piechart.js') }}"></script>
+<script src="{{ url_for('static', filename='js/radarchart.js') }}"></script>
+<script src="{{ url_for('static', filename='js/doughnutchart.js') }}"></script>
 {% endblock %}
 
 </body>

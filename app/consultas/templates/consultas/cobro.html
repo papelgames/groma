@@ -26,7 +26,9 @@
 	</div>
     <div class="col-md-4">
 		<p class="mb-1 text-muted">Número de presupuesto</p>
-		<p class="mb-0">{{ cobro_individual.cobro.id }}</p>
+		<a class="nav-link" href="{{ url_for('gestiones.modifica_cobros_cabecera', id_gestion = cobro_individual.id) }}">
+		<p class="mb-0">{{ cobro_individual.cobro.id }}</p> 
+		</a>
 	</div>
 </div>
 <hr>
@@ -38,8 +40,12 @@
 	<div class="col-md-6">
 		<p class="mb-1 text-muted">Detalle</p>
 		<p class="mb-0">Importe total: {{ cobro_individual.cobro.importe_total }}</p>
-        <p class="mb-0">Importe cobrado: {{ importe_cobrado }}</p>
-        <p class="mb-0">Debe: {{ cobro_individual.cobro.importe_total - importe_cobrado }}</p>
+        {% if cobro_individual.cobro.importe_cobrado %}
+			<p class="mb-0">Importe cobrado: {{ cobro_individual.cobro.importe_cobrado }}</p>
+		{% else %}
+			<p class="mb-0">Importe cobrado: 0 </p>
+		{% endif %}
+		<p class="mb-0">Debe: {{ cobro_individual.cobro.importe_total|float - cobro_individual.cobro.importe_cobrado|float }}</p>
 	</div>
     
 </div>

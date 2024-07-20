@@ -91,8 +91,8 @@ def cobro():
     cobro_individual = Gestiones.get_by_id(id_gestion)
     
     if cobro_individual:
-        importe_cobrado = sum(importe_cobro.importe for importe_cobro in cobro_individual.cobro.importes_cobros)
-        return render_template("consultas/cobro.html", cobro_individual = cobro_individual, importe_cobrado=importe_cobrado)
+        # importe_cobrado = sum(importe_cobro.importe for importe_cobro in cobro_individual.cobro.importes_cobros)
+        return render_template("consultas/cobro.html", cobro_individual = cobro_individual)
     flash("La gestión no tiene dado de alta un presupuesto","alert-warning")
     return redirect(url_for("consultas.lista_gestiones", criterio = id_gestion))
 
@@ -149,10 +149,11 @@ def tareas_pendientes():
 def reportes():
     #elijo un reporte a mostrar con un string
     reporte = request.args.get('reporte','')
-    graficos = [[ 'tixm','Cantidad de tareas por mes'], 
-                [ 'qtxe','Tareas por estados'], 
-                [ 'qgxc','Gestiones por cliente'], 
-                [ 'qgpxc','Gestiones pendientes por cliente']]
+    graficos = [['tixm','Cantidad de tareas por mes'], 
+                ['qtxe','Tareas por estados'], 
+                ['qgxc','Gestiones por cliente'], 
+                ['qgpxc','Gestiones pendientes por cliente'],
+                ['dpxc','Deuda pendiente por cliente']]
     
     #cantidad de tareas ingresadas por mes grafico de barras 
     if reporte == 'tixm':
@@ -161,7 +162,6 @@ def reportes():
         id_canvas = 'barChart'
         id_div_chartdata = 'chartDataBar'
         label_grafico = 'Tareas iniciadas'
-        
         for datos in q_inicio_x_mes:
             if datos.year:
                 diccionario['label'].append(f'{datos.month}-{datos.year}') 
@@ -216,4 +216,21 @@ def reportes():
                                id_canvas = id_canvas,
                                id_div_chartdata = id_div_chartdata,
                                label_grafico = label_grafico) 
+    #Deuda pendiente por cliente
+    elif reporte == 'dpxc':
+        deuda_pendiente_x_clientes = Cobros.get_deuda_x_clientes()
+        diccionario = {'label':[], 'valor':[]}
+        id_canvas = 'barChart'
+        id_div_chartdata = 'chartDataBar'
+        label_grafico = 'Deuda pendiente por cliente'
+        for datos in deuda_pendiente_x_clientes:
+            if datos.deuda:
+                diccionario['label'].append(datos.cliente)
+                diccionario['valor'].append(datos.deuda)
+        return render_template("/consultas/reportes.html", diccionario=diccionario, 
+                               graficos = graficos, 
+                               id_canvas = id_canvas,
+                               id_div_chartdata = id_div_chartdata,
+                               label_grafico = label_grafico) 
+    
     return render_template("/consultas/reportes.html", graficos= graficos)

@@ -25,7 +25,7 @@
             <div class="container mt-5">
                 <div class="row">
                     <div class="col-md-8 offset-md-2">
-                        <h2 class="text-center">Cantidad de tareas iniciadas por mes</h2>
+                        <h2 class="text-center">{{ label_grafico }}</h2>
                         <canvas id="{{ id_canvas }}"></canvas>
                         <div id="{{ id_div_chartdata }}" data-labels='{{ diccionario["label"]|tojson }}'
                             data-values='{{ diccionario["valor"]|tojson }}' data-label="{{ label_grafico }}"

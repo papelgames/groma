@@ -142,7 +142,7 @@ class Cobros (Base):
     limitada = db.Column(db.Boolean)
     usuario_alta = db.Column(db.String(256))
     usuario_modificacion = db.Column(db.String(256))
-    observaciones = db.relationship('Observaciones', backref='cobros', uselist=False)
+    observaciones = db.relationship('Observaciones', backref='cobros', uselist=True)
     importes_cobros = db.relationship('ImportesCobros', backref='cobro', uselist=True)
     
     def save(self):
@@ -166,6 +166,21 @@ class Cobros (Base):
     def get_by_id(id_persona):
         return Cobros.query.filter_by(id = id_persona).first()
     
+    #reportes
+    @staticmethod
+    def get_deuda_x_clientes():
+        query = db.session.query(
+                Personas.descripcion_nombre.label('cliente'),
+                (func.sum(Cobros.importe_total) - func.sum(Cobros.importe_cobrado)).label('deuda')
+            ).join(Gestiones, Gestiones.id_cliente == Personas.id)\
+            .join(Cobros, Cobros.id_gestion == Gestiones.id)
+            
+        result = query.group_by(
+                Personas.descripcion_nombre
+            ).all()
+        
+        return result 
+
 class ImportesCobros (Base):
     __tablename__ = "importescobros"
     id_cobro = db.Column(db.Integer, db.ForeignKey('cobros.id'))

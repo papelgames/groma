@@ -14,8 +14,8 @@ from .forms import UserAdminForm, PermisosUserForm, RolesUserForm
 logger = logging.getLogger(__name__)
 
 #creo una tupla para usar en el campo select del form que quiera que necesite los permisos
-def permisos_select():
-    permisos = Permisos.get_all()
+def permisos_select(user_id):
+    permisos = Permisos.get_permisos_no_relacionadas_personas(user_id)
     select_permisos =[( '','Seleccionar permiso')]
     for rs in permisos:
         sub_select_permisos = (str(rs.id), rs.descripcion)
@@ -25,7 +25,7 @@ def permisos_select():
 #creo una tupla para usar en el campo select del form que quiera que necesite los roles
 def roles_select():
     roles = Roles.get_all()
-    select_rol =[( '','Seleccionar permiso')]
+    select_rol =[( '','Seleccionar rol')]
     for rs in roles:
         sub_select_rol = (str(rs.id), rs.descripcion)
         select_rol.append(sub_select_rol)
@@ -48,11 +48,12 @@ def list_users():
     return render_template("admin/users.html", users=users)
 
 
-@admin_bp.route("/admin/user/<int:user_id>/", methods=['GET', 'POST'])
+@admin_bp.route("/admin/user/", methods=['GET', 'POST'])
 @login_required
 @admin_required
 @not_initial_status
-def update_user_form(user_id):
+def update_user_form():
+    user_id = request.args.get('user_id','')
     # Aquí entra para actualizar un usuario existente
     user = Users.get_by_id(user_id)
     if user is None:
@@ -72,11 +73,12 @@ def update_user_form(user_id):
     return render_template("admin/user_form.html", form=form, user=user)
 
 
-@admin_bp.route("/admin/user/delete/<int:user_id>/", methods=['POST', ])
+@admin_bp.route("/admin/user/delete/", methods=['POST', ])
 @login_required
 @admin_required
 @not_initial_status
-def delete_user(user_id):
+def delete_user():
+    user_id = request.args.get('user_id','')
     logger.info(f'Se va a eliminar al usuario {user_id}')
     user = Users.get_by_id(user_id)
     if user is None:
@@ -86,15 +88,16 @@ def delete_user(user_id):
     logger.info(f'El usuario {user_id} ha sido eliminado')
     return redirect(url_for('admin.list_users'))
 
-@admin_bp.route("/admin/asignacionpermisos/<int:user_id>/", methods=['GET', 'POST'])
+@admin_bp.route("/admin/asignacionpermisos/", methods=['GET', 'POST'])
 @login_required
 @admin_required
 @not_initial_status
-def asignacion_permisos(user_id):
+def asignacion_permisos():
+    user_id = request.args.get('user_id','')
     # Aquí entra para actualizar un usuario existente
     user = Users.get_by_id(user_id)
     form = PermisosUserForm()
-    form.id_permiso.choices = permisos_select()
+    form.id_permiso.choices = permisos_select(user_id)
     
     if form.validate_on_submit():
         permiso = Permisos.get_by_id(form.id_permiso.data)
@@ -111,11 +114,12 @@ def asignacion_permisos(user_id):
     return render_template("admin/permisos_usuarios.html", form=form, user=user)
 
 
-@admin_bp.route("/admin/asignacionroles/<int:user_id>/", methods=['GET', 'POST'])
+@admin_bp.route("/admin/asignacionroles/", methods=['GET', 'POST'])
 @login_required
 @admin_required
 @not_initial_status
-def asignacion_roles(user_id):
+def asignacion_roles():
+    user_id = request.args.get('user_id','')
     # Aquí entra para actualizar un usuario existente
     user = Users.get_by_id(user_id)
     form = RolesUserForm()

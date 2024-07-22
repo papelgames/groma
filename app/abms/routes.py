@@ -21,8 +21,8 @@ from time import strftime, gmtime
 logger = logging.getLogger(__name__)
 
 #creo una tupla para usar en el campo select del form que quiera que necesite los tipo de gestiones
-def permisos_select():
-    permisos = Permisos.get_all()
+def permisos_select(id_rol):
+    permisos = Permisos.get_permisos_no_relacionadas_roles(id_rol)
     select_permisos =[( '','Seleccionar permiso')]
     for rs in permisos:
         sub_select_permisos = (str(rs.id), rs.descripcion)
@@ -190,7 +190,9 @@ def asignar_permisos_roles():
     permisos_en_rol = Roles.get_by_id(id_rol)
     
     form = PermisosSelectForm()
-    form.id_permiso.choices=permisos_select()
+    form.id_permiso.choices=permisos_select(id_rol)
+    
+    
     if form.validate_on_submit():
         permiso = Permisos.get_by_id(form.id_permiso.data)
         for permiso_en_rol in permisos_en_rol.permisos:
@@ -200,7 +202,7 @@ def asignar_permisos_roles():
         
         permisos_en_rol.permisos.append(permiso)
         permisos_en_rol.save()
-        print ("llego")
+
         flash ('Permiso asignado correctamente del rol', 'alert-success')
         return redirect(url_for('abms.asignar_permisos_roles', id_rol = id_rol))
     return render_template("abms/alta_permisos_en_roles.html", form=form, permisos_en_rol=permisos_en_rol)
@@ -263,10 +265,7 @@ def modificar_tarea():
     if form.validate_on_submit():
         form.populate_obj(tarea)
         tarea.usuario_modificacion = current_user.username
-        print (form.fecha_unica.data)
-        print (form.carga_dibujante.data)
-        print (form.activo.data)
-        
+     
         tarea.save()
         flash("La tarea ha sido actualizada", "alert-success")
         return redirect(url_for('abms.alta_tarea'))

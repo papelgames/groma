@@ -6,45 +6,135 @@
 {% endblock %}
 
 {% block content %}
-<div class="row mb-3">
-	<div class="col-md-12 d-flex justify-content-between align-items-center">
-		<h5 class="mb-0">Consulta de gestiones</h5>
-		<form action="" class="form-inline mt-3" method="post" enctype="multipart/form-data" novalidate>	
-            {{ form.hidden_tag() }}
-            {{ render_input(form.buscar,'', id= "buscar" , class="form-control mr-sm-3", placeholder="Ingrese nombre/razón social o número de gestión" ) }}
-            <button class="btn btn-light my-2 my-sm-0" type="submit">Buscar</button>
-        </form>
-	</div>
+<div class="row"> 
+    <div class="col-xl-9 col-md-6 mb-4">
+        <div class="card-body p-2">
+            <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Consulta de gestiones</div>
+                    <div class="row no-gutters align-items-center">
+                        <div class="col-auto">
+                            <form action="" class="form-inline" method="post" enctype="multipart/form-data" novalidate>	
+                                {{ form.hidden_tag() }}
+                                {{ render_input(form.tipo_busqueda,'', id= "tipo_busqueda" , class="form-control mx-2") }}
+                                {{ render_input(form.buscar,'', id= "buscar" , class="form-control mx-2", placeholder="Ingrese criterio " ) }}
+                                <button class="btn btn-light ml-2 mr-2" type="submit">Buscar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card-body p-2">
+            <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                        Gestiones por estado</div>
+                        {% for estado in q_gestiones_x_estados%}
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ estado[0] }}: {{ estado[1] }}</div>
+                        {% endfor%}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-{% if gestiones.items %}
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th scope="col">ID</th>
-            <th scope="col">CLIENTE</th>
-            <th scope="col">TITULAR</th>
-            <th scope="col">UBICACION</th>
-            <th scope="col">DIBUJANTE</th>
-            <th scope="col">TIPO DE GESTION</th>
-            <th scope="col">ESTADO GESTION</th>
-            <th scope="col">ESTADO COBRO</th>
-            <th scope="col">ACCION</th> 
-        </tr>
-    </thead>
-    
-    <tbody>
-        {% for gestion in gestiones.items %}
+
+    {% if gestiones.items %}
+    <table class="table table-striped">
+        <thead>
             <tr>
-                <th scope="row">{{ gestion.id }}</th>
-                <td> {{ gestion.cliente.descripcion_nombre }}</td>
-                <td> {{ gestion.titular }} </td>
-                <td> {{ gestion.ubicacion_gestion }}</td>
-                <td> {{ gestion.dibujante.descripcion_nombre }}</td>
-                <td> {{ gestion.tipos_gestiones.descripcion }}</td>
-                <td> {{ gestion.estado_gestiones.descripcion }}</td>
-                {% if not gestion.cobro.importe_total or (gestion.cobro.importe_total|float - gestion.cobro.importe_cobrado|float) > 0 %}
+                <th scope="col">ID</th>
+                <th scope="col">CLIENTE</th>
+                <th scope="col">TITULAR</th>
+                <th scope="col">UBICACION</th>
+                <th scope="col">PARTIDO-PARTIDA</th>
+                <th scope="col">DIBUJANTE</th>
+                <th scope="col">TIPO DE GESTION</th>
+                <th scope="col">ESTADO GESTION</th>
+                <th scope="col">ESTADO COBRO</th>
+                <th scope="col">ACCION</th> 
+            </tr>
+        </thead>
+        
+        <tbody>
+            {% for gestion in gestiones.items %}
+                <tr>
+                    <th scope="row">{{ gestion.id }}</th>
+                    <td> {{ gestion.cliente.descripcion_nombre }}</td>
+                    <td> {{ gestion.titular }} </td>
+                    <td> {{ gestion.ubicacion_gestion }}</td>
+                    <td> {{ gestion.numero_partido }} - {{ gestion.numero_partida }}</td>
+                    <td> {{ gestion.dibujante.descripcion_nombre }}</td>
+                    <td> {{ gestion.tipos_gestiones.descripcion }}</td>
+                    <td> {{ gestion.estado_gestiones.descripcion }}</td>
+                    {% if not gestion.cobro.importe_total or (gestion.cobro.importe_total|float - gestion.cobro.importe_cobrado|float) > 0 %}
+                        <td> CON DEUDA </td>
+                    {% elif (gestion.cobro.importe_total|float - gestion.cobro.importe_cobrado|float) <= 0%}
+                        <td> COBRADO </td>
+                    {% endif %}
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Acción
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item"  href="{{ url_for('gestiones.modificacion_gestiones', id_gestion = gestion.id) }}">Modificar gestión</a>
+                            <a class="dropdown-item"  href="{{ url_for('gestiones.gestiones_tareas', id_gestion = gestion.id) }}">Tareas</a>
+                            <a class="dropdown-item"  href="{{ url_for('consultas.tareas_pendientes', id_gestion = gestion.id) }}">Tareas pendientes</a>
+                            {% if not gestion.cobro %}
+                                <a class="dropdown-item"  href="{{ url_for('gestiones.alta_cobros_cabecera', id_gestion = gestion.id) }}">Crear presupuesto cobro</a>
+                            {% else %}
+                                <a class="dropdown-item"  href="{{ url_for('consultas.cobro', id_gestion = gestion.id) }}">Ver presupuesto cobro</a>
+                                {% if gestion.cobro.importes_cobros %}
+                                    <a class="dropdown-item"  href="{{ url_for('consultas.ver_cobros', id_gestion = gestion.id) }}">Ver cobros</a>
+                                {% endif %}
+                            {% endif %}
+                            <a class="dropdown-item"  href="{{ url_for('consultas.caratula', id_gestion = gestion.id)}} ">Carátula</a>
+                            <a class="dropdown-item"  href="{{ url_for('consultas.bitacora', id_gestion = gestion.id) }}">Bitácora</a>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- uso un block para transformar esta vista a un template par poder distintos parametros en el navegador -->
+
+    {% block navpag %}{% endblock %}
+
+    {% elif gestiones %}
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">CLIENTE</th>
+                <th scope="col">TITULAR</th>
+                <th scope="col">UBICACION</th>
+                <th scope="col">PARTIDO-PARTIDA</th>
+                <th scope="col">DIBUJANTE</th>
+                <th scope="col">TIPO DE GESTION</th>
+                <th scope="col">ESTADO GESTION</th>
+                <th scope="col">ESTADO COBRO</th>
+                <th scope="col">ACCION</th>
+                
+            </tr>
+        </thead>
+        
+        <tbody>
+            <tr>
+                <th scope="row">{{ gestiones.id }}</th>
+                <td> {{ gestiones.cliente.descripcion_nombre }}</td>
+                <td> {{ gestiones.titular }} </td>
+                <td> {{ gestiones.ubicacion_gestion }}</td>
+                <td> {{ gestiones.numero_partido }} - {{ gestiones.numero_partida }}</td>
+                <td> {{ gestiones.dibujante.descripcion_nombre }}</td>
+                <td> {{ gestiones.tipos_gestiones.descripcion }}</td>
+                <td> {{ gestiones.estado_gestiones.descripcion }}</td>
+                {% if not gestiones.cobro.importe_total or (gestiones.cobro.importe_total|float - gestiones.cobro.importe_cobrado|float) > 0 %}
                     <td> CON DEUDA </td>
-                {% elif (gestion.cobro.importe_total|float - gestion.cobro.importe_cobrado|float) <= 0%}
+                {% elif (gestiones.cobro.importe_total|float - gestiones.cobro.importe_cobrado|float) <= 0%}
                     <td> COBRADO </td>
                 {% endif %}
                 <td>
@@ -53,103 +143,23 @@
                             Acción
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item"  href="{{ url_for('gestiones.modificacion_gestiones', id_gestion = gestion.id) }}">Modificar gestión</a>
-                        <a class="dropdown-item"  href="{{ url_for('gestiones.gestiones_tareas', id_gestion = gestion.id) }}">Tareas</a>
-                        <a class="dropdown-item"  href="{{ url_for('consultas.tareas_pendientes', id_gestion = gestion.id) }}">Tareas pendientes</a>
-                        {% if not gestion.cobro %}
-                            <a class="dropdown-item"  href="{{ url_for('gestiones.alta_cobros_cabecera', id_gestion = gestion.id) }}">Crear presupuesto cobro</a>
+                        <a class="dropdown-item"  href="{{ url_for('gestiones.modificacion_gestiones', id_gestion = gestiones.id) }}">Modificar gestión</a>
+                        <a class="dropdown-item"  href="{{ url_for('gestiones.gestiones_tareas', id_gestion = gestiones.id) }}">Tareas</a>
+                        {% if not gestiones.cobro %}
+                            <a class="dropdown-item"  href="{{ url_for('gestiones.alta_cobros_cabecera', id_gestion = gestiones.id) }}">Crear presupuesto cobro</a>
                         {% else %}
-                            <a class="dropdown-item"  href="{{ url_for('consultas.cobro', id_gestion = gestion.id) }}">Ver presupuesto cobro</a>
-                            {% if gestion.cobro.importes_cobros %}
-                                <a class="dropdown-item"  href="{{ url_for('consultas.ver_cobros', id_gestion = gestion.id) }}">Ver cobros</a>
+                            <a class="dropdown-item"  href="{{ url_for('consultas.cobro', id_gestion = gestiones.id) }}">Ver presupuesto cobro</a>
+                            {% if gestiones.cobro.importes_cobros %}
+                                <a class="dropdown-item"  href="{{ url_for('consultas.ver_cobros', id_gestion = gestiones.id) }}">Ver cobros</a>
                             {% endif %}
                         {% endif %}
-                        <a class="dropdown-item"  href="{{ url_for('consultas.caratula', id_gestion = gestion.id)}} ">Carátula</a>
-                        <a class="dropdown-item"  href="{{ url_for('consultas.bitacora', id_gestion = gestion.id) }}">Bitácora</a>
+                        <a class="dropdown-item"  href="{{ url_for('consultas.caratula', id_gestion = gestiones.id)}} ">Carátula</a>
+                        <a class="dropdown-item"  href="{{ url_for('consultas.bitacora', id_gestion = gestiones.id)}} ">Bitácora</a>
                     </div>
                 </td>
             </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<nav aria-label="Page navigation example">
-	<ul class="pagination justify-content-center">
-
-        {%- for page in gestiones.iter_pages() %}
-			{% if page %}
-
-				{% if page != gestiones.page %}
-					<li class="page-item"><a class="page-link" href="{{ url_for('consultas.lista_gestiones', criterio= criterio, page=page) }}">{{ page }}</a>
-				{% else %}
-					<li class="page-item active">
-						<span class="page-link">
-							{{ page }}
-							<span class="sr-only">(current)</span>
-						</span>
-					</li>
-                {% endif %}
-			{% endif %}
-		{%- endfor %}
-	</ul>
-</nav>
-
-
-{% elif gestiones %}
-
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th scope="col">ID</th>
-            <th scope="col">CLIENTE</th>
-            <th scope="col">TITULAR</th>
-            <th scope="col">UBICACION</th>
-            <th scope="col">DIBUJANTE</th>
-            <th scope="col">TIPO DE GESTION</th>
-            <th scope="col">ESTADO GESTION</th>
-            <th scope="col">ESTADO COBRO</th>
-            <th scope="col">ACCION</th>
-            
-        </tr>
-    </thead>
-    
-    <tbody>
-        <tr>
-            <th scope="row">{{ gestiones.id }}</th>
-            <td> {{ gestiones.cliente.descripcion_nombre }}</td>
-            <td> {{ gestiones.titular }} </td>
-            <td> {{ gestiones.ubicacion_gestion }}</td>
-            <td> {{ gestiones.dibujante.descripcion_nombre }}</td>
-            <td> {{ gestiones.tipos_gestiones.descripcion }}</td>
-            <td> {{ gestiones.estado_gestiones.descripcion }}</td>
-            {% if not gestiones.cobro.importe_total or (gestiones.cobro.importe_total|float - gestiones.cobro.importe_cobrado|float) > 0 %}
-                <td> CON DEUDA </td>
-            {% elif (gestiones.cobro.importe_total|float - gestiones.cobro.importe_cobrado|float) <= 0%}
-                <td> COBRADO </td>
-            {% endif %}
-            <td>
-                <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Acción
-                </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item"  href="{{ url_for('gestiones.modificacion_gestiones', id_gestion = gestiones.id) }}">Modificar gestión</a>
-                    <a class="dropdown-item"  href="{{ url_for('gestiones.gestiones_tareas', id_gestion = gestiones.id) }}">Tareas</a>
-                    {% if not gestiones.cobro %}
-                        <a class="dropdown-item"  href="{{ url_for('gestiones.alta_cobros_cabecera', id_gestion = gestiones.id) }}">Crear presupuesto cobro</a>
-                    {% else %}
-                        <a class="dropdown-item"  href="{{ url_for('consultas.cobro', id_gestion = gestiones.id) }}">Ver presupuesto cobro</a>
-                        {% if gestiones.cobro.importes_cobros %}
-                            <a class="dropdown-item"  href="{{ url_for('consultas.ver_cobros', id_gestion = gestiones.id) }}">Ver cobros</a>
-                        {% endif %}
-                    {% endif %}
-                    <a class="dropdown-item"  href="{{ url_for('consultas.caratula', id_gestion = gestiones.id)}} ">Carátula</a>
-                    <a class="dropdown-item"  href="{{ url_for('consultas.bitacora', id_gestion = gestiones.id)}} ">Bitácora</a>
-                </div>
-            </td>
-        </tr>
-    </tbody>
-</table>
+        </tbody>
+    </table>
 
 {% endif %}
 

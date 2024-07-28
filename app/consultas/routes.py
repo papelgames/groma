@@ -10,7 +10,7 @@ from app.auth.models import Users
 from app.models import Gestiones, Cobros, ImportesCobros, Estados, TiposGestiones, Observaciones, Personas, GestionesDeTareas
 
 from . import consultas_bp 
-from .forms import BusquedaForm
+from .forms import BusquedaForm, BusquedaSelectForm
 
 
 logger = logging.getLogger(__name__)
@@ -43,43 +43,80 @@ def consulta_personas(criterio = ""):
 
     return render_template("consultas/consulta_personas.html", form = form, criterio = criterio, lista_de_personas= lista_de_personas )
 
-@consultas_bp.route("/consultas/listagestiones/<criterio>", methods = ['GET', 'POST'])
+#@consultas_bp.route("/consultas/listagestiones/<criterio>", methods = ['GET', 'POST'])
 @consultas_bp.route("/consultas/listagestiones/", methods = ['GET', 'POST'])
 @login_required
 @not_initial_status
 @nocache
-def lista_gestiones(criterio = ""):
-    form = BusquedaForm()
-    
+def lista_gestiones():
+    form = BusquedaSelectForm()
+    #parametros de navegacion
     page = int(request.args.get('page', 1))
     per_page = current_app.config['ITEMS_PER_PAGE']
-    gestiones = Gestiones.get_all_paginated(page, per_page)
-
-    cuit_cliente = request.args.get('cuit','')
+    # consulta de gestiones pendientes para abrir vista
+    gestiones = Gestiones.get_all_paginated_pendientes(page, per_page)
+    # consulta abierta por estados para mostrar cantidades
+    q_gestiones_x_estados = Gestiones.get_q_gestiones_x_estados()
+   
+    gestion = request.args.get('gestion','')
+    cuit = request.args.get('cuit','')
+    razon = request.args.get('razon','')
+    partida = request.args.get('partida','')
     
     if len(gestiones.items) == 0:
             gestiones =[]
 
     if form.validate_on_submit():
+        tipo_busqueda = form.tipo_busqueda.data
         buscar = form.buscar.data
-        return redirect(url_for("consultas.lista_gestiones", criterio = buscar))
-    
-    if criterio.isdigit() == True:
-        gestiones = Gestiones.get_by_id(criterio)
-    elif cuit_cliente:
-        id_cliente = Personas.get_by_cuit(cuit_cliente)
-        gestiones = Gestiones.get_gestiones_by_id_cliente_all_paginated(id_cliente.id)
-        if len(gestiones.items) == 0:
-            gestiones =[]
+        if tipo_busqueda == "gestion":
+            return redirect(url_for("consultas.lista_gestiones", gestion = buscar))
+        elif tipo_busqueda == "cuit":
+            return redirect(url_for("consultas.lista_gestiones", cuit = buscar))
+        elif tipo_busqueda == "razon":
+            return redirect(url_for("consultas.lista_gestiones", razon = buscar))
+        elif tipo_busqueda == "partida":
+            return redirect(url_for("consultas.lista_gestiones", partida = buscar))
 
-    elif criterio == "":
-        pass
-    else:
-        gestiones = Gestiones.get_like_descripcion_all_paginated(criterio, page, per_page)
+    if gestion:
+        gestiones = Gestiones.get_by_id(gestion)
+        return render_template("consultas/lista_gestiones.html", form=form, 
+                           gestiones=gestiones, 
+                           q_gestiones_x_estados=q_gestiones_x_estados 
+                           )
+    elif cuit:
+        print("entra")
+        id_cliente = Personas.get_by_cuit(cuit)
+        gestiones = Gestiones.get_gestiones_by_id_cliente_all_paginated(id_cliente.id, page, per_page)
         if len(gestiones.items) == 0:
             gestiones =[]
-    
-    return render_template("consultas/lista_gestiones.html", form = form, criterio = criterio, gestiones = gestiones )
+        return render_template("consultas/lista_gestiones_cuit_her.html", form=form, 
+                           gestiones=gestiones, 
+                           q_gestiones_x_estados=q_gestiones_x_estados, 
+                           cuit=cuit
+                           )
+    elif partida:
+        gestiones = Gestiones.get_gestiones_by_partida_all_paginated(partida, page, per_page)
+        if len(gestiones.items) == 0:
+            gestiones =[]
+        return render_template("consultas/lista_gestiones_partida_her.html", form=form, 
+                           gestiones=gestiones, 
+                           q_gestiones_x_estados=q_gestiones_x_estados, 
+                           partida=partida
+                           )
+    elif razon:
+        gestiones = Gestiones.get_like_descripcion_all_paginated(razon, page, per_page)
+        if len(gestiones.items) == 0:
+            gestiones =[]
+        return render_template("consultas/lista_gestiones_razon_her.html", form=form, 
+                           gestiones=gestiones, 
+                           q_gestiones_x_estados=q_gestiones_x_estados, 
+                           razon=razon)
+
+    return render_template("consultas/lista_gestiones_all_her.html", form=form, 
+                           gestiones=gestiones, 
+                           q_gestiones_x_estados=q_gestiones_x_estados 
+                           )
 
 
 @consultas_bp.route("/consultas/cobro/")

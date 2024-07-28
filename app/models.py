@@ -66,6 +66,7 @@ class Personas (Base):
 
 class Gestiones (Base):
     __tablename__ = "gestiones"
+    id_excel =db.Column(db.Integer)
     id_cliente = db.Column(db.Integer, db.ForeignKey('personas.id'))
     titular = db.Column(db.String(50), nullable = False)
     ubicacion_gestion= db.Column(db.String(50))
@@ -100,6 +101,13 @@ class Gestiones (Base):
         return Gestiones.query.paginate(page=page, per_page=per_page, error_out=False)
     
     @staticmethod
+    def get_all_paginated_pendientes(page=1, per_page=20):
+        return Gestiones.query.join(Estados, Gestiones.id_estado == Estados.id)\
+            .filter(Estados.clave.notin_([4, 5]))\
+            .order_by(Gestiones.created.asc())\
+            .paginate(page=page, per_page=per_page, error_out=False)
+    
+    @staticmethod
     def get_by_id(id):
         return Gestiones.query.get(id)
 
@@ -115,6 +123,11 @@ class Gestiones (Base):
     def get_gestiones_by_id_cliente_all_paginated(id_cliente_, page=1, per_page=20):
         return Gestiones.query.filter_by(id_cliente = id_cliente_)\
             .paginate(page=page, per_page=per_page, error_out=False)
+    
+    @staticmethod
+    def get_gestiones_by_partida_all_paginated(numero_partida, page=1, per_page=20):
+        return Gestiones.query.filter_by(numero_partida = numero_partida)\
+            .paginate(page=page, per_page=per_page, error_out=False)
 
     #reportes    
     @staticmethod
@@ -125,13 +138,21 @@ class Gestiones (Base):
             ).join(Personas, Gestiones.id_cliente == Personas.id)\
             .join(Estados, Gestiones.id_estado == Estados.id)
         if clave_estado:
-            query = query.filter(Estados.clave != clave_estado)    
+            query = query.filter(Estados.clave.notin_([clave_estado, 5]))    
             
         result = query.group_by(
                 Personas.descripcion_nombre
             ).all()
         return result
 
+    @staticmethod
+    def get_q_gestiones_x_estados():
+        return db.session.query(
+                Estados.descripcion.label('estado',),
+                func.count(Gestiones.id).label('count')
+            ).join(Estados, Gestiones.id_estado == Estados.id)\
+            .group_by(Estados.descripcion).all()
+        
 class Cobros (Base):
     __tablename__ = "cobros"
     id_gestion = db.Column(db.Integer, db.ForeignKey('gestiones.id'))

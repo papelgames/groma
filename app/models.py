@@ -5,7 +5,7 @@ from itertools import product
 from types import ClassMethodDescriptorType
 from typing import Text
 
-from slugify import slugify
+#from slugify import slugify
 from sqlalchemy import func, or_, alias, not_
 from sqlalchemy.orm import aliased
 from sqlalchemy.exc import IntegrityError

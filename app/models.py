@@ -220,8 +220,8 @@ class ImportesCobros (Base):
         db.session.commit()
 
     @staticmethod
-    def get_all_by_id_cobro(id_cobro):
-        return ImportesCobros.query.filter_by(id_cobro = id_cobro).all()
+    def get_by_id_cobro(id_cobro):
+        return ImportesCobros.query.filter_by(id = id_cobro).first()
 
 
 class Observaciones (Base):

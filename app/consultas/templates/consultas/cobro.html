@@ -82,7 +82,7 @@
 									Acción
 							</button>
 							<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-								<a class="dropdown-item"  href="#">Modificar Cobro</a>
+								<a class="dropdown-item"  href="{{ url_for('gestiones.modificacion_importe_cobro', id_cobro_individual = cobro.id) }}">Modificar Cobro</a>
 								<a class="dropdown-item"  href="#">Eliminar Cobro</a>
 							</div>
 						</td>

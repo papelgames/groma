@@ -43,7 +43,6 @@ def consulta_personas(criterio = ""):
 
     return render_template("consultas/consulta_personas.html", form = form, criterio = criterio, lista_de_personas= lista_de_personas )
 
-#@consultas_bp.route("/consultas/listagestiones/<criterio>", methods = ['GET', 'POST'])
 @consultas_bp.route("/consultas/listagestiones/", methods = ['GET', 'POST'])
 @login_required
 @not_initial_status
@@ -58,7 +57,7 @@ def lista_gestiones():
     # consulta abierta por estados para mostrar cantidades
     q_gestiones_x_estados = Gestiones.get_q_gestiones_x_estados()
    
-    gestion = request.args.get('gestion','')
+    id_gestion = request.args.get('id_gestion','')
     cuit = request.args.get('cuit','')
     razon = request.args.get('razon','')
     partida = request.args.get('partida','')
@@ -69,8 +68,8 @@ def lista_gestiones():
     if form.validate_on_submit():
         tipo_busqueda = form.tipo_busqueda.data
         buscar = form.buscar.data
-        if tipo_busqueda == "gestion":
-            return redirect(url_for("consultas.lista_gestiones", gestion = buscar))
+        if tipo_busqueda == "id_gestion":
+            return redirect(url_for("consultas.lista_gestiones", id_gestion = buscar))
         elif tipo_busqueda == "cuit":
             return redirect(url_for("consultas.lista_gestiones", cuit = buscar))
         elif tipo_busqueda == "razon":
@@ -78,23 +77,26 @@ def lista_gestiones():
         elif tipo_busqueda == "partida":
             return redirect(url_for("consultas.lista_gestiones", partida = buscar))
 
-    if gestion:
-        gestiones = Gestiones.get_by_id(gestion)
-        return render_template("consultas/lista_gestiones.html", form=form, 
-                           gestiones=gestiones, 
-                           q_gestiones_x_estados=q_gestiones_x_estados 
-                           )
+    if id_gestion:
+        gestiones = Gestiones.get_by_id(id_gestion)
+        if gestiones:
+            return render_template("consultas/lista_gestiones.html", form=form, 
+                            gestiones=gestiones, 
+                            q_gestiones_x_estados=q_gestiones_x_estados 
+                            )
+        flash(f"No existe la gestión: {id_gestion}", "alert-warning")
     elif cuit:
-        print("entra")
         id_cliente = Personas.get_by_cuit(cuit)
-        gestiones = Gestiones.get_gestiones_by_id_cliente_all_paginated(id_cliente.id, page, per_page)
-        if len(gestiones.items) == 0:
-            gestiones =[]
-        return render_template("consultas/lista_gestiones_cuit_her.html", form=form, 
-                           gestiones=gestiones, 
-                           q_gestiones_x_estados=q_gestiones_x_estados, 
-                           cuit=cuit
-                           )
+        if id_cliente:
+            gestiones = Gestiones.get_gestiones_by_id_cliente_all_paginated(id_cliente.id, page, per_page)
+            if len(gestiones.items) == 0:
+                gestiones =[]
+            return render_template("consultas/lista_gestiones_cuit_her.html", form=form, 
+                            gestiones=gestiones, 
+                            q_gestiones_x_estados=q_gestiones_x_estados, 
+                            cuit=cuit
+                            )
+        flash(f"No se encontró cliente con el CUIT {cuit} consultado", "alert-warning")
     elif partida:
         gestiones = Gestiones.get_gestiones_by_partida_all_paginated(partida, page, per_page)
         if len(gestiones.items) == 0:
@@ -117,7 +119,6 @@ def lista_gestiones():
                            gestiones=gestiones, 
                            q_gestiones_x_estados=q_gestiones_x_estados 
                            )
-
 
 @consultas_bp.route("/consultas/cobro/")
 @login_required

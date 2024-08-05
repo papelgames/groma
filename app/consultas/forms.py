@@ -13,7 +13,7 @@ class BusquedaForm(FlaskForm):
 class BusquedaSelectForm(BusquedaForm):
     tipo_busqueda = SelectField('Tipo de busqueda: ', 
                          choices =[( '','Seleccionar acción'),
-                                   ( "gestion",'Número de gestion'),
+                                   ( "id_gestion",'Número de gestion'),
                                    ( "cuit",'Número de cuit'),
                                    ( "razon",'Razon social o nombre'),
                                    ( "partida",'Número de partida')], 

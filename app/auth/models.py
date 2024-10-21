@@ -14,7 +14,7 @@ class Users(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(128), nullable=False)
+    password = db.Column(db.String(162), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     es_dibujante = db.Column(db.Boolean, default=False)
     id_estado = db.Column(db.Integer)

@@ -170,23 +170,25 @@ def forgot_username():
     form = FindUserForm()
     if form.validate_on_submit():
         persona = Personas.get_by_correo(form.correo_electronico.data)
-        user = Users.get_by_id(persona.id_usuario)
-        if user:
-            correo_electronico = persona.correo_electronico        
-            name = persona.descripcion_nombre
-            username = user.username 
-            url_login = url_for('auth.login', _external=True)
+        if persona:
+            user = Users.get_by_id(persona.id_usuario)
+            if user:
+                correo_electronico = persona.correo_electronico        
+                name = persona.descripcion_nombre
+                username = user.username 
+                url_login = url_for('auth.login', _external=True)
 
-            send_email(subject='Diaz Agrimensura | Usuario',
-                        sender=(current_app.config['MAIL_DEFAULT_SENDER'], current_app.config['MAIL_USERNAME'] ),
-                        recipients=[correo_electronico, ],
-                        text_body=f'Hola {name}, te enviamos un correo para poder informarte tu nombre de usuario',
-                        html_body=f'<p>Hola <strong>{name}</strong>, su nombre de usuario es: <strong>{username}</strong>. Puede ingresar <a href="{url_login}">Link</a></p>')
-            
-            flash('Se ha enviado una notificación a su correo con el nombre de usuario','alert-success')
-            return redirect(url_for('auth.login'))
+                send_email(subject='Diaz Agrimensura | Usuario',
+                            sender=(current_app.config['MAIL_DEFAULT_SENDER'], current_app.config['MAIL_USERNAME'] ),
+                            recipients=[correo_electronico, ],
+                            text_body=f'Hola {name}, te enviamos un correo para poder informarte tu nombre de usuario',
+                            html_body=f'<p>Hola <strong>{name}</strong>, su nombre de usuario es: <strong>{username}</strong>. Puede ingresar <a href="{url_login}">Link</a></p>')
+                
+                flash('Se ha enviado una notificación a su correo con el nombre de usuario','alert-success')
+                return redirect(url_for('auth.login'))
         else:
             flash('Comuniquese con el administrador de Groma','alert-warning')
+
     return render_template('auth/forgot_username.html', form=form)
 
 @auth_bp.route('/logout')

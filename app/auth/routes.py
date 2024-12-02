@@ -2,7 +2,7 @@ from flask import (render_template, redirect, url_for,
                    request, current_app)
 from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy import true
-#from urllib.parse import urlparse 
+from urllib.parse import urlparse 
 from flask.helpers import flash
 
 from app import login_manager
@@ -69,7 +69,7 @@ def show_signup_form():
             
             # Enviamos un email de bienvenida
             send_email(subject='Bienvenid@ GromaSoft',
-                        sender=current_app.config['DONT_REPLY_FROM_EMAIL'],
+                        sender=(current_app.config['MAIL_DEFAULT_SENDER'], current_app.config['MAIL_USERNAME'] ),
                         recipients=[correo_electronico, ],
                         text_body=f'Hola {name}, eres nuevo usuairo de GromaSoft',
                         html_body=f'<p>Hola <strong>{name}</strong>, ya tienes usuario en gromasoft: <br>Usuario: <strong>{username}</strong> <br>Contraseña: <strong>{new_password}</strong></p>')
@@ -90,7 +90,7 @@ def login():
             # if user.id_estado == 1:
             #     return redirect(url_for('auth.change_password'))
             next_page = request.args.get('next')
-            if not next_page or url_parse(next_page).netloc != '':
+            if not next_page or urlparse(next_page).netloc != '':
                 next_page = url_for('public.index')
             return redirect(next_page)
     return render_template('auth/login_form.html', form=form)

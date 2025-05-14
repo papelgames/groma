@@ -286,8 +286,8 @@ def modificacion_importe_cobro():
     id_cobro_individual = request.args.get('id_cobro_individual','')
     if not id_cobro_individual:
          return redirect(url_for('consultas.lista_gestiones'))
-    form = ImportesCobrosForm()                                                                                                                   
     cobro_individual = ImportesCobros.get_by_id_cobro(id_cobro_individual)
+    form = ImportesCobrosForm(obj=cobro_individual)                                                                                                                   
     id_gestion = cobro_individual.cobro.id_gestion
     hoy = datetime.today()
     importe_actual = cobro_individual.importe
